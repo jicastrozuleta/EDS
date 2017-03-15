@@ -93,9 +93,16 @@ public class JFrameIngresoDinero extends javax.swing.JFrame implements IVale{
     private JFrameAgregarVales jFrameAgregarVales;
     
     /**
-     * Creates new form JFrameIngresoDinero
+     * Interface para comunicar a la pantalla principal el total de dinero ingresado.
      */
-    public JFrameIngresoDinero() {
+    private final IDinero interfaceDinero;
+    
+    /**
+     * Creates new form JFrameIngresoDinero
+     * @param interfaceDinero
+     */
+    public JFrameIngresoDinero(IDinero interfaceDinero) {
+        this.interfaceDinero = interfaceDinero;
         initComponents();
         setDocumentsNumeric();
         cargarIconoBoton();
@@ -177,6 +184,16 @@ public class JFrameIngresoDinero extends javax.swing.JFrame implements IVale{
         setMinimumSize(null);
         setResizable(false);
         setSize(new java.awt.Dimension(0, 0));
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentHidden(java.awt.event.ComponentEvent evt) {
+                formComponentHidden(evt);
+            }
+        });
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
 
         jPanelcontenedorEntregaDinero.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Entrega de Dinero", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP));
 
@@ -866,6 +883,16 @@ public class JFrameIngresoDinero extends javax.swing.JFrame implements IVale{
         }
         jFrameAgregarVales.setVisible(true);
     }//GEN-LAST:event_jButtonAgregarValeActionPerformed
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        calcularTotalDinero();
+        this.interfaceDinero.dineroIngresado(this.totalDinero);
+    }//GEN-LAST:event_formWindowClosed
+
+    private void formComponentHidden(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentHidden
+        calcularTotalDinero();
+        this.interfaceDinero.dineroIngresado(this.totalDinero);
+    }//GEN-LAST:event_formComponentHidden
 
      
     /**

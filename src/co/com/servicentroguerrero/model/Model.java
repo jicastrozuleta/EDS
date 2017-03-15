@@ -10,6 +10,8 @@ import co.com.servicentroguerrero.modelos.Calibraciones;
 import co.com.servicentroguerrero.modelos.Cilindro;
 import co.com.servicentroguerrero.modelos.Combustible;
 import co.com.servicentroguerrero.modelos.Empleado;
+import co.com.servicentroguerrero.modelos.Liquidacion;
+import co.com.servicentroguerrero.modelos.LiquidacionDispensador;
 import co.com.servicentroguerrero.modelos.Surtidores;
 import co.com.servicentroguerrero.modelos.Volumenes;
 import java.sql.ResultSet;
@@ -227,13 +229,15 @@ public class Model {
 
         /*Query para cargar la lista de surtidores disponibles*/
         String query = ""
-                + "SELECT   c.idSurtidor,"
-                + "         c.cantidadDispensadores,"
-                + "         c.serie,"
-                + "         c.modelo,"
-                + "         c.marca "
-                + "FROM surtidores c "
-                + "ORDER BY c.idSurtidor;";
+                + "SELECT   s.idSurtidor,"
+                + "         s.cantidadDispensadores,"
+                + "         s.galonaje, "
+                + "         s.codigoIdentificador, "
+                + "         s.serie,"
+                + "         s.modelo,"
+                + "         s.marca "                
+                + "FROM surtidores s "
+                + "ORDER BY s.idSurtidor;";
 
         /*Objeto lista que sera llenada.*/
         ArrayList<Surtidores> listaSurtidores = new ArrayList<>();
@@ -248,9 +252,11 @@ public class Model {
                     Surtidores surtidor = new Surtidores(
                             resultSet.getInt(1),
                             resultSet.getInt(2),
-                            resultSet.getString(3),
+                            resultSet.getDouble(3),
                             resultSet.getString(4),
-                            resultSet.getString(5)
+                            resultSet.getString(5),
+                            resultSet.getString(6),
+                            resultSet.getString(7)
                     );
 
                     /*agregar el combustible a la lista*/
@@ -329,5 +335,94 @@ public class Model {
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, e);
         }
         return listaEmpleados;
+    }
+    
+    
+    /**
+     * Metodo que permite cargar la informacion de la ultima liquidacion 
+     * ejecutada en el sistema.
+     * @return Liquidacion, instancia de la clase con la informacioin de la liquidacion o null
+     * si no se entuentra informacion.
+     */
+    public Liquidacion cargarUltimaLiquidacion(){
+    
+
+        /*Query para cargar la informacion de la ultima liquidacion*/
+        String query = "CALL sp_ultimaLiquidacion()";
+
+        /*instancia null para conservar la liquidacion*/
+        Liquidacion liquidacion = null;
+        try {
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(query);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                do {
+                    liquidacion = new Liquidacion(
+                            resultSet.getLong(1),
+                            resultSet.getInt(2),
+                            resultSet.getDouble(3),
+                            resultSet.getDouble(4),
+                            resultSet.getDouble(5),
+                            resultSet.getDouble(6),
+                            resultSet.getDouble(7),                            
+                            resultSet.getString(8)
+                    );
+                } while (resultSet.next());
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return liquidacion;
+    }
+    
+    
+    /**
+     * Metodo para cargar la liquidacion individual de cada dispensador disponible,
+     * de la ultima liquidacion.
+     * @param liquidacion
+     * @return lista con la liquidacion individual por dispensador, de la ultima liquidacion disponible en 
+     * el sistema.
+     */
+    public ArrayList<LiquidacionDispensador> cargarDetallesUltimaLiquidacion(Liquidacion liquidacion){
+    
+        /*Query para cargar la informacion de la ultima liquidacion de cada surtidor*/
+        String query = "CALL sp_detalleLiquidacionDispensadores(" + liquidacion.getNumeroLiquidacion() + ")";
+        
+        /*Objeto lista que sera llenada.*/
+        ArrayList<LiquidacionDispensador> listaLiquidacionDispensador = new ArrayList<>();
+
+        try {
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(query);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                do {
+                    LiquidacionDispensador liquidacionDispensador = new LiquidacionDispensador(
+                            resultSet.getLong(1),
+                            resultSet.getInt(2),
+                            resultSet.getInt(3),
+                            resultSet.getInt(4),
+                            resultSet.getDouble(5),
+                            resultSet.getDouble(6),
+                            resultSet.getDouble(7),
+                            resultSet.getDouble(8),
+                            resultSet.getDouble(9),
+                            resultSet.getDouble(10),
+                            resultSet.getDouble(11),
+                            resultSet.getInt(12),
+                            resultSet.getString(13).trim()
+                    );
+
+                    /*agregar el combustible a la lista*/
+                    listaLiquidacionDispensador.add(liquidacionDispensador);
+                } while (resultSet.next());
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return listaLiquidacionDispensador;
     }
 }

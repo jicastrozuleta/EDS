@@ -25,10 +25,23 @@ public class Surtidores implements Serializable{
      */
     private int cantidadDispensadores;
     
+    
+    /**
+     * Maximo galonaje entregado por el surtidor
+     */
+    private double galonaje;
+    
     /**
      * numero de serial del surtidor
      */
     private String serie;
+    
+    
+    /**
+     * Codigo para identificar el surtidor,
+     * nombre del surtidor y combustible que entrega.
+     */
+    private String codigoIdentificador;
     
     /**
      * modelo o nombre de referencia del surtidor
@@ -39,19 +52,25 @@ public class Surtidores implements Serializable{
      * marca del surtidor.
      */
     private String marca;
+    
 
     
     /**
      * Contructor recomendado para crear el objeto.
      * @param idSurtidor
      * @param cantidadDispensadores
+     * @param galonaje
+     * @param codigoIdentificador 
      * @param serie
      * @param modelo
      * @param marca 
+     * 
      */
-    public Surtidores(int idSurtidor, int cantidadDispensadores, String serie, String modelo, String marca) {
+    public Surtidores(int idSurtidor, int cantidadDispensadores, double galonaje, String codigoIdentificador, String serie, String modelo, String marca) {
         this.idSurtidor = idSurtidor;
         this.cantidadDispensadores = cantidadDispensadores;
+        this.galonaje = galonaje;
+        this.codigoIdentificador = codigoIdentificador;
         this.serie = serie;
         this.modelo = modelo;
         this.marca = marca;
@@ -96,4 +115,20 @@ public class Surtidores implements Serializable{
     public void setMarca(String marca) {
         this.marca = marca;
     }    
+
+    public double getGalonaje() {
+        return galonaje;
+    }
+
+    public void setGalonaje(double galonaje) {
+        this.galonaje = galonaje;
+    }
+
+    public String getCodigoIdentificador() {
+        return codigoIdentificador;
+    }
+
+    public void setCodigoIdentificador(String codigoIdentificador) {
+        this.codigoIdentificador = codigoIdentificador;
+    }
 }

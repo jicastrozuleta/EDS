@@ -18,7 +18,7 @@ public class ConexionBD {
     private Statement sentencia;
     private static final String BD = "servicentro_guerrero";
     private static final String USER = "servicentro";
-    private static final String PASSWORD = "123456";
+    private static final String PASSWORD = "87sErv01";
     private static final String SERVER = "jdbc:mariadb://localhost:3306/" + BD;
     private Connection conexion;
 

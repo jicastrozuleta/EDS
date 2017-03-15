@@ -13,6 +13,9 @@ import co.com.servicentroguerrero.modelos.Calibraciones;
 import co.com.servicentroguerrero.modelos.Cilindro;
 import co.com.servicentroguerrero.modelos.Combustible;
 import co.com.servicentroguerrero.modelos.Empleado;
+import co.com.servicentroguerrero.modelos.Liquidacion;
+import co.com.servicentroguerrero.modelos.LiquidacionDispensador;
+import co.com.servicentroguerrero.modelos.Surtidores;
 import co.com.servicentroguerrero.modelos.Volumenes;
 import java.io.File;
 import java.util.ArrayList;
@@ -216,5 +219,31 @@ public class ControllerBO {
     public static ArrayList<Empleado> cargarListaEmpleadosIsleros() {
         return MODELO.cargarEmpleadosPorRol(Empleado.ISLERO);
     }
-
+    
+    
+    /**
+     * Crear una lista con los surtidores disponibles
+     * @return 
+     */
+    public static ArrayList<Surtidores> cargarListaSurtidores() {
+        return MODELO.cargarSurtidores();
+    }
+    
+    
+    /**
+     * Metodo para cargar la ultima liquidacion disponible.
+     * @return Liquidacion
+     */
+    public static Liquidacion cargarUltimaLiquidacion(){
+        return MODELO.cargarUltimaLiquidacion();
+    }
+    
+    /**
+     * Cargar los detalles por dispensador de la ultima liquidacion.
+     * @param liquidacion
+     * @return 
+     */
+    public static ArrayList<LiquidacionDispensador> cargarLiquidacionDispensadores(Liquidacion liquidacion){
+        return MODELO.cargarDetallesUltimaLiquidacion(liquidacion);
+    }
 }

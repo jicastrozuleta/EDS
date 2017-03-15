@@ -58,7 +58,7 @@ public class Util {
     /**
      * Metodo que permite validar si un texto es un numero valido.
      * @param numero
-     * @return 
+     * @return true si el numero es valido, false en caso contrario.
      */
     public static boolean isNumeric(String numero){
         try {
