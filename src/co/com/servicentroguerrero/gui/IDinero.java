@@ -11,5 +11,11 @@ package co.com.servicentroguerrero.gui;
  * @author JICZ4
  */
 public interface IDinero {
+    
+    /**
+     * Metodo para calcular el cambio de dinero ingresado en las ventanas de ingreso de dinero
+     * y transferido a la pantalla de liquidacion principal. 
+     * @param totalDineroIngresado 
+     */
     public void dineroIngresado(double totalDineroIngresado);
 }

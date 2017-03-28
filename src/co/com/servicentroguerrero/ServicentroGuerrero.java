@@ -5,7 +5,7 @@
  */
 package co.com.servicentroguerrero;
 
-import co.com.servicentroguerrero.controler.ControllerBO;
+import co.com.reports.Reports;
 
 /**
  *
@@ -17,9 +17,7 @@ public class ServicentroGuerrero {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-
-        ControllerBO.cargarCombustibles().forEach((e) -> {
-            System.out.println(e.getCombustible() + " " + e.getPrecioVigente() + " " + e.getFechaEntradaVigencia() );
-        });
+        Reports r = new Reports();
+        r.toPDF();        
     }
 }

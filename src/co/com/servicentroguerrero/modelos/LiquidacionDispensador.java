@@ -36,37 +36,37 @@ public class LiquidacionDispensador implements Serializable {
     /**
      * Numero de lectura del dispensador
      */
-    private double numeroEntregado;
+    private double numeroEntregado = 0;
 
     /**
      * Numero de lectura de dispensador anterior
      */
-    private double numeroRecibido;
+    private double numeroRecibido = 0;
 
     /**
      * gelones de combustible vendidos
      */
-    private double galones;
+    private double galones = 0;
 
     /**
      * galones calculados por sistema
      */
-    private double galonesCalculados;
+    private double galonesCalculados = 0;
 
     /**
      * Dinero entregado por el empleado
      */
-    private double dineroEntregado;
+    private double dineroEntregado = 0;
 
     /**
      * dinero calculado por el sistema
      */
-    private double dineroCalculado;
+    private double dineroCalculado = 0;
 
     /**
      * diferencia de dinero ente entregado y calcuado por el sistema.
      */
-    private double diferenciaDinero;
+    private double diferenciaDinero = 0;
 
     /**
      * Identificador del surtidor al que pertenece el dispensador
@@ -78,6 +78,12 @@ public class LiquidacionDispensador implements Serializable {
      * que entrega.
      */
     private String codigoIdentificador;
+
+    /**
+     * Constructor para crear una liquidacion vacia.
+     */
+    public LiquidacionDispensador() {
+    }
 
     /**
      * Constructor recomendado para crear el objeto

@@ -87,4 +87,11 @@ public final class Instance {
         }
         Instance.conexion = null;
     }
+
+    public static ConexionBD getPrivateConexion() {
+        if(conexion != null)
+            return conexion;
+        else
+            return null;
+    }
 }

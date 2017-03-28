@@ -33,23 +33,35 @@ public class Model {
      *
      * @param user
      * @param password
+     * @return empleado logeado, null si hay error en login.
      */
-    public void login(String user, String password) {
-        ResultSet resultado;
+    public Empleado login(String user, String password) {
+        ResultSet resultSet;
+        Empleado empleado = null;
         try {
-            //La sentencia BINARY indica que debe realizarce una comparacion a nivel de bits, lo que
-            // significa que debe coincidr en tipo case sensitive. Unicamente el password.
-            resultado = Instance.getInstance().executeQuery(""
-                    + "SELECT 1 FROM USUARIOS WHERE BINARY PASSWORD = '" + password + "' AND USER = '" + user + "';");
+            
+            resultSet = Instance.getInstance().executeQuery("CALL sp_login('" + user + "','" + password + "');");
 
-            if (resultado.first()) {
-                System.out.println("logeado OK!");
-            } else {
-                System.out.println("Error No logeado");
+            if (resultSet.first()) {
+                do {
+                    empleado = new Empleado(
+                            resultSet.getInt(1),
+                            resultSet.getInt(2),
+                            resultSet.getInt(3),
+                            resultSet.getString(4).trim(),
+                            resultSet.getString(5).trim(),
+                            resultSet.getString(6).trim(),
+                            resultSet.getString(7).trim(),
+                            resultSet.getString(8).trim(),
+                            0,
+                            ""
+                    );
+                } while (resultSet.next());
             }
         } catch (SQLException ex) {
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, ex);
         }
+        return empleado;
     }
 
     /**
@@ -424,5 +436,42 @@ public class Model {
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, e);
         }
         return listaLiquidacionDispensador;
+    }
+    
+    /**
+     * metodo para insertar la cabecera de liquidacion del dia.
+     * @param liquidacion
+     * @param liquidacionesPorDispensador
+     * @return numeroLiquidacion, llave primaria para los detalles de la liquidacion actual.
+     */
+    public long insertarCabeceraDeLiquidacion(final Liquidacion liquidacion, final String liquidacionesPorDispensador) {
+        
+        /*Numero de liquidacion generado por la insersion en base de datos*/
+        long numeroLiquidacion = Long.MIN_VALUE;
+        
+        /*LLamar el SP que inicia la transaccion de liquidacion, no confirma con commit 
+        hasta que se termine de insertar el ultimo detalle de dispensador de la liquidacion actual*/
+        String insert = "CALL sp_insertarLiquidacion("
+                + " '" + liquidacion.getIdEmpleadoLiquidador() + "',"
+                + " '" + liquidacion.getTotalCombustibles() + "',"
+                + " '" + liquidacion.getTotalAceites() + "',"
+                + " '" + liquidacion.getTotalLiquidado() + "',"
+                + " '" + liquidacion.getDineroEntregado() + "',"
+                + " '" + liquidacion.getDiferencia() + "',"
+                + " '" + liquidacionesPorDispensador + "'"
+                + ");";
+        
+        try {
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(insert);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                numeroLiquidacion = resultSet.getLong(1);
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return numeroLiquidacion;
     }
 }

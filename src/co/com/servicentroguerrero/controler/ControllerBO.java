@@ -246,4 +246,42 @@ public class ControllerBO {
     public static ArrayList<LiquidacionDispensador> cargarLiquidacionDispensadores(Liquidacion liquidacion){
         return MODELO.cargarDetallesUltimaLiquidacion(liquidacion);
     }
+    
+    
+    /**
+     * Insertar la cabecera de liquidacion en la base de datos.
+     * @param liquidacion
+     * @param liquidacionesPorDispensador string donde estan concatenados todos los datos de liquidacion de cada dispensador.
+     * @return el numeroLiquidacion para insertar los detalles de la liquidacion actual, o Long.MIN_VALUE si hay valores no validos
+     */
+    public static long insertarCabeceraDeLiquidacion(final Liquidacion liquidacion, final String liquidacionesPorDispensador){
+        /*validar que los datos de la liquidacion basicos sean validos*/
+//        if(liquidacion.getIdEmpleadoLiquidador() <= 0 || liquidacion.getTotalCombustibles() == 0 || liquidacion.getTotalLiquidado() == 0 || liquidacion.getDineroEntregado() == 0)
+//            return Long.MIN_VALUE;
+//        else
+            return MODELO.insertarCabeceraDeLiquidacion(liquidacion, liquidacionesPorDispensador);
+    }
+    
+    
+   /**
+    * Metodo para iniciar la autenticacion de usuarios.
+    * @param user
+    * @param password
+    * @return
+    * @throws Exception 
+    */ 
+    public static Empleado login(String user, String password) throws Exception{
+        if(user == null || user.length() == 0)
+            throw new Exception("Usuario invalido.");
+        if (password == null || password.length() == 0)
+            throw new Exception("Contraseña invalido.");
+        
+        /*intentar cargar el usuario*/
+        Empleado empleado = MODELO.login(user, password);
+        
+        if(empleado == null)    
+            throw new Exception("Usuario o Contraseña invalidos.");
+        else
+            return empleado;
+    }
 }

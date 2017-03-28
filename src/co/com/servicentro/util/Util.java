@@ -88,4 +88,14 @@ public class Util {
         SimpleDateFormat formateador = new SimpleDateFormat("EEEE, dd MMMM yyyy", new Locale("es","CO"));
         return formateador.format(ahora);
     }
+    
+     /**
+     * Metodo para obtener la fecha actual del sistema
+     * @return 
+     */
+    public static String getHoraActual() {
+        Date ahora = new Date();
+        SimpleDateFormat formateador = new SimpleDateFormat("hh:mm a", new Locale("es","CO"));
+        return formateador.format(ahora);
+    }
 }

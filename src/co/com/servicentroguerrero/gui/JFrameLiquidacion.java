@@ -8,7 +8,9 @@ package co.com.servicentroguerrero.gui;
 import co.com.servicentro.util.DocumentTypeDouble;
 import co.com.servicentro.util.Util;
 import co.com.servicentroguerrero.controler.ControllerBO;
+import co.com.servicentroguerrero.controler.WorkerBO;
 import co.com.servicentroguerrero.modelos.Combustible;
+import co.com.servicentroguerrero.modelos.Empleado;
 import co.com.servicentroguerrero.modelos.Liquidacion;
 import co.com.servicentroguerrero.modelos.LiquidacionDispensador;
 import java.awt.Color;
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 
 /**
@@ -58,6 +61,12 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private ArrayList<LiquidacionDispensador> listaUltimaLiquidacionDispensador;
 
     /**
+     * Referencia de la lista de liquidaciones de cada dispensador que se esta
+     * liquidando acualmente.
+     */
+    private LiquidacionDispensador[] liquidacionesPorDispensador;
+
+    /**
      *
      * Constante para indicar una posicion por defecto en combobox.
      */
@@ -68,16 +77,31 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
      * vendidos.
      */
     private double totalLiquidado = 0;
+
+    private double totalDineroIngresado = 0;
     /**
      * Referencia para la ventana de ingreso de dinero.
      */
     private JFrameIngresoDinero jFrameIngresoDinero;
 
+    
+    private final Empleado empleadoLiquidador; 
     /**
      * Creates new form JFrameLiquidacion
+     * @param empleadoLiquidador, empleado que realiza la liquidacion actual.
      */
-    public JFrameLiquidacion() {
+    public JFrameLiquidacion(final Empleado empleadoLiquidador) {
+        
+        /*Empleado que va a realizar la liquidacion*/
+        this.empleadoLiquidador = empleadoLiquidador;
+
+        /*Inicializar componentes*/
         initComponents();
+
+        /*cargar listener de cambio de texto para calcular liquidacion total*/
+        jTextFieldTotalCombustibles.getDocument().addDocumentListener((JTextFieldChangedListener) e -> {
+            calcularLiquidacionTotal();
+        });
 
         /*Poner la fecha del dia*/
         cargarFechaActual();
@@ -89,6 +113,44 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         cargarIdentificadorDeSurtidores();
         /*Validar que los campos sean numericos tipo double*/
         setDocumentsDouble();
+
+        /*Inicializar la lsta de liquidaciones por dispensador*/
+        crearArrayLiquidaciones();
+
+    }
+
+    /**
+     * Metodo para crear el objeto array y llenar con liquidaciones vacias
+     * inicialmente. Se asigna a cada posicion del arreglo un dispensador por
+     * cada surtidor.
+     */
+    private void crearArrayLiquidaciones() {
+
+        liquidacionesPorDispensador = new LiquidacionDispensador[6];
+
+        liquidacionesPorDispensador[0] = new LiquidacionDispensador();
+        liquidacionesPorDispensador[0].setIdDispensador(DISPENSADOR1);
+        liquidacionesPorDispensador[0].setIdSurtidor(SURTIDOR1);
+
+        liquidacionesPorDispensador[1] = new LiquidacionDispensador();
+        liquidacionesPorDispensador[1].setIdDispensador(DISPENSADOR2);
+        liquidacionesPorDispensador[1].setIdSurtidor(SURTIDOR1);
+
+        liquidacionesPorDispensador[2] = new LiquidacionDispensador();
+        liquidacionesPorDispensador[2].setIdDispensador(DISPENSADOR3);
+        liquidacionesPorDispensador[2].setIdSurtidor(SURTIDOR2);
+
+        liquidacionesPorDispensador[3] = new LiquidacionDispensador();
+        liquidacionesPorDispensador[3].setIdDispensador(DISPENSADOR4);
+        liquidacionesPorDispensador[3].setIdSurtidor(SURTIDOR2);
+
+        liquidacionesPorDispensador[4] = new LiquidacionDispensador();
+        liquidacionesPorDispensador[4].setIdDispensador(DISPENSADOR5);
+        liquidacionesPorDispensador[4].setIdSurtidor(SURTIDOR3);
+
+        liquidacionesPorDispensador[5] = new LiquidacionDispensador();
+        liquidacionesPorDispensador[5].setIdDispensador(DISPENSADOR6);
+        liquidacionesPorDispensador[5].setIdSurtidor(SURTIDOR3);
     }
 
     private void setDocumentsDouble() {
@@ -112,6 +174,11 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jTextFieldS3D2Entregado.setDocument(new DocumentTypeDouble());
         jTextFieldS3D2GalonesIngresados.setDocument(new DocumentTypeDouble());
         jTextFieldS3D2TotalDinero.setDocument(new DocumentTypeDouble());
+
+        jTextFieldVentasAceites.setDocument(new DocumentTypeDouble());
+        jTextFieldCompraCombustibleSurtidor1.setDocument(new DocumentTypeDouble());
+        jTextFieldCompraCombustibleSurtidor2.setDocument(new DocumentTypeDouble());
+        jTextFieldCompraCombustibleSurtidor3.setDocument(new DocumentTypeDouble());
 
     }
 
@@ -147,7 +214,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jTextFieldVentasAceites = new javax.swing.JTextField();
         jPanelCombustibles = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        jTextFieldTotalCombustibles = new javax.swing.JTextField();
         jPanel2 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
@@ -164,7 +231,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jLabel2 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jPanel10 = new javax.swing.JPanel();
-        jTextField6 = new javax.swing.JTextField();
+        jTextFieldTotalLiquidado = new javax.swing.JTextField();
         jTextFieldEntregado = new javax.swing.JTextField();
         jTextFieldDiferencia = new javax.swing.JTextField();
         jPanel3 = new javax.swing.JPanel();
@@ -454,6 +521,16 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
 
         jTextFieldVentasAceites.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jTextFieldVentasAceites.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTextFieldVentasAceites.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTextFieldVentasAceitesFocusLost(evt);
+            }
+        });
+        jTextFieldVentasAceites.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextFieldVentasAceitesActionPerformed(evt);
+            }
+        });
         jPanelAceites.add(jTextFieldVentasAceites);
 
         jPanelEnpleado.add(jPanelAceites);
@@ -465,13 +542,13 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jLabel4.setText("Combustibles : ");
         jPanelCombustibles.add(jLabel4);
 
-        jTextField2.setEditable(false);
-        jTextField2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jTextField2.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
-        jTextField2.setText("$0");
-        jTextField2.setDisabledTextColor(new java.awt.Color(51, 51, 51));
-        jTextField2.setEnabled(false);
-        jPanelCombustibles.add(jTextField2);
+        jTextFieldTotalCombustibles.setEditable(false);
+        jTextFieldTotalCombustibles.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTextFieldTotalCombustibles.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jTextFieldTotalCombustibles.setText("$0");
+        jTextFieldTotalCombustibles.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        jTextFieldTotalCombustibles.setEnabled(false);
+        jPanelCombustibles.add(jTextFieldTotalCombustibles);
 
         jPanelEnpleado.add(jPanelCombustibles);
 
@@ -486,6 +563,12 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jLabel6.setText("Compra Surtidor 1 : ");
         jPanel6.add(jLabel6);
 
+        jTextFieldCompraCombustibleSurtidor1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTextFieldCompraCombustibleSurtidor1.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTextFieldCompraCombustibleSurtidor1FocusLost(evt);
+            }
+        });
         jTextFieldCompraCombustibleSurtidor1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextFieldCompraCombustibleSurtidor1ActionPerformed(evt);
@@ -502,6 +585,12 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jLabel7.setText("Compra Surtidor 2 : ");
         jPanel7.add(jLabel7);
 
+        jTextFieldCompraCombustibleSurtidor2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTextFieldCompraCombustibleSurtidor2.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTextFieldCompraCombustibleSurtidor2FocusLost(evt);
+            }
+        });
         jTextFieldCompraCombustibleSurtidor2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextFieldCompraCombustibleSurtidor2ActionPerformed(evt);
@@ -518,6 +607,12 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jLabel8.setText("Compra Surtidor 3 : ");
         jPanel8.add(jLabel8);
 
+        jTextFieldCompraCombustibleSurtidor3.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTextFieldCompraCombustibleSurtidor3.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jTextFieldCompraCombustibleSurtidor3FocusLost(evt);
+            }
+        });
         jTextFieldCompraCombustibleSurtidor3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextFieldCompraCombustibleSurtidor3ActionPerformed(evt);
@@ -552,14 +647,13 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
 
         jPanel10.setLayout(new java.awt.GridLayout(1, 3, 1, 1));
 
-        jTextField6.setEditable(false);
-        jTextField6.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField6.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jTextField6.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        jTextField6.setText("$0");
-        jTextField6.setDisabledTextColor(new java.awt.Color(0, 0, 0));
-        jTextField6.setEnabled(false);
-        jPanel10.add(jTextField6);
+        jTextFieldTotalLiquidado.setEditable(false);
+        jTextFieldTotalLiquidado.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTextFieldTotalLiquidado.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jTextFieldTotalLiquidado.setText("$0");
+        jTextFieldTotalLiquidado.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        jTextFieldTotalLiquidado.setEnabled(false);
+        jPanel10.add(jTextFieldTotalLiquidado);
 
         jTextFieldEntregado.setEditable(false);
         jTextFieldEntregado.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
@@ -1495,6 +1589,11 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jMenuEmpleados.setText("Empleados");
 
         jMenuItemEmpleadosAgregar.setText("Agregar");
+        jMenuItemEmpleadosAgregar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemEmpleadosAgregarActionPerformed(evt);
+            }
+        });
         jMenuEmpleados.add(jMenuItemEmpleadosAgregar);
 
         jMenuItemEmpleadosEliminar.setText("Eliminar");
@@ -1526,6 +1625,11 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jMenuHerramientas.add(jMenuItemActualizarPrecios);
 
         jMenuItemCalibracion.setText("Calibracion");
+        jMenuItemCalibracion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemCalibracionActionPerformed(evt);
+            }
+        });
         jMenuHerramientas.add(jMenuItemCalibracion);
 
         jMenuItemExtraLiquidacion.setText("Extra Liquidacion");
@@ -1574,7 +1678,64 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     }//GEN-LAST:event_jButtonIngresarDineroActionPerformed
 
     private void jButtonGuardarLiquidacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGuardarLiquidacionActionPerformed
-        // TODO add your handling code here:
+        
+        /*re-calcular todas las liquidaciones*/
+        iniciarRecalculoDeLiquidaciones();
+
+        /*validar islero seleccionado*/
+        int position = jComboBoxCambiarIslero.getSelectedIndex();
+        if (position == JComboBox.UNDEFINED_CONDITION || position == 0) {
+            JOptionPane.showMessageDialog(this, "Selecione un islero de la lista.", "ERROR DE ISLERO", JOptionPane.ERROR_MESSAGE);
+            jComboBoxCambiarIslero.requestFocusInWindow();
+            return;
+        }
+
+        /*validar que ya se ha ingreado el dinero de la liquidacion*/
+        if (jTextFieldEntregado.getText().trim().length() <= 2) {
+            jButtonIngresarDinero.requestFocusInWindow();
+            JOptionPane.showMessageDialog(this, "No se ha ingresado el dinero.", "ERROR DE LIQUIDACION", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        /*validar que se ha ingresado el valor en aceites*/
+        if (jTextFieldVentasAceites.getText().trim().length() == 0 || !Util.isNumeric(jTextFieldVentasAceites.getText().trim())) {
+            jTextFieldVentasAceites.requestFocusInWindow();
+            JOptionPane.showMessageDialog(this, "Valor no valido de aceites.\nPuede liquidar en cero.", "ERROR DE LIQUIDACION", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        /*validar que se ha ingresado el valor en combustibles del surtidor 1*/
+        if (jTextFieldCompraCombustibleSurtidor1.getText().trim().length() == 0 || !Util.isNumeric(jTextFieldCompraCombustibleSurtidor1.getText().trim())) {
+            jTextFieldCompraCombustibleSurtidor1.requestFocusInWindow();
+            JOptionPane.showMessageDialog(this, "Valor no valido en compra de combustible del surtidor 1.\nPuede liquidar en cero.", "ERROR DE LIQUIDACION", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        /*validar que se ha ingresado el valor en combustibles del surtidor 2*/
+        if (jTextFieldCompraCombustibleSurtidor2.getText().trim().length() == 0 || !Util.isNumeric(jTextFieldCompraCombustibleSurtidor2.getText().trim())) {
+            jTextFieldCompraCombustibleSurtidor2.requestFocusInWindow();
+            JOptionPane.showMessageDialog(this, "Valor no valido en compra de combustible del surtidor 2.\nPuede liquidar en cero.", "ERROR DE LIQUIDACION", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        /*validar que se ha ingresado el valor en combustibles del surtidor 3*/
+        if (jTextFieldCompraCombustibleSurtidor3.getText().trim().length() == 0 || !Util.isNumeric(jTextFieldCompraCombustibleSurtidor3.getText().trim())) {
+            jTextFieldCompraCombustibleSurtidor3.requestFocusInWindow();
+            JOptionPane.showMessageDialog(this, "Valor no valido en compra de combustible del surtidor 3.\nPuede liquidar en cero.", "ERROR DE LIQUIDACION", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        /*Validar que todos los campos sean validos*/
+        try {
+            validarDatosDeLiquidaciones();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR DE LIQUIDACION", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        /*Si todas las validaciones son correctas se crear la cabecera de liquidacion
+        para ser insertada.*/
+        mostrarResumenDeLiquidacion();
     }//GEN-LAST:event_jButtonGuardarLiquidacionActionPerformed
 
     private void jMenuItemActualizarPreciosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemActualizarPreciosActionPerformed
@@ -1680,7 +1841,13 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     }//GEN-LAST:event_jTextFieldS3D2GalonesIngresadosActionPerformed
 
     private void jComboBoxCambiarIsleroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxCambiarIsleroActionPerformed
-        // TODO add your handling code here:
+        int position = jComboBoxCambiarIslero.getSelectedIndex() - 1;
+        if (position != JComboBox.UNDEFINED_CONDITION) {
+            int idEmpleado = ControllerBO.cargarListaEmpleadosIsleros().get(position).getIdEmpleado();
+            for (LiquidacionDispensador liquidacionDispensador : liquidacionesPorDispensador) {
+                liquidacionDispensador.setIdEmpleadoLiquidado(idEmpleado);
+            }
+        }
     }//GEN-LAST:event_jComboBoxCambiarIsleroActionPerformed
 
     private void jTextFieldCompraCombustibleSurtidor1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldCompraCombustibleSurtidor1ActionPerformed
@@ -1716,8 +1883,9 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
             /*cargar liquidacion del dispensador 1 del surtidor 1*/
             cargarLiquidacionSurtidor(SURTIDOR1, DISPENSADOR1);
             /*Si ya se ingreso dinero, recalcular la diferencia*/
-            if(jTextFieldS1D1TotalDinero.getText().trim().length() > 0)
+            if (jTextFieldS1D1TotalDinero.getText().trim().length() > 0) {
                 jTextFieldS1D1TotalDineroFocusLost(null);
+            }
         }
 
     }//GEN-LAST:event_jTextFieldS1D1EntregadoFocusLost
@@ -1731,7 +1899,22 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
             } else if (Util.isNumeric(dineroEntregado)) {
                 jTextFieldS1D1TotalDinero.setBackground(Color.white);
                 double dineroCalculado = Double.parseDouble(jTextFieldS1D1TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                jTextFieldS1D1Diferencia.setText("$" + calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado));
+                jTextFieldS1D1Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
+
+                {
+                    /*crear el objeto liquidacion actual*/
+                    double numeroEntregado = Double.parseDouble(jTextFieldS1D1Entregado.getText().trim());
+                    double numeroRecibido = Double.parseDouble(jTextFieldS1D1Entregado.getText().trim());
+                    double galones = Double.parseDouble(jTextFieldS1D1GalonesIngresados.getText().trim());
+                    double galonesCalculados = Double.parseDouble(jTextFieldS1D1GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    double diferencia = Double.parseDouble(jTextFieldS1D1Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    int position = DISPENSADOR1 - 1;
+
+                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
+                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
+                    /*calcular el total de liquidacion de combustibles*/
+                    calcularTotalCombustibles();
+                }
             }
         }
     }//GEN-LAST:event_jTextFieldS1D1TotalDineroFocusLost
@@ -1750,8 +1933,9 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
             jTextFieldS1D2Entregado.setBackground(Color.white);
             cargarLiquidacionSurtidor(SURTIDOR1, DISPENSADOR2);
             /*Si ya se ingreso dinero, recalcular la diferencia*/
-            if(jTextFieldS1D2TotalDinero.getText().trim().length() > 0)
+            if (jTextFieldS1D2TotalDinero.getText().trim().length() > 0) {
                 jTextFieldS1D2TotalDineroFocusLost(null);
+            }
         }
     }//GEN-LAST:event_jTextFieldS1D2EntregadoFocusLost
 
@@ -1771,8 +1955,9 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
             /*cargar liquidacion del dispensador 1 del surtidor 1*/
             cargarLiquidacionSurtidor(SURTIDOR2, DISPENSADOR3);
             /*Si ya se ingreso dinero, recalcular la diferencia*/
-            if(jTextFieldS2D1TotalDinero.getText().trim().length() > 0)
+            if (jTextFieldS2D1TotalDinero.getText().trim().length() > 0) {
                 jTextFieldS2D1TotalDineroFocusLost(null);
+            }
         }
     }//GEN-LAST:event_jTextFieldS2D1EntregadoFocusLost
 
@@ -1791,8 +1976,9 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
             /*cargar liquidacion del dispensador 1 del surtidor 1*/
             cargarLiquidacionSurtidor(SURTIDOR2, DISPENSADOR4);
             /*Si ya se ingreso dinero, recalcular la diferencia*/
-            if(jTextFieldS2D2TotalDinero.getText().trim().length() > 0)
+            if (jTextFieldS2D2TotalDinero.getText().trim().length() > 0) {
                 jTextFieldS2D2TotalDineroFocusLost(null);
+            }
         }
     }//GEN-LAST:event_jTextFieldS2D2EntregadoFocusLost
 
@@ -1811,8 +1997,9 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
             /*cargar liquidacion del dispensador 1 del surtidor 1*/
             cargarLiquidacionSurtidor(SURTIDOR3, DISPENSADOR5);
             /*Si ya se ingreso dinero, recalcular la diferencia*/
-            if(jTextFieldS3D1TotalDinero.getText().trim().length() > 0)
+            if (jTextFieldS3D1TotalDinero.getText().trim().length() > 0) {
                 jTextFieldS3D1TotalDineroFocusLost(null);
+            }
         }
     }//GEN-LAST:event_jTextFieldS3D1EntregadoFocusLost
 
@@ -1831,8 +2018,9 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
             /*cargar liquidacion del dispensador 1 del surtidor 1*/
             cargarLiquidacionSurtidor(SURTIDOR3, DISPENSADOR6);
             /*Si ya se ingreso dinero, recalcular la diferencia*/
-            if(jTextFieldS3D2TotalDinero.getText().trim().length() > 0)
+            if (jTextFieldS3D2TotalDinero.getText().trim().length() > 0) {
                 jTextFieldS3D2TotalDineroFocusLost(null);
+            }
         }
     }//GEN-LAST:event_jTextFieldS3D2EntregadoFocusLost
 
@@ -1845,7 +2033,22 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
             } else if (Util.isNumeric(dineroEntregado)) {
                 jTextFieldS2D2TotalDinero.setBackground(Color.white);
                 double dineroCalculado = Double.parseDouble(jTextFieldS2D2TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                jTextFieldS2D2Diferencia.setText("$" + calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado));
+                jTextFieldS2D2Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
+
+                {
+                    /*crear el objeto liquidacion actual*/
+                    double numeroEntregado = Double.parseDouble(jTextFieldS2D2Entregado.getText().trim());
+                    double numeroRecibido = Double.parseDouble(jTextFieldS2D2Entregado.getText().trim());
+                    double galones = Double.parseDouble(jTextFieldS2D2GalonesIngresados.getText().trim());
+                    double galonesCalculados = Double.parseDouble(jTextFieldS2D2GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    double diferencia = Double.parseDouble(jTextFieldS2D2Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    int position = DISPENSADOR4 - 1;
+
+                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
+                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
+                    /*calcular el total de liquidacion de combustibles*/
+                    calcularTotalCombustibles();
+                }
             }
         }
     }//GEN-LAST:event_jTextFieldS2D2TotalDineroFocusLost
@@ -1859,7 +2062,22 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
             } else if (Util.isNumeric(dineroEntregado)) {
                 jTextFieldS2D1TotalDinero.setBackground(Color.white);
                 double dineroCalculado = Double.parseDouble(jTextFieldS2D1TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                jTextFieldS2D1Diferencia.setText("$" + calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado));
+                jTextFieldS2D1Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
+
+                {
+                    /*crear el objeto liquidacion actual*/
+                    double numeroEntregado = Double.parseDouble(jTextFieldS2D1Entregado.getText().trim());
+                    double numeroRecibido = Double.parseDouble(jTextFieldS2D1Entregado.getText().trim());
+                    double galones = Double.parseDouble(jTextFieldS2D1GalonesIngresados.getText().trim());
+                    double galonesCalculados = Double.parseDouble(jTextFieldS2D1GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    double diferencia = Double.parseDouble(jTextFieldS2D1Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    int position = DISPENSADOR3 - 1;
+
+                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
+                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
+                    /*calcular el total de liquidacion de combustibles*/
+                    calcularTotalCombustibles();
+                }
             }
         }
     }//GEN-LAST:event_jTextFieldS2D1TotalDineroFocusLost
@@ -1873,7 +2091,22 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
             } else if (Util.isNumeric(dineroEntregado)) {
                 jTextFieldS1D2TotalDinero.setBackground(Color.white);
                 double dineroCalculado = Double.parseDouble(jTextFieldS1D2TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                jTextFieldS1D2Diferencia.setText("$" + calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado));
+                jTextFieldS1D2Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
+
+                {
+                    /*crear el objeto liquidacion actual*/
+                    double numeroEntregado = Double.parseDouble(jTextFieldS1D2Entregado.getText().trim());
+                    double numeroRecibido = Double.parseDouble(jTextFieldS1D2Entregado.getText().trim());
+                    double galones = Double.parseDouble(jTextFieldS1D2GalonesIngresados.getText().trim());
+                    double galonesCalculados = Double.parseDouble(jTextFieldS1D2GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    double diferencia = Double.parseDouble(jTextFieldS1D2Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    int position = DISPENSADOR2 - 1;
+
+                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
+                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
+                    /*calcular el total de liquidacion de combustibles*/
+                    calcularTotalCombustibles();
+                }
             }
         }
     }//GEN-LAST:event_jTextFieldS1D2TotalDineroFocusLost
@@ -1887,7 +2120,22 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
             } else if (Util.isNumeric(dineroEntregado)) {
                 jTextFieldS3D1TotalDinero.setBackground(Color.white);
                 double dineroCalculado = Double.parseDouble(jTextFieldS3D1TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                jTextFieldS3D1Diferencia.setText("$" + calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado));
+                jTextFieldS3D1Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
+
+                {
+                    /*crear el objeto liquidacion actual*/
+                    double numeroEntregado = Double.parseDouble(jTextFieldS3D1Entregado.getText().trim());
+                    double numeroRecibido = Double.parseDouble(jTextFieldS3D1Entregado.getText().trim());
+                    double galones = Double.parseDouble(jTextFieldS3D1GalonesIngresados.getText().trim());
+                    double galonesCalculados = Double.parseDouble(jTextFieldS3D1GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    double diferencia = Double.parseDouble(jTextFieldS3D1Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    int position = DISPENSADOR5 - 1;
+
+                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
+                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
+                    /*calcular el total de liquidacion de combustibles*/
+                    calcularTotalCombustibles();
+                }
             }
         }
     }//GEN-LAST:event_jTextFieldS3D1TotalDineroFocusLost
@@ -1901,7 +2149,22 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
             } else if (Util.isNumeric(dineroEntregado)) {
                 jTextFieldS3D2TotalDinero.setBackground(Color.white);
                 double dineroCalculado = Double.parseDouble(jTextFieldS3D2TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                jTextFieldS3D2Diferencia.setText("$" + calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado));
+                jTextFieldS3D2Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
+
+                {
+                    /*crear el objeto liquidacion actual*/
+                    double numeroEntregado = Double.parseDouble(jTextFieldS3D2Entregado.getText().trim());
+                    double numeroRecibido = Double.parseDouble(jTextFieldS3D2Entregado.getText().trim());
+                    double galones = Double.parseDouble(jTextFieldS3D2GalonesIngresados.getText().trim());
+                    double galonesCalculados = Double.parseDouble(jTextFieldS3D2GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    double diferencia = Double.parseDouble(jTextFieldS3D2Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    int position = DISPENSADOR6 - 1;
+
+                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
+                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
+                    /*calcular el total de liquidacion de combustibles*/
+                    calcularTotalCombustibles();
+                }
             }
         }
     }//GEN-LAST:event_jTextFieldS3D2TotalDineroFocusLost
@@ -1983,38 +2246,64 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     }//GEN-LAST:event_jTextFieldS3D2GalonesIngresadosFocusLost
 
     /**
-     * @param args the command line arguments
+     * Validar que el total de aceites ingresados sea un numero valido.
+     *
+     * @param evt
      */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(JFrameLiquidacion.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+    private void jTextFieldVentasAceitesFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldVentasAceitesFocusLost
+        String sTotalAceites = jTextFieldVentasAceites.getText().trim();
+        if (sTotalAceites.length() > 1 && !Util.isNumeric(sTotalAceites)) {
+            jTextFieldVentasAceites.setBackground(Color.red);
+        } else if (Util.isNumeric(sTotalAceites)) {
+            jTextFieldVentasAceites.setBackground(Color.white);
+            calcularLiquidacionTotal();
         }
-        //</editor-fold>
+    }//GEN-LAST:event_jTextFieldVentasAceitesFocusLost
 
-        //</editor-fold>
+    private void jTextFieldCompraCombustibleSurtidor1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldCompraCombustibleSurtidor1FocusLost
+        String sTotalComprado = jTextFieldCompraCombustibleSurtidor1.getText().trim();
+        if (sTotalComprado.length() > 1 && !Util.isNumeric(sTotalComprado)) {
+            jTextFieldCompraCombustibleSurtidor1.setBackground(Color.red);
+        } else if (Util.isNumeric(sTotalComprado)) {
+            jTextFieldCompraCombustibleSurtidor1.setBackground(Color.white);
+        }
+    }//GEN-LAST:event_jTextFieldCompraCombustibleSurtidor1FocusLost
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                JFrameLiquidacion jFrameLiquidacion = new JFrameLiquidacion();
-                jFrameLiquidacion.setLocationRelativeTo(null);
-                jFrameLiquidacion.setVisible(true);
-            }
-        });
-    }
+    private void jTextFieldCompraCombustibleSurtidor2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldCompraCombustibleSurtidor2FocusLost
+        String sTotalComprado = jTextFieldCompraCombustibleSurtidor2.getText().trim();
+        if (sTotalComprado.length() > 1 && !Util.isNumeric(sTotalComprado)) {
+            jTextFieldCompraCombustibleSurtidor2.setBackground(Color.red);
+        } else if (Util.isNumeric(sTotalComprado)) {
+            jTextFieldCompraCombustibleSurtidor2.setBackground(Color.white);
+        }
+    }//GEN-LAST:event_jTextFieldCompraCombustibleSurtidor2FocusLost
 
+    private void jTextFieldCompraCombustibleSurtidor3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldCompraCombustibleSurtidor3FocusLost
+        String sTotalComprado = jTextFieldCompraCombustibleSurtidor3.getText().trim();
+        if (sTotalComprado.length() > 1 && !Util.isNumeric(sTotalComprado)) {
+            jTextFieldCompraCombustibleSurtidor3.setBackground(Color.red);
+        } else if (Util.isNumeric(sTotalComprado)) {
+            jTextFieldCompraCombustibleSurtidor3.setBackground(Color.white);
+        }
+    }//GEN-LAST:event_jTextFieldCompraCombustibleSurtidor3FocusLost
+
+    private void jTextFieldVentasAceitesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldVentasAceitesActionPerformed
+        jTextFieldCompraCombustibleSurtidor1.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldVentasAceitesActionPerformed
+
+    private void jMenuItemCalibracionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemCalibracionActionPerformed
+        JFrameCalibracion jFrameCalibracion = new JFrameCalibracion();
+        jFrameCalibracion.setLocationRelativeTo(this);
+        jFrameCalibracion.setVisible(true);
+    }//GEN-LAST:event_jMenuItemCalibracionActionPerformed
+
+    private void jMenuItemEmpleadosAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemEmpleadosAgregarActionPerformed
+        JFrameAgregarEmpleados jFrameAgregarEmpleados = new JFrameAgregarEmpleados();
+        jFrameAgregarEmpleados.setLocationRelativeTo(this);
+        jFrameAgregarEmpleados.setVisible(true);
+    }//GEN-LAST:event_jMenuItemEmpleadosAgregarActionPerformed
+
+  
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonGuardarLiquidacion;
     private javax.swing.JButton jButtonIngresarDinero;
@@ -2160,8 +2449,6 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private javax.swing.JPanel jPanelSurtidor3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField6;
     private javax.swing.JTextField jTextFieldCompraCombustibleSurtidor1;
     private javax.swing.JTextField jTextFieldCompraCombustibleSurtidor2;
     private javax.swing.JTextField jTextFieldCompraCombustibleSurtidor3;
@@ -2209,6 +2496,8 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private javax.swing.JTextField jTextFieldS3D2Recibido;
     private javax.swing.JTextField jTextFieldS3D2TotalDinero;
     private javax.swing.JTextField jTextFieldS3D2TotalDineroCalculado;
+    private javax.swing.JTextField jTextFieldTotalCombustibles;
+    private javax.swing.JTextField jTextFieldTotalLiquidado;
     private javax.swing.JTextField jTextFieldVentasAceites;
     // End of variables declaration//GEN-END:variables
 
@@ -2255,8 +2544,8 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
 
     @Override
     public void dineroIngresado(double totalDineroIngresado) {
-        jTextFieldEntregado.setText("$" + Util.formatearMiles(totalDineroIngresado));
-        jTextFieldDiferencia.setText("$" + Util.formatearMiles(totalDineroIngresado - this.totalLiquidado));
+        this.totalDineroIngresado = totalDineroIngresado;
+        mostrarDineroIngresado();
     }
 
     /**
@@ -2412,5 +2701,202 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
      */
     private double calcularDiferenciaDinero(double dineroIngresado, double dineroCalculado) {
         return Util.round(dineroIngresado - dineroCalculado, 2);
+    }
+
+    /**
+     * Guardar los datos de la liquidacion actual en el array
+     *
+     * @param numeroEntregado
+     * @param numeroRecibido
+     * @param galones
+     * @param galonesCalculados
+     * @param dineroEntregado
+     * @param dineroCalculado
+     * @param diferencia
+     * @param position
+     */
+    private void guardarLiquidacionDispensadorEnLista(double numeroEntregado, double numeroRecibido, double galones, double galonesCalculados, double dineroEntregado, double dineroCalculado, double diferencia, int position) {
+        liquidacionesPorDispensador[position].setNumeroEntregado(numeroEntregado);
+        liquidacionesPorDispensador[position].setNumeroRecibido(numeroRecibido);
+        liquidacionesPorDispensador[position].setGalones(galones);
+        liquidacionesPorDispensador[position].setGalonesCalculados(galonesCalculados);
+        liquidacionesPorDispensador[position].setDineroEntregado(dineroEntregado);
+        liquidacionesPorDispensador[position].setDineroCalculado(dineroCalculado);
+        liquidacionesPorDispensador[position].setDiferenciaDinero(diferencia);
+    }
+
+    /**
+     * Recalculoar todas las liquidaciones antes de guardar la informacion de la
+     * liquidacion en base de datos.
+     */
+    private void iniciarRecalculoDeLiquidaciones() {
+        jTextFieldS1D1EntregadoFocusLost(null);
+        jTextFieldS1D2EntregadoFocusLost(null);
+        jTextFieldS2D1EntregadoFocusLost(null);
+        jTextFieldS2D2EntregadoFocusLost(null);
+        jTextFieldS3D1EntregadoFocusLost(null);
+        jTextFieldS3D2EntregadoFocusLost(null);
+    }
+
+    /**
+     * Calcular el total de combustibles liquidado hasta el momento.
+     */
+    private void calcularTotalCombustibles() {
+        double totalCombustibles = 0;
+        double totalDiferencia = 0;
+        for (LiquidacionDispensador liquidacionDispensador : liquidacionesPorDispensador) {
+            totalCombustibles += liquidacionDispensador.getDineroEntregado();
+        }
+        jTextFieldTotalCombustibles.setText("$" + Util.formatearMiles(Util.round(totalCombustibles, 2)));
+    }
+
+    /**
+     * Validar que los campos ingresados para liquidar sean correctos.
+     *
+     * @throws Exception
+     */
+    private void validarDatosDeLiquidaciones() throws Exception {
+        for (LiquidacionDispensador liquidacionDispensador : liquidacionesPorDispensador) {
+            if (liquidacionDispensador.getNumeroEntregado() == 0) {
+                throw new Exception("Hay liquidaciones con numero entregado no validos!.\nVerifique los datos de liquidacion.");
+            }
+            if (liquidacionDispensador.getGalones() == 0) {
+                throw new Exception("Hay liquidaciones con galones no validos!.\nVerifique los datos de liquidacion.");
+            }
+            if (liquidacionDispensador.getDineroEntregado() == 0) {
+                throw new Exception("Hay liquidaciones con dinero entregado no validos!.\nVerifique los datos de liquidacion.");
+            }
+        }
+    }
+
+    /**
+     * Calcular la cabecera de la liquidacion actual.
+     */
+    private void mostrarResumenDeLiquidacion() {
+        String fecha = Util.getFechaActual().toUpperCase(new Locale("es", "CO"));
+        String hora = Util.getHoraActual().toUpperCase(new Locale("es", "CO"));
+        String islero = jComboBoxCambiarIslero.getSelectedItem().toString().trim();
+        String mensajeResumen = "<html><h3><U><p align=center>RESUMEN</p></U></h3>"
+                + "<ul>"
+                + "<li>FECHA:&nbsp;&nbsp;&nbsp;"
+                + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                + "<b>" + fecha + "</b></li>"
+                + "<li>HORA:&nbsp;&nbsp;&nbsp;"
+                + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                + "<b>" + hora + "</b></li>"
+                + "<li>LIQUIDADOR:&nbsp;&nbsp;&nbsp;&nbsp;<b>JORGE CASTRO</b></li>"
+                + "<li>ISLERO:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                + "<b>" + islero + " </li>"
+                + "<li>DINERO ENTREGADO:&nbsp;<b><font color= blue>$" + Util.formatearMiles(this.totalDineroIngresado) + "</font></b></li>"
+                + "<li>TOTAL LIQUIDACION:&nbsp;<b><font color= blue>$" + Util.formatearMiles(this.totalLiquidado) + "</font></b></li>"
+                + "<li>DIFERENCIA:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                + "<b><font color= blue>$" + Util.formatearMiles(this.totalDineroIngresado - this.totalLiquidado) + "</font> </b></li>"
+                + "</ul>"
+                + "<p><b>Si esta correcto por favor seleccione la opcion <b>SI</b>."
+                + "<br>De lo contrario cierre esta ventana o seleccione <b>NO</b>.</b></p></html>";
+
+        /*Mostrar un resumen de la liquidacioin actual*/
+        int opcion = JOptionPane.showConfirmDialog(this, mensajeResumen, "RESUMEN", JOptionPane.OK_OPTION);
+        if (opcion == 0) {
+            confirmarInsercionDeLiquidacion();
+        }
+    }
+
+    /**
+     * Calcular el total de la liquidacion actual.
+     */
+    private void calcularLiquidacionTotal() {
+        /*obtener el total de aceites ingresado, si no hay nada ingresado se calcula como cero*/
+        String sTotalAceites = jTextFieldVentasAceites.getText().trim();
+        double totalAceites = (sTotalAceites.length() > 0) ? Double.parseDouble(sTotalAceites) : 0.0;
+
+        /*Total de dinero entregado por liquidacion de combustibles*/
+        double totalCombustibles = 0;
+
+        /*total de diferencia de dinero por cada liquidacion de surtidor*/
+        double totalDiferencias = 0;
+
+        for (LiquidacionDispensador liquidacionDispensador : liquidacionesPorDispensador) {
+            totalCombustibles += liquidacionDispensador.getDineroEntregado();
+            totalDiferencias += liquidacionDispensador.getDiferenciaDinero();
+        }
+        /*asignar el total de liquidacion*/
+        this.totalLiquidado = Util.round((totalAceites + totalCombustibles + totalDiferencias), 2);
+
+        /*Mostrar el total de liquidacion*/
+        jTextFieldTotalLiquidado.setText("$" + Util.formatearMiles(this.totalLiquidado));
+        mostrarDineroIngresado();
+    }
+
+    private void mostrarDineroIngresado() {
+        jTextFieldEntregado.setText("$" + Util.formatearMiles(this.totalDineroIngresado));
+        jTextFieldDiferencia.setText("$" + Util.formatearMiles(totalDineroIngresado - this.totalLiquidado));
+        if ((totalDineroIngresado - this.totalLiquidado) < 0) {
+            jTextFieldDiferencia.setDisabledTextColor(Color.red);
+        } else {
+            jTextFieldDiferencia.setDisabledTextColor(Color.black);
+        }
+
+    }
+
+    /**
+     * Mostrar ultima confirmacion al usuario antes de insertar la liquidacion.
+     */
+    private void confirmarInsercionDeLiquidacion() {
+        String mensaje = "<html><h3><b>Si esta seguro de guardar "
+                + "la liquidacion actual seleccione aceptar."
+                + "<br>De lo contrario cancele la transaccion.</b></h3></html>";
+        int opcion = JOptionPane.showConfirmDialog(this, mensaje, "¿GUARDAR LIQUIDACION?", JOptionPane.CANCEL_OPTION);
+        if (opcion == 0) {
+            insertarLiquidacion();
+        }
+    }
+
+    /**
+     * Iniciar el hilo de insercion de la liquidacion actual.
+     */
+    private void insertarLiquidacion() {
+
+        /*obtener el total de aceites ingresado, si no hay nada ingresado se calcula como cero*/
+        String sTotalAceites = jTextFieldVentasAceites.getText().trim();
+        double totalAceites = (sTotalAceites.length() > 0) ? Double.parseDouble(sTotalAceites) : 0.0;
+
+        /*Total de dinero entregado por liquidacion de combustibles*/
+        double totalCombustibles = 0;
+
+        /*total de diferencia de dinero por cada liquidacion de surtidor*/
+        double totalDiferencias = 0;
+
+        String textLiquidacionesDispensador = "";
+        for (LiquidacionDispensador liquidacionDispensador : liquidacionesPorDispensador) {
+            totalCombustibles += liquidacionDispensador.getDineroEntregado();
+
+            /*Texto que contiene la informacion de liquidacion de cada surtidor*/
+            textLiquidacionesDispensador
+                    += liquidacionDispensador.getIdSurtidor() + ";"
+                    + liquidacionDispensador.getIdDispensador() + ";"
+                    + liquidacionDispensador.getIdPrecio() + ";"
+                    + liquidacionDispensador.getIdEmpleadoLiquidado() + ";"
+                    + liquidacionDispensador.getNumeroEntregado() + ";"
+                    + liquidacionDispensador.getNumeroRecibido() + ";"
+                    + liquidacionDispensador.getGalones() + ";"
+                    + liquidacionDispensador.getGalonesCalculados() + ";"
+                    + liquidacionDispensador.getDineroEntregado() + ";"
+                    + liquidacionDispensador.getDineroCalculado() + ";"
+                    + liquidacionDispensador.getDiferenciaDinero() + "*";
+        }
+
+        /*crear el worker encargado de crear los hilos para insercion*/
+        WorkerBO worked = new WorkerBO(empleadoLiquidador.getIdEmpleado(),
+                totalCombustibles,
+                totalAceites,
+                this.totalLiquidado,
+                this.totalDineroIngresado,
+                (totalDineroIngresado - this.totalLiquidado),
+                textLiquidacionesDispensador);
+        worked.execute();
+//        JOptionPane.showMessageDialog(this, "Datos insertados de forma correcta.", "DATOS INSERTADOR", JOptionPane.OK_OPTION);
     }
 }

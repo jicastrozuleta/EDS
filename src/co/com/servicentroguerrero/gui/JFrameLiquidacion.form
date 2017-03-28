@@ -33,6 +33,9 @@
                   <Properties>
                     <Property name="text" type="java.lang.String" value="Agregar"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemEmpleadosAgregarActionPerformed"/>
+                  </Events>
                 </MenuItem>
                 <MenuItem class="javax.swing.JMenuItem" name="jMenuItemEmpleadosEliminar">
                   <Properties>
@@ -73,6 +76,9 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Calibracion"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemCalibracionActionPerformed"/>
+              </Events>
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItemExtraLiquidacion">
               <Properties>
@@ -458,6 +464,10 @@
                                 </Property>
                                 <Property name="horizontalAlignment" type="int" value="4"/>
                               </Properties>
+                              <Events>
+                                <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="jTextFieldVentasAceitesFocusLost"/>
+                                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTextFieldVentasAceitesActionPerformed"/>
+                              </Events>
                             </Component>
                           </SubComponents>
                         </Container>
@@ -479,7 +489,7 @@
                                 <Property name="text" type="java.lang.String" value="Combustibles : "/>
                               </Properties>
                             </Component>
-                            <Component class="javax.swing.JTextField" name="jTextField2">
+                            <Component class="javax.swing.JTextField" name="jTextFieldTotalCombustibles">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
                                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
@@ -488,7 +498,7 @@
                                 <Property name="horizontalAlignment" type="int" value="4"/>
                                 <Property name="text" type="java.lang.String" value="$0"/>
                                 <Property name="disabledTextColor" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                                  <Color blue="33" green="33" red="33" type="rgb"/>
+                                  <Color blue="0" green="0" red="0" type="rgb"/>
                                 </Property>
                                 <Property name="enabled" type="boolean" value="false"/>
                               </Properties>
@@ -525,7 +535,13 @@
                               </Properties>
                             </Component>
                             <Component class="javax.swing.JTextField" name="jTextFieldCompraCombustibleSurtidor1">
+                              <Properties>
+                                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                                  <Font name="Tahoma" size="12" style="1"/>
+                                </Property>
+                              </Properties>
                               <Events>
+                                <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="jTextFieldCompraCombustibleSurtidor1FocusLost"/>
                                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTextFieldCompraCombustibleSurtidor1ActionPerformed"/>
                               </Events>
                             </Component>
@@ -550,7 +566,13 @@
                               </Properties>
                             </Component>
                             <Component class="javax.swing.JTextField" name="jTextFieldCompraCombustibleSurtidor2">
+                              <Properties>
+                                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                                  <Font name="Tahoma" size="12" style="1"/>
+                                </Property>
+                              </Properties>
                               <Events>
+                                <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="jTextFieldCompraCombustibleSurtidor2FocusLost"/>
                                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTextFieldCompraCombustibleSurtidor2ActionPerformed"/>
                               </Events>
                             </Component>
@@ -575,7 +597,13 @@
                               </Properties>
                             </Component>
                             <Component class="javax.swing.JTextField" name="jTextFieldCompraCombustibleSurtidor3">
+                              <Properties>
+                                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                                  <Font name="Tahoma" size="12" style="1"/>
+                                </Property>
+                              </Properties>
                               <Events>
+                                <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="jTextFieldCompraCombustibleSurtidor3FocusLost"/>
                                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTextFieldCompraCombustibleSurtidor3ActionPerformed"/>
                               </Events>
                             </Component>
@@ -639,12 +667,9 @@
                             <Property name="verticalGap" type="int" value="1"/>
                           </Layout>
                           <SubComponents>
-                            <Component class="javax.swing.JTextField" name="jTextField6">
+                            <Component class="javax.swing.JTextField" name="jTextFieldTotalLiquidado">
                               <Properties>
                                 <Property name="editable" type="boolean" value="false"/>
-                                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-                                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
-                                </Property>
                                 <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                                   <Font name="Tahoma" size="12" style="1"/>
                                 </Property>
