@@ -66,7 +66,7 @@ public class BackUp {
 
 
             /*crear el comando que se ejecutara para generar el backUp*/
-            String executeCmd = "mysqldump --user=" + user + " -p" + pass + " " + db + " > " + savePath;
+            String executeCmd = "mysqldump --user=" + user + " -p" + pass + " --routines " + db + " > " + savePath;
             String[] cmd = new String[]{"cmd.exe", "/C", executeCmd};
             /*Aqui se ejecuta el comando*/
             Process runtimeProcess = Runtime.getRuntime().exec(cmd, null, fileMysqlDump);
