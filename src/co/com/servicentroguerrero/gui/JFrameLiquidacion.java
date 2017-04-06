@@ -19,7 +19,9 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -1664,7 +1666,13 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     }//GEN-LAST:event_jMenuItemSalirActionPerformed
 
     private void jMenuItemRestaurarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemRestaurarActionPerformed
-        // TODO add your handling code here:
+        JFileChooser jFileChooser = new JFileChooser();
+        
+        /*Definicion de extension del backup*/
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Restaurar Back-Up", "bkp");
+        jFileChooser.setFileFilter(filter);
+        
+        jFileChooser.showOpenDialog(JFrameLiquidacion.this);
     }//GEN-LAST:event_jMenuItemRestaurarActionPerformed
 
     private void jButtonIngresarDineroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonIngresarDineroActionPerformed

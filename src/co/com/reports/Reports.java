@@ -30,10 +30,12 @@ public class Reports {
           try {
               
               /*archivo jasper*/
-              String aJasper = "D:\\ProyectoEstacionServicio\\ServicentroGuerrero\\ServicentroGuerrero\\src\\co\\com\\reports\\report.jasper";
+              String aJasper = "D:\\ProyectoEstacionServicio\\ServicentroGuerrero\\ServicentroGuerrero\\src\\co\\com\\reports\\liquidacionDiaria.jasper";
               /*genera instancia de BD*/
               Instance.getInstance();
-              HashMap hm = new HashMap();
+              LiquidacionDiariaReport ldr = new LiquidacionDiariaReport();
+              HashMap hm = ldr.reporteLiquidacionDispensador("2017-03-13");
+              
               // fills compiled report with parameters and a connection
               JasperPrint print = JasperFillManager.fillReport(aJasper, hm, Instance.getPrivateConexion().getConexion());
               // exports report to pdf

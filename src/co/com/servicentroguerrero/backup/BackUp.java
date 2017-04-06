@@ -33,7 +33,7 @@ public class BackUp {
     /**
      * Directorio donde se almacena el archivo de backup en el pc local.
      */
-    private static final String FOLDER_PATH = "C:\\backUpServicentro";
+    private static final String FOLDER_PATH = "C:\\Servicentro\\backup\\backUpServicentro";
 
     /**
      * Directorio donde esta el ejecutable mysqldump del motor de bd Mysql o

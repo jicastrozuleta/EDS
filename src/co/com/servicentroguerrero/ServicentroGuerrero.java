@@ -6,6 +6,7 @@
 package co.com.servicentroguerrero;
 
 import co.com.reports.Reports;
+import co.com.servicentroguerrero.backup.BackUp;
 
 /**
  *
@@ -17,7 +18,10 @@ public class ServicentroGuerrero {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        Reports r = new Reports();
-        r.toPDF();        
+//        Reports r = new Reports();
+//        r.toPDF();     
+    if(BackUp.generarBackUp()){
+        System.out.println("completo!");
+    }
     }
 }
