@@ -7,13 +7,17 @@ package co.com.servicentroguerrero.gui;
 
 import co.com.servicentro.util.DocumentTypeDouble;
 import co.com.servicentro.util.Util;
+import co.com.servicentroguerrero.backup.BackUp;
 import co.com.servicentroguerrero.controler.ControllerBO;
 import co.com.servicentroguerrero.controler.WorkerBO;
 import co.com.servicentroguerrero.modelos.Combustible;
 import co.com.servicentroguerrero.modelos.Empleado;
+import co.com.servicentroguerrero.modelos.Existencias;
 import co.com.servicentroguerrero.modelos.Liquidacion;
 import co.com.servicentroguerrero.modelos.LiquidacionDispensador;
 import java.awt.Color;
+import java.awt.event.WindowEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.logging.Level;
@@ -33,6 +37,9 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private static final int SURTIDOR1 = 0X01;
     private static final int SURTIDOR2 = 0X02;
     private static final int SURTIDOR3 = 0X03;
+    
+    /*cantidad de cilindros*/
+    private static final int TOTAL_CILINDROS = 0x03;
 
     /*Constantes para identificar el dispensador de cada surtidor.*/
     private static final int DISPENSADOR1 = 0X01;
@@ -86,14 +93,44 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
      */
     private JFrameIngresoDinero jFrameIngresoDinero;
 
+    /**
+     * Empleado que realiza la liquidacion
+     */
+    private final Empleado empleadoLiquidador;
+
+    /**
+     * Objeto que representa la ventana de eliminacion de empleados.
+     */
+    private JFrameEliminarEmpleados jFrameEliminarEmpleados;
+
+    /**
+     * Objeto que representa la ventana de insercion de empleados.
+     */
+    private JFrameAgregarEmpleados jFrameAgregarEmpleados;
     
-    private final Empleado empleadoLiquidador; 
+    /**
+     * Objeto que representa la ventana de insercion de calibraciones.
+     */
+    private JFrameCalibracion jFrameCalibracion;
+    
+    /**
+     * Objeto que representa la ventana de registro de medida de regla mojada.
+     */
+    private JFrameMedidaRegla jFrameMedidaRegla;
+    
+    
+    /**
+     * Objeto que representa la ventana para generar el reporte de liquidacion diaria.
+     */
+    private JFrameGenerarReporteDiario jFrameGenerarReporteDiario;
+
     /**
      * Creates new form JFrameLiquidacion
+     *
      * @param empleadoLiquidador, empleado que realiza la liquidacion actual.
      */
     public JFrameLiquidacion(final Empleado empleadoLiquidador) {
-        
+
         /*Empleado que va a realizar la liquidacion*/
         this.empleadoLiquidador = empleadoLiquidador;
 
@@ -374,6 +411,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jPanelS3D2DiferenciaDinero = new javax.swing.JPanel();
         jLabelS3D2Diferencia = new javax.swing.JLabel();
         jTextFieldS3D2Diferencia = new javax.swing.JTextField();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
         jMenuBar = new javax.swing.JMenuBar();
         jMenuArchivo = new javax.swing.JMenu();
         jMenuItemSalir = new javax.swing.JMenuItem();
@@ -387,12 +425,17 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jMenuItemActualizarPrecios = new javax.swing.JMenuItem();
         jMenuItemCalibracion = new javax.swing.JMenuItem();
         jMenuItemExtraLiquidacion = new javax.swing.JMenuItem();
+        jMenuItemMedicionRegla = new javax.swing.JMenuItem();
+        jMenuItemGenerarReporteDiario = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Servicentro Guerrero");
         setExtendedState(6);
         setMaximumSize(new java.awt.Dimension(0, 0));
         addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
             }
@@ -1573,6 +1616,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         );
 
         jTabbedPane.addTab("Liquidacion", jPanelLiquidacion);
+        jTabbedPane.addTab("Resumen Diario", jTabbedPane1);
 
         jMenuArchivo.setText("Archivo");
 
@@ -1599,6 +1643,11 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jMenuEmpleados.add(jMenuItemEmpleadosAgregar);
 
         jMenuItemEmpleadosEliminar.setText("Eliminar");
+        jMenuItemEmpleadosEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemEmpleadosEliminarActionPerformed(evt);
+            }
+        });
         jMenuEmpleados.add(jMenuItemEmpleadosEliminar);
 
         jMenuHerramientas.add(jMenuEmpleados);
@@ -1606,6 +1655,11 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jMenuBaseDeDatos.setText("Base de Datos");
 
         jMenuItemBackUp.setText("BackUp");
+        jMenuItemBackUp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemBackUpActionPerformed(evt);
+            }
+        });
         jMenuBaseDeDatos.add(jMenuItemBackUp);
 
         jMenuItemRestaurar.setText("Restaurar");
@@ -1637,6 +1691,22 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jMenuItemExtraLiquidacion.setText("Extra Liquidacion");
         jMenuHerramientas.add(jMenuItemExtraLiquidacion);
 
+        jMenuItemMedicionRegla.setText("Medicion Regla");
+        jMenuItemMedicionRegla.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemMedicionReglaActionPerformed(evt);
+            }
+        });
+        jMenuHerramientas.add(jMenuItemMedicionRegla);
+
+        jMenuItemGenerarReporteDiario.setText("Generar Reporte Diario");
+        jMenuItemGenerarReporteDiario.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemGenerarReporteDiarioActionPerformed(evt);
+            }
+        });
+        jMenuHerramientas.add(jMenuItemGenerarReporteDiario);
+
         jMenuBar.add(jMenuHerramientas);
 
         setJMenuBar(jMenuBar);
@@ -1662,17 +1732,30 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItemSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSalirActionPerformed
-        // TODO add your handling code here:
+        System.exit(0);
     }//GEN-LAST:event_jMenuItemSalirActionPerformed
 
     private void jMenuItemRestaurarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemRestaurarActionPerformed
         JFileChooser jFileChooser = new JFileChooser();
-        
+
+        File dirDeafult = new File(BackUp.PATH_DAFULT_BACKUP);
         /*Definicion de extension del backup*/
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("Restaurar Back-Up", "bkp");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Restauracion bkp", "bkp");
         jFileChooser.setFileFilter(filter);
-        
+        jFileChooser.setCurrentDirectory(dirDeafult);
         jFileChooser.showOpenDialog(JFrameLiquidacion.this);
+
+        /*capturar el archivo seleccionado*/
+        File file = jFileChooser.getSelectedFile();
+
+        /*validar que el archivo sea correcto.*/
+        if (file.exists() && file.getAbsolutePath().contains(".bkp")) {
+            if (BackUp.restaurarBackup(file.getAbsolutePath())) {
+                JOptionPane.showMessageDialog(this, "Restauracion Completada correctamente.", "Restauracion OK", JOptionPane.OK_OPTION);
+            } else {
+                JOptionPane.showMessageDialog(this, "Error en la restauracion de la base de datos. Intente nuevamente.", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }//GEN-LAST:event_jMenuItemRestaurarActionPerformed
 
     private void jButtonIngresarDineroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonIngresarDineroActionPerformed
@@ -1686,10 +1769,16 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     }//GEN-LAST:event_jButtonIngresarDineroActionPerformed
 
     private void jButtonGuardarLiquidacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGuardarLiquidacionActionPerformed
-        
+
         /*re-calcular todas las liquidaciones*/
         iniciarRecalculoDeLiquidaciones();
-
+        
+        /*verificar que ya se realizo el registro de mededias por regla mojada*/
+        if(verficarMedidasDeExistenciasActuales()){
+            JOptionPane.showMessageDialog(this, "Debe registrar todas las medidas de regla en los cilindros.", "ERROR DE MEDIDA REGLA", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
         /*validar islero seleccionado*/
         int position = jComboBoxCambiarIslero.getSelectedIndex();
         if (position == JComboBox.UNDEFINED_CONDITION || position == 0) {
@@ -2300,18 +2389,58 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     }//GEN-LAST:event_jTextFieldVentasAceitesActionPerformed
 
     private void jMenuItemCalibracionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemCalibracionActionPerformed
-        JFrameCalibracion jFrameCalibracion = new JFrameCalibracion();
+        if(jFrameCalibracion == null)
+            jFrameCalibracion = new JFrameCalibracion();
         jFrameCalibracion.setLocationRelativeTo(this);
         jFrameCalibracion.setVisible(true);
     }//GEN-LAST:event_jMenuItemCalibracionActionPerformed
 
     private void jMenuItemEmpleadosAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemEmpleadosAgregarActionPerformed
-        JFrameAgregarEmpleados jFrameAgregarEmpleados = new JFrameAgregarEmpleados();
+        if (jFrameAgregarEmpleados == null) {
+            jFrameAgregarEmpleados = new JFrameAgregarEmpleados();
+        }
         jFrameAgregarEmpleados.setLocationRelativeTo(this);
         jFrameAgregarEmpleados.setVisible(true);
+
     }//GEN-LAST:event_jMenuItemEmpleadosAgregarActionPerformed
 
-  
+    private void jMenuItemBackUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemBackUpActionPerformed
+        if (BackUp.generarBackUp()) {
+            JOptionPane.showMessageDialog(this, "BackUp Generado de forma correcta.", "BACKUP OK", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Error generando backup. Intente nuevamente", "BACKUP ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jMenuItemBackUpActionPerformed
+
+    private void jMenuItemEmpleadosEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemEmpleadosEliminarActionPerformed
+        if (jFrameEliminarEmpleados == null) {
+            jFrameEliminarEmpleados = new JFrameEliminarEmpleados();
+        }
+        jFrameEliminarEmpleados.setLocationRelativeTo(this);
+        jFrameEliminarEmpleados.setVisible(true);
+    }//GEN-LAST:event_jMenuItemEmpleadosEliminarActionPerformed
+
+    private void jMenuItemMedicionReglaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemMedicionReglaActionPerformed
+        if(jFrameMedidaRegla == null)
+            jFrameMedidaRegla = new JFrameMedidaRegla();
+        jFrameMedidaRegla.setLocationRelativeTo(this);
+        jFrameMedidaRegla.setVisible(true);
+    }//GEN-LAST:event_jMenuItemMedicionReglaActionPerformed
+
+    private void jMenuItemGenerarReporteDiarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGenerarReporteDiarioActionPerformed
+    
+        if (jFrameGenerarReporteDiario == null) {
+            jFrameGenerarReporteDiario = new JFrameGenerarReporteDiario();
+        }
+        jFrameGenerarReporteDiario.setLocationRelativeTo(this);
+        jFrameGenerarReporteDiario.setVisible(true);
+    }//GEN-LAST:event_jMenuItemGenerarReporteDiarioActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+     
+    }//GEN-LAST:event_formWindowClosing
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonGuardarLiquidacion;
     private javax.swing.JButton jButtonIngresarDinero;
@@ -2382,6 +2511,8 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private javax.swing.JMenuItem jMenuItemEmpleadosAgregar;
     private javax.swing.JMenuItem jMenuItemEmpleadosEliminar;
     private javax.swing.JMenuItem jMenuItemExtraLiquidacion;
+    private javax.swing.JMenuItem jMenuItemGenerarReporteDiario;
+    private javax.swing.JMenuItem jMenuItemMedicionRegla;
     private javax.swing.JMenuItem jMenuItemRestaurar;
     private javax.swing.JMenuItem jMenuItemSalir;
     private javax.swing.JPanel jPanel1;
@@ -2457,6 +2588,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private javax.swing.JPanel jPanelSurtidor3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextField jTextFieldCompraCombustibleSurtidor1;
     private javax.swing.JTextField jTextFieldCompraCombustibleSurtidor2;
     private javax.swing.JTextField jTextFieldCompraCombustibleSurtidor3;
@@ -2874,8 +3006,10 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         /*Total de dinero entregado por liquidacion de combustibles*/
         double totalCombustibles = 0;
 
-        /*total de diferencia de dinero por cada liquidacion de surtidor*/
-        double totalDiferencias = 0;
+        /*Conservar el movimiento de salida de combustibles de cada surtidor*/
+        double galonesVendidosSurtidor1 = 0;
+        double galonesVendidosSurtidor2 = 0;
+        double galonesVendidosSurtidor3 = 0;
 
         String textLiquidacionesDispensador = "";
         for (LiquidacionDispensador liquidacionDispensador : liquidacionesPorDispensador) {
@@ -2894,6 +3028,46 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
                     + liquidacionDispensador.getDineroEntregado() + ";"
                     + liquidacionDispensador.getDineroCalculado() + ";"
                     + liquidacionDispensador.getDiferenciaDinero() + "*";
+            
+            /*calcular la salida de combustible de cada surtidor*/
+            if(liquidacionDispensador.getIdSurtidor() == SURTIDOR1)
+                galonesVendidosSurtidor1 += liquidacionDispensador.getGalones();
+            
+            if(liquidacionDispensador.getIdSurtidor() == SURTIDOR2)
+                galonesVendidosSurtidor2 += liquidacionDispensador.getGalones();
+            
+            if(liquidacionDispensador.getIdSurtidor() == SURTIDOR3)
+                galonesVendidosSurtidor3 += liquidacionDispensador.getGalones();
+        }
+        
+        /*calcular movimiento de existencias de combustibles*/
+        ArrayList<Existencias> listaExistencias = ControllerBO.cargarExistenciasDeCombustible();
+        {
+            /*cargar movimiento de compras de combustible*/
+            double comprasSurtidor1 = Double.parseDouble(jTextFieldCompraCombustibleSurtidor1.getText().trim());
+            double comprasSurtidor2 = Double.parseDouble(jTextFieldCompraCombustibleSurtidor2.getText().trim());
+            double comprasSurtidor3 = Double.parseDouble(jTextFieldCompraCombustibleSurtidor3.getText().trim());
+            
+            /*realizar movimientos de entrada y salida de galones de combustibles*/
+            for (Existencias existencia : listaExistencias) {
+                if(existencia.getIdSurtidor() == SURTIDOR1){
+                    existencia.setGalonesComprados(comprasSurtidor1);
+                    existencia.setGalonesVendidos(galonesVendidosSurtidor1);
+                    existencia.setGalonesExistentes(existencia.getMedidaGalonesInicial() + comprasSurtidor1 - galonesVendidosSurtidor1);
+                }
+                
+                if(existencia.getIdSurtidor() == SURTIDOR2){
+                    existencia.setGalonesComprados(comprasSurtidor2);
+                    existencia.setGalonesVendidos(galonesVendidosSurtidor2);
+                    existencia.setGalonesExistentes(existencia.getMedidaGalonesInicial() + comprasSurtidor2 - galonesVendidosSurtidor2);
+                }
+                
+                if(existencia.getIdSurtidor() == SURTIDOR3){
+                    existencia.setGalonesComprados(comprasSurtidor3);
+                    existencia.setGalonesVendidos(galonesVendidosSurtidor3);
+                    existencia.setGalonesExistentes(existencia.getMedidaGalonesInicial() + comprasSurtidor3 - galonesVendidosSurtidor3);
+                }
+            }
         }
 
         /*crear el worker encargado de crear los hilos para insercion*/
@@ -2903,8 +3077,19 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
                 this.totalLiquidado,
                 this.totalDineroIngresado,
                 (totalDineroIngresado - this.totalLiquidado),
-                textLiquidacionesDispensador);
+                textLiquidacionesDispensador,
+                listaExistencias
+        );
         worked.execute();
-//        JOptionPane.showMessageDialog(this, "Datos insertados de forma correcta.", "DATOS INSERTADOR", JOptionPane.OK_OPTION);
+        JOptionPane.showMessageDialog(this, "Liquidacion terminada de forma correcta.", "DATOS INSERTADOS", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+
+    /**
+     * validar que ya se registraron las medidas de regla de cada cilindro el dia actual
+     * @return true si ya estan los registros, false en caso contrario.
+     */
+    private boolean verficarMedidasDeExistenciasActuales() {
+        return (ControllerBO.cargarExistenciasDeCombustible().size() < TOTAL_CILINDROS);
     }
 }

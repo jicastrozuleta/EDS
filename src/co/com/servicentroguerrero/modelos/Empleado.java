@@ -14,6 +14,11 @@ import java.io.Serializable;
 public class Empleado implements Serializable{
     
     /**
+     * CONSTANTE PARA identificar QUE EL EMPLEADO ESTA ACTIVO ACTUALMENTE.
+     */
+    public static final int IS_ACTIVO = 0X01;
+    
+    /**
      * Constante para identificar empleados con rol de islero
      */
     public static final String ISLERO = "ISLERO";
@@ -27,6 +32,7 @@ public class Empleado implements Serializable{
      * Constante para identificar empleados con rol de secretaria
      */
     public static final String SECRETARIA = "SECRETARIA";
+    
     
     /**
      * Identificador unico de empleado PK

@@ -5,16 +5,17 @@
  */
 package co.com.servicentroguerrero.model;
 
-import co.com.servicentro.util.Util;
 import co.com.servicentroguerrero.conexion.Instance;
 import co.com.servicentroguerrero.modelos.Calibraciones;
 import co.com.servicentroguerrero.modelos.Cilindro;
 import co.com.servicentroguerrero.modelos.Combustible;
 import co.com.servicentroguerrero.modelos.Empleado;
+import co.com.servicentroguerrero.modelos.Existencias;
 import co.com.servicentroguerrero.modelos.Liquidacion;
 import co.com.servicentroguerrero.modelos.LiquidacionDispensador;
 import co.com.servicentroguerrero.modelos.Surtidores;
 import co.com.servicentroguerrero.modelos.Volumenes;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -166,22 +167,25 @@ public class Model {
     /**
      * Metodo para buscar un cilindro por codigo unico asignado.
      *
-     * @param codigo
+     * @param codigoSurtidor
      * @return el objeto cilindro, o null en caso contrario.
      */
-    public Cilindro buscarCilindroPorCodigo(String codigo) {
+    public Cilindro buscarCilindroPorCodigoSurtidor(String codigoSurtidor) {
         Cilindro cilindro = null;
         String query = ""
                 + "SELECT c.idCilindro AS idCilindro, "
-                + "		 c.idCombustible AS idCombustible,"
-                + "		 b.combustible AS combustible,"
-                + "		 c.longitud AS longitud,"
-                + "		 c.radio AS radio,"
-                + "		 c.codigo AS codigo,"
-                + "              c.volumenFijo AS volumenFijo  "
-                + "FROM cilindros c "
+                + "       c.idCombustible AS idCombustible, "
+                + "       b.combustible AS combustible, "
+                + "       c.longitud AS longitud, "
+                + "       c.radio AS radio, "
+                + "       c.codigo AS codigo, "
+                + "       c.volumenFijo AS volumenFijo "
+                + "FROM surtidores s "
+                + "INNER JOIN dispensadores d ON d.idSurtidor = s.idSurtidor "
+                + "INNER JOIN cilindros c ON c.idCilindro = d.idCilindro "
                 + "INNER JOIN combustibles b ON b.idCombustible = c.idCombustible "
-                + "WHERE codigo = '" + codigo + "';";
+                + "WHERE s.idSurtidor = " + codigoSurtidor + " "
+                + "GROUP BY s.idSurtidor";
 
         try {
             /*Ejecutar la consulta para obtener el set de datos*/
@@ -251,6 +255,66 @@ public class Model {
                 + "         s.modelo,"
                 + "         s.marca "                
                 + "FROM surtidores s "
+                + "ORDER BY s.idSurtidor;";
+
+        /*Objeto lista que sera llenada.*/
+        ArrayList<Surtidores> listaSurtidores = new ArrayList<>();
+
+        try {
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(query);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                do {
+                    Surtidores surtidor = new Surtidores(
+                            resultSet.getInt(1),
+                            resultSet.getInt(2),
+                            resultSet.getDouble(3),
+                            resultSet.getString(4),
+                            resultSet.getString(5),
+                            resultSet.getString(6),
+                            resultSet.getString(7)
+                    );
+
+                    /*agregar el combustible a la lista*/
+                    listaSurtidores.add(surtidor);
+                } while (resultSet.next());
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return listaSurtidores;
+    }
+    
+    
+     /**
+     * Metodo que permite cargar la lista de surtidores disponibles que aun no se les ha realizado
+     * medida de regla mojada en el dia actual.
+     *
+     * @return una lista con los objetos disponibles.
+     */
+    public ArrayList<Surtidores> cargarSurtidoresSinMedidaRegla() {
+
+        /*Query para cargar la lista de surtidores disponibles*/
+        String query = ""
+                + "SELECT   s.idSurtidor, "
+                + "         s.cantidadDispensadores, "
+                + "         s.galonaje, "
+                + "         s.codigoIdentificador, "
+                + "         s.serie, "
+                + "         s.modelo, "
+                + "         s.marca, "
+                + "         v.fecha "
+                + "FROM surtidores s "
+                + "INNER JOIN dispensadores d ON d.idSurtidor = s.idSurtidor "
+                + "INNER JOIN cilindros c ON c.idCilindro = d.idCilindro "
+                + "LEFT JOIN volumenes v ON v.idCilindro = c.idCilindro "
+                + "WHERE c.idCilindro NOT IN ( "
+                + "	SELECT v.idCilindro FROM volumenes v "
+                + "	WHERE TIMESTAMPDIFF(DAY,v.fecha,CURRENT_DATE()) <= 0 "
+                + ") "
+                + "GROUP BY s.idSurtidor "
                 + "ORDER BY s.idSurtidor;";
 
         /*Objeto lista que sera llenada.*/
@@ -475,5 +539,228 @@ public class Model {
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, e);
         }
         return numeroLiquidacion;
+    }
+
+    
+    /**
+     * Metodo para insertar un nuevo empleado en la base de datos.
+     * si tiene usuario y contraseña, tambien insertar en tabla de usuarios con acceso.
+     * @param empleado
+     * @param usuario
+     * @param password
+     * @return true si el empleado fue insertado de forma correcta.
+     */
+    public boolean insertarEmpleado(Empleado empleado, String usuario, String password) {
+        /*Numero de id generado por la insersion en base de datos*/
+        int nuevoIdEmpleado = 0;
+        
+        /*LLamar el SP que inicia la transaccion de liquidacion, no confirma con commit 
+        hasta que se termine de insertar el ultimo detalle de dispensador de la liquidacion actual*/
+        String insert = "CALL sp_insertarEmpleado("
+                + "'" + empleado.getIdentificacion() + "', "
+                + "'" + empleado.getNombres() + "', "
+                + "'" + empleado.getApellidos() + "', "
+                + "'" + empleado.getTelefono() + "', "
+                + "'" + empleado.getDireccion() + "'  "
+                + ");";
+        
+        try {
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(insert);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                nuevoIdEmpleado = resultSet.getInt(1);
+            }
+            
+            /*cerrar el resultSet actual*/
+            if(resultSet != null && !resultSet.isClosed())
+                resultSet.close();
+            
+            /*Insertar usuario y contraseña si es necesario*/
+            if(usuario != null && usuario.length() > 0 && password != null && password.length() > 0 && nuevoIdEmpleado > 0){
+                String insertUser = "CALL sp_insertarUsuario( "
+                        + "'" + nuevoIdEmpleado + "', "
+                        + "'" + usuario + "', "
+                        + "'" + password + "'  "
+                        + ");";
+                
+                /*Ejecutar la consulta para obtener el set de datos*/
+                resultSet = Instance.getInstance().executeQuery(insertUser);
+                
+                /*Capturar el resultado de la consulta*/
+                if (resultSet != null && resultSet.first()) {
+                    nuevoIdEmpleado = resultSet.getInt(1);
+                }
+                
+                /*cerrar el resultSet actual*/
+                if(resultSet != null && !resultSet.isClosed())
+                    resultSet.close();
+                }
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return (nuevoIdEmpleado > 0);
+    }
+
+    
+    /**
+     * buscar el empleado por numero de identificacion en la base de datos.
+     * @param identificacion
+     * @return objeto empleado con los datos del empleado encontrado.
+     */
+    public Empleado buscarEmpleadoPorIdentificacion(final String identificacion) {
+         Empleado empleado = null;
+        String query = ""
+                + "SELECT   e.idEmpleado,"
+                + "         e.idEds,"
+                + "         e.activo,"
+                + "         e.identificacion,"
+                + "         e.nombres,"
+                + "         e.apellidos,"
+                + "         e.telefono,"
+                + "         e.direccion "
+                + "FROM empleados e "
+                + "WHERE e.identificacion = '" + identificacion + "';";
+
+        try {
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(query);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+
+                empleado = new Empleado(
+                        resultSet.getInt(1),
+                        resultSet.getInt(2),
+                        resultSet.getInt(3),
+                        resultSet.getString(4).trim(),
+                        resultSet.getString(5).trim(),
+                        resultSet.getString(6).trim(),
+                        resultSet.getString(7).trim(),
+                        resultSet.getString(8).trim(),
+                        0,
+                        null
+                );
+            }
+            /*cerrar el resulset.*/
+            if(resultSet != null && !resultSet.isClosed())
+                resultSet.close();
+        } catch (SQLException e) {
+            empleado = null;
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        }
+        return empleado;
+    }
+
+    
+    /**
+     * Metodo que actualiza el estado de un empleado, para eliminarlo del sistema.
+     * @param idEmpleadoEliminar
+     * @return true si es cambiado su estado, false en caso contrario.
+     */
+    public boolean desactivarEmpleado(final int idEmpleadoEliminar) {
+        int desactivado = 0;
+        
+        /*Query para cargar la informacion de la ultima liquidacion*/
+        String query = "CALL sp_desactivarEmpleado('" + idEmpleadoEliminar + "');";
+        
+        try {
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(query);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                do {
+                    desactivado = resultSet.getInt(1);
+                } while (resultSet.next());
+            }
+            
+            /*cerrar el resulset.*/
+            if(resultSet != null && !resultSet.isClosed())
+                resultSet.close();
+            
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, e);
+        }
+        return (desactivado > 0);
+    }
+    
+    
+    
+    /**
+     * cargar las existencias iniciales de combustibles del dia.
+     * 
+     * @return lista con las existencias de combustible de cada cilindro.
+     */
+    public ArrayList<Existencias> cargarExistenciasDeCombustible() {
+        
+        /*lista vacia para conservar la existencias encontradas.*/
+        ArrayList<Existencias> listaExistencias = new ArrayList<>();
+        
+        /*Query para cargar la lista de existencias del dia.*/
+        String query = ""
+                + "SELECT   ROUND((v.volumen * c.volumenFijo),2), "
+                + "         s.idSurtidor,"
+                + "         c.idCilindro "
+                + "FROM volumenes v "
+                + "INNER JOIN cilindros c ON c.idCilindro = v.idCilindro "
+                + "INNER JOIN dispensadores d ON d.idCilindro = c.idCilindro "
+                + "INNER JOIN surtidores s ON s.idSurtidor = d.idSurtidor "
+                + "WHERE DATE(v.fecha) = CURRENT_DATE() "
+                + "GROUP BY s.idSurtidor "
+                + "ORDER BY v.idCilindro;";
+
+        try {
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(query);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                do {
+                    Existencias existencias = new Existencias(
+                            resultSet.getDouble(1),
+                            resultSet.getInt(2),
+                            resultSet.getInt(3)
+                    );
+                    /*agregar a la lista de existencias*/
+                    listaExistencias.add(existencias);
+                } while (resultSet.next());
+            }
+            /*cerrar el resulset.*/
+            if(resultSet != null && !resultSet.isClosed())
+                resultSet.close();
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        }
+        return listaExistencias;
+    }
+
+    
+    /**
+     * Insertar en base de datos los registros que controlan el movimiento de existencias
+     * de combustibles que se realizaron en el dia.
+     * @param listaExistencias 
+     */
+    public void registrarMovimientoDeExistenciasDeCombustibles(final ArrayList<Existencias> listaExistencias) {
+        
+        try {
+            /*Query con prepareStatement*/
+            String insert = "CALL sp_insertarExistenciasGalones(?, ?, ?, ?);";
+            PreparedStatement pstmtSurtidores = Instance.getPrivateConexion().getConexion().prepareStatement(insert);
+
+            /*insertar los movimientos de combustibles*/
+            for (Existencias existencia : listaExistencias) {
+                pstmtSurtidores.setInt(1, existencia.getIdCilindro());
+                pstmtSurtidores.setDouble(2, existencia.getGalonesVendidos());
+                pstmtSurtidores.setDouble(3, existencia.getGalonesComprados());
+                pstmtSurtidores.setDouble(4, existencia.getGalonesExistentes());
+                pstmtSurtidores.execute();
+                /*Limpiar los parametros*/
+                pstmtSurtidores.clearParameters();
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, e);
+        }
     }
 }

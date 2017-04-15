@@ -7,9 +7,13 @@ package co.com.reports;
 
 import co.com.servicentro.util.Util;
 import co.com.servicentroguerrero.conexion.Instance;
+import co.com.servicentroguerrero.controler.ControllerBO;
 import co.com.servicentroguerrero.model.Model;
+import co.com.servicentroguerrero.modelos.Surtidores;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +32,8 @@ public class LiquidacionDiariaReport {
             long numeroLiquidacion = obtenerBaseReporte(queryBase, hashMap);
             obtenerTotalesPorSurtidor(hashMap, numeroLiquidacion);
             obtenerResumenCombustibles(hashMap, numeroLiquidacion);
-
+            obtenerLiquidacionSurtidor(hashMap, numeroLiquidacion);
+            obtenerExistenciasCombustibles(hashMap, fechaLiquidacion);
         } catch (SQLException e) {
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, e);
         }
@@ -137,6 +142,101 @@ public class LiquidacionDiariaReport {
                     case 2:
                         hashMap.put("totalGalonesAcpm", Util.formatearMiles(resultSet.getDouble(2)));
                         hashMap.put("precioAcpm", "$" + Util.formatearMiles(resultSet.getDouble(3)));
+                        break;
+                }
+            } while (resultSet.next());
+        }
+        /*cerrar el resultset */
+        if (resultSet != null && !resultSet.isClosed()) {
+            resultSet.close();
+        }
+    }
+    
+    private void obtenerLiquidacionSurtidor(HashMap hashMap, long numeroLiquidacion) throws SQLException {
+        
+        /*Query con prepareStatement*/
+        String query = ""
+                + "SELECT l.numeroEntregado,"
+                + "	  l.numeroRecibido, "
+                + "	  l.galones, "
+                + "	  l.galonesCalculados, "
+                + "	  l.dineroEntregado, "
+                + "	  l.dineroCalculado, "
+                + "	  l.diferenciaDinero "
+                + "FROM liquidaciondispensador l "
+                + "WHERE l.numeroLiquidacion = ? AND "
+                + "	 l.idSurtidor = ? AND "
+                + "	 l.idDispensador = ? "
+                + "LIMIT 1;";
+        PreparedStatement pstmtSurtidores = Instance.getPrivateConexion().getConexion().prepareStatement(query);
+        
+        /*Identificador del dispensador*/
+        int dispensador = 1;
+        
+        /*cargar la lista de surtidores disponibles para generar reporte*/
+        ArrayList<Surtidores> listaSurtidores = ControllerBO.cargarListaSurtidores();
+        for (Surtidores surtidor : listaSurtidores) {
+            for (int i = 1; i <= surtidor.getCantidadDispensadores(); i++) {
+                 pstmtSurtidores.setLong(1, numeroLiquidacion);
+                 pstmtSurtidores.setInt(2, surtidor.getIdSurtidor());
+                 pstmtSurtidores.setInt(3, dispensador);
+                 /*ejecutar el query para recuperar el resultset*/
+                 if(pstmtSurtidores.execute()){
+                    ResultSet resultSet  = pstmtSurtidores.getResultSet();
+                    /*Capturar el resultado de la consulta*/
+                    if (resultSet != null && resultSet.first()) {
+                        do {
+                            hashMap.put("les" + surtidor.getIdSurtidor() + "d" + i, Util.formatearMiles(resultSet.getDouble(1)));
+                            hashMap.put("lcs" + surtidor.getIdSurtidor() + "d" + i, Util.formatearMiles(resultSet.getDouble(2)));
+                            hashMap.put("ges" + surtidor.getIdSurtidor() + "d" + i, Util.formatearMiles(resultSet.getDouble(3)));
+                            hashMap.put("gcs" + surtidor.getIdSurtidor() + "d" + i, Util.formatearMiles(resultSet.getDouble(4)));
+                            hashMap.put("dines" + surtidor.getIdSurtidor() + "d" + i, "$" + Util.formatearMiles(resultSet.getDouble(5)));
+                            hashMap.put("dincs" + surtidor.getIdSurtidor() + "d" + i, "$" + Util.formatearMiles(resultSet.getDouble(6)));
+                            hashMap.put("difcs" + surtidor.getIdSurtidor() + "d" + i, "$" + Util.formatearMiles(resultSet.getDouble(7)));
+                        } while (resultSet.next());
+                    }
+                    /*cerrar el resultSet actual*/
+                    if(resultSet != null && !resultSet.isClosed())
+                        resultSet.close();
+                }
+                 
+                 /*limpiar parametros de PreparedStatement*/
+                 pstmtSurtidores.clearParameters();
+                 dispensador++;
+            }
+        }
+    }
+
+    
+    /**
+     * Obtener la cantidad en galones de existencias de combustibles disponibles.
+     * @param hashMap
+     * @param fechaLiquidacion
+     * @throws SQLException 
+     */
+    private void obtenerExistenciasCombustibles(HashMap hashMap,final String fechaLiquidacion) throws SQLException {
+        String query = ""
+                + "SELECT   b.idCombustible, "
+                + "         ROUND(SUM(g.existentes),2) "
+                + "FROM galones g "
+                + "INNER JOIN cilindros c ON c.idCilindro = g.idCilindro "
+                + "INNER JOIN combustibles b ON b.idCombustible = c.idCombustible "
+                + "WHERE DATE(g.fecha) = DATE('" + fechaLiquidacion + "') "
+                + "GROUP BY b.idCombustible "
+                + "ORDER BY g.idCilindro;";
+
+        /*Ejecutar la consulta para obtener el set de datos*/
+        ResultSet resultSet = Instance.getInstance().executeQuery(query);
+
+        /*Capturar el resultado de la consulta*/
+        if (resultSet != null && resultSet.first()) {
+            do {
+                switch (resultSet.getInt(1)) {
+                    case 1:
+                        hashMap.put("existCorriente", Util.formatearMiles(resultSet.getDouble(2)) + " gal");
+                        break;
+                    case 2:
+                        hashMap.put("existAcpm", Util.formatearMiles(resultSet.getDouble(2)) + " gal");
                         break;
                 }
             } while (resultSet.next());

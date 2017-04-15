@@ -5,8 +5,10 @@
  */
 package co.com.servicentroguerrero.controler;
 
+import co.com.servicentroguerrero.modelos.Existencias;
 import co.com.servicentroguerrero.modelos.Liquidacion;
 import co.com.servicentroguerrero.modelos.LiquidacionDispensador;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JProgressBar;
 import javax.swing.SwingWorker;
@@ -57,6 +59,12 @@ public class WorkerBO extends SwingWorker<Boolean, String> {
     private final String liquidacionesPorDispensador;
 
     /**
+     * Lista que contiene el movimiento de existencias de combustibles de cada
+     * surtidor
+     */
+    private final ArrayList<Existencias> listaExistencias;
+
+    /**
      * Constructor para istanciar el worker que se encargara de insertar en base
      * de datos la liquidacion. ademas de mostrar al usuario el avance de la
      * transaccion.
@@ -68,8 +76,9 @@ public class WorkerBO extends SwingWorker<Boolean, String> {
      * @param dineroEntregado
      * @param diferencia
      * @param liquidacionesPorDispensador
+     * @param listaExistencias
      */
-    public WorkerBO(int idEmpleadoLiquidador, double totalCombustibles, double totalAceites, double totalLiquidado, double dineroEntregado, double diferencia, String liquidacionesPorDispensador) {
+    public WorkerBO(int idEmpleadoLiquidador, double totalCombustibles, double totalAceites, double totalLiquidado, double dineroEntregado, double diferencia, String liquidacionesPorDispensador, final ArrayList<Existencias> listaExistencias) {
         this.idEmpleadoLiquidador = idEmpleadoLiquidador;
         this.totalCombustibles = totalCombustibles;
         this.totalAceites = totalAceites;
@@ -77,6 +86,7 @@ public class WorkerBO extends SwingWorker<Boolean, String> {
         this.dineroEntregado = dineroEntregado;
         this.diferencia = diferencia;
         this.liquidacionesPorDispensador = liquidacionesPorDispensador;
+        this.listaExistencias = listaExistencias;
     }
 
     @Override
@@ -85,6 +95,10 @@ public class WorkerBO extends SwingWorker<Boolean, String> {
         publish("Creando cabecera de liquidacion...");
         /*crear la cabecera de liquidacion, que sera insertada en la tabla Liquidaciones*/
         if (generarCabecera() != Long.MIN_VALUE) {
+
+            /*registrar el movimiento de combustibles*/
+            registrarMovimientoDeCombustibles();
+
             Thread.sleep(2000);
             return true;
         } else {
@@ -118,10 +132,13 @@ public class WorkerBO extends SwingWorker<Boolean, String> {
         /*solicitar a la base de datos un begin transaction*/
         return ControllerBO.insertarCabeceraDeLiquidacion(liquidacion, this.liquidacionesPorDispensador);
     }
-    
-    
-    
-    
+
+    /**
+     * registrar el movimiento de combustibles
+     */
+    private void registrarMovimientoDeCombustibles() {
+        ControllerBO.registrarMovimientoDeCombustibles(listaExistencias);
+    }
 
     public JProgressBar getProgressBar() {
         return progressBar;
@@ -130,4 +147,5 @@ public class WorkerBO extends SwingWorker<Boolean, String> {
     public void setProgressBar(JProgressBar progressBar) {
         this.progressBar = progressBar;
     }
+
 }

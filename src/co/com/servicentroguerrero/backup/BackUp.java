@@ -24,6 +24,13 @@ import java.util.logging.Logger;
  * @author JICZ4
  */
 public class BackUp {
+    
+    /**
+     * Directorio que contiene los archivos de restauracion por defecto.
+     * En este directorio se guardan los archivos de backup generados por 
+     * el sistema de BackUp.
+     */
+    public static final String PATH_DAFULT_BACKUP = "C:\\Servicentro\\backup\\backUpServicentro";
 
     /**
      * fORMATO DE FECHA ACTUAL PARA COMPONER EL NOMBRE DEL ARCHIVO DE BACKUP

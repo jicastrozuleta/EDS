@@ -5,6 +5,10 @@
  */
 package co.com.servicentroguerrero.gui;
 
+import co.com.servicentroguerrero.controler.ControllerBO;
+import co.com.servicentroguerrero.modelos.Empleado;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author JICZ4
@@ -32,21 +36,21 @@ public class JFrameAgregarEmpleados extends javax.swing.JFrame {
         jPanelDatosPersonales = new javax.swing.JPanel();
         jPanelIngresoDatos = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        jTextFieldIdentificacion = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        jTextFieldNombres = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
+        jTextFieldApellidos = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jTextField4 = new javax.swing.JTextField();
+        jTextFieldTelefono = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        jTextField5 = new javax.swing.JTextField();
+        jTextFieldDireccion = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
-        jTextField6 = new javax.swing.JTextField();
+        jTextFieldUser = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
-        jTextField7 = new javax.swing.JTextField();
+        jTextFieldPassword = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         getContentPane().setLayout(new java.awt.GridLayout(1, 1, 1, 1));
@@ -66,46 +70,46 @@ public class JFrameAgregarEmpleados extends javax.swing.JFrame {
         jLabel1.setText("Identificacion:");
         jPanelIngresoDatos.add(jLabel1);
 
-        jTextField1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jPanelIngresoDatos.add(jTextField1);
+        jTextFieldIdentificacion.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jPanelIngresoDatos.add(jTextFieldIdentificacion);
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel2.setText("Nombres:");
         jPanelIngresoDatos.add(jLabel2);
 
-        jTextField2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jPanelIngresoDatos.add(jTextField2);
+        jTextFieldNombres.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jPanelIngresoDatos.add(jTextFieldNombres);
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel3.setText("Apellidos:");
         jPanelIngresoDatos.add(jLabel3);
 
-        jTextField3.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jTextField3.addActionListener(new java.awt.event.ActionListener() {
+        jTextFieldApellidos.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTextFieldApellidos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField3ActionPerformed(evt);
+                jTextFieldApellidosActionPerformed(evt);
             }
         });
-        jPanelIngresoDatos.add(jTextField3);
+        jPanelIngresoDatos.add(jTextFieldApellidos);
 
         jLabel4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel4.setText("Telefono:");
         jPanelIngresoDatos.add(jLabel4);
 
-        jTextField4.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jTextField4.addActionListener(new java.awt.event.ActionListener() {
+        jTextFieldTelefono.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTextFieldTelefono.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField4ActionPerformed(evt);
+                jTextFieldTelefonoActionPerformed(evt);
             }
         });
-        jPanelIngresoDatos.add(jTextField4);
+        jPanelIngresoDatos.add(jTextFieldTelefono);
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel5.setText("Direccion:");
         jPanelIngresoDatos.add(jLabel5);
 
-        jTextField5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jPanelIngresoDatos.add(jTextField5);
+        jTextFieldDireccion.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jPanelIngresoDatos.add(jTextFieldDireccion);
 
         javax.swing.GroupLayout jPanelDatosPersonalesLayout = new javax.swing.GroupLayout(jPanelDatosPersonales);
         jPanelDatosPersonales.setLayout(jPanelDatosPersonalesLayout);
@@ -132,15 +136,15 @@ public class JFrameAgregarEmpleados extends javax.swing.JFrame {
         jLabel6.setText("Usuario:");
         jPanel2.add(jLabel6);
 
-        jTextField6.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jPanel2.add(jTextField6);
+        jTextFieldUser.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jPanel2.add(jTextFieldUser);
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel7.setText("Contraseña:");
         jPanel2.add(jLabel7);
 
-        jTextField7.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jPanel2.add(jTextField7);
+        jTextFieldPassword.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jPanel2.add(jTextFieldPassword);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -189,18 +193,48 @@ public class JFrameAgregarEmpleados extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+
+        try {
+            /*Iniciar la captura de los datos del nuevo empleado*/
+            String identificacion = jTextFieldIdentificacion.getText().trim().toUpperCase();
+            String nombres = jTextFieldNombres.getText().trim().toUpperCase();
+            String apellidos = jTextFieldApellidos.getText().trim().toUpperCase();
+            String telefono = jTextFieldTelefono.getText().trim().toUpperCase();
+            String direccion = jTextFieldDireccion.getText().trim().toUpperCase();
+            String usuario = jTextFieldUser.getText().trim();
+            String password = jTextFieldPassword.getText().trim();
+
+            /*validar los datos ingresados*/
+            if (usuario.length() == 0) {
+                usuario = null;
+            }
+
+            if (password.length() == 0) {
+                password = null;
+            }
+
+            /*insertar  empleado*/
+            Empleado empleado = new Empleado(0, 0, 0, identificacion, nombres, apellidos, telefono, direccion, 0, null);
+
+            if (ControllerBO.guardarEmpleado(empleado, usuario, password)) {
+                JOptionPane.showMessageDialog(this, "Se registro el empleado de forma correcta.", "REGISTRADO OK", JOptionPane.INFORMATION_MESSAGE);
+                this.dispose();
+            } else {
+                throw new Exception("No se registro el empleado, verifique los datos e intente nuevamente.");
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
+    private void jTextFieldApellidosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldApellidosActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField3ActionPerformed
+    }//GEN-LAST:event_jTextFieldApellidosActionPerformed
 
-    private void jTextField4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField4ActionPerformed
+    private void jTextFieldTelefonoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldTelefonoActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField4ActionPerformed
+    }//GEN-LAST:event_jTextFieldTelefonoActionPerformed
 
-   
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -216,12 +250,12 @@ public class JFrameAgregarEmpleados extends javax.swing.JFrame {
     private javax.swing.JPanel jPanelAgregarEmpleado;
     private javax.swing.JPanel jPanelDatosPersonales;
     private javax.swing.JPanel jPanelIngresoDatos;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
-    private javax.swing.JTextField jTextField6;
-    private javax.swing.JTextField jTextField7;
+    private javax.swing.JTextField jTextFieldApellidos;
+    private javax.swing.JTextField jTextFieldDireccion;
+    private javax.swing.JTextField jTextFieldIdentificacion;
+    private javax.swing.JTextField jTextFieldNombres;
+    private javax.swing.JTextField jTextFieldPassword;
+    private javax.swing.JTextField jTextFieldTelefono;
+    private javax.swing.JTextField jTextFieldUser;
     // End of variables declaration//GEN-END:variables
 }
