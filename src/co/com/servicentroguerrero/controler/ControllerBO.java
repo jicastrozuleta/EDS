@@ -135,7 +135,7 @@ public class ControllerBO {
      * @return el rowid del registro incertado en la BD.
      * @throws Exception
      */
-    public static long insertarCalibracion(int idSurtidor, double galonesUsados, String descripcion) throws Exception {
+    public static long insertarCalibracion(int idSurtidor, String galonesUsados, String descripcion) throws Exception {
 
         /*verificar que el surtidor sea valido*/
         if (idSurtidor <= 0) {
@@ -146,9 +146,14 @@ public class ControllerBO {
         if (descripcion.length() > 499) {
             descripcion = descripcion.substring(0, 499);
         }
+       
+        /*validar que los galones ingresados sea un numero valido*/
+        if (!Util.isNumeric(galonesUsados)) {
+            throw new Exception("Ingrese un numero valido de galones usados.");
+        }
 
         /*Crear la calibracion*/
-        Calibraciones calibraciones = new Calibraciones(Long.MIN_VALUE, idSurtidor, galonesUsados, null, descripcion);
+        Calibraciones calibraciones = new Calibraciones(Long.MIN_VALUE, idSurtidor, Double.parseDouble(galonesUsados), null, descripcion);
 
         /*Insertar la calibracion*/
         long rowid = MODELO.insertarCalibracion(calibraciones);
@@ -389,5 +394,36 @@ public class ControllerBO {
     public static void registrarMovimientoDeCombustibles(final ArrayList<Existencias> listaExistencias) {
         if(listaExistencias != null && !listaExistencias.isEmpty())
             MODELO.registrarMovimientoDeExistenciasDeCombustibles(listaExistencias);
+    }
+
+    /**
+     * Metodo para actualizar el precio de planta de los combustibles
+     * @param sPrecioCorriente
+     * @param sPrecioAcpm 
+     * @return  rowid del nuevo registro vigente de combustibles
+     * @throws java.lang.Exception 
+     */
+    public static int actualizarPrecioCombustiblePlanta(String sPrecioCorriente, String sPrecioAcpm) throws Exception{
+        /*validar que el precio de corriente sea valido*/
+        if(sPrecioCorriente == null || sPrecioCorriente.length() == 0 || !Util.isNumeric(sPrecioCorriente))
+            throw  new Exception("Ingrese un precio de corriente valido.");
+        
+        /*validar que el precio de corriente sea valido*/
+        if(sPrecioAcpm == null || sPrecioAcpm.length() == 0 || !Util.isNumeric(sPrecioAcpm))
+            throw  new Exception("Ingrese un precio de ACPM valido.");
+        
+        /*Intentar actualizar el precio de los combustibles*/
+        return MODELO.actualizarPrecioCombustiblesPlanta(Double.parseDouble(sPrecioCorriente), Double.parseDouble(sPrecioAcpm));
+    }
+
+    
+    /**
+     * cargar el resumen de liquidaciones realizados a la fecha actual
+     *
+     * @return Lista que contiene los objectos que representaran la informacion
+     * de cada fila de la tabla de resumen
+     */
+    public static ArrayList<Object[]> cargarResumenLiquidaciones() {
+        return MODELO.cargarResumenLiquidaciones();
     }
 }

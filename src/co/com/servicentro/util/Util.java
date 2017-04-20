@@ -119,6 +119,27 @@ public class Util {
         }
         return newDate;
     }
+    
+    /**
+     * Devuelve cadena con el nombre de la fecha ingresada
+     * @param fecha
+     * @return 
+     */
+    public static String devolverMesDeFecha(String fecha){
+        String mes = "";
+        try {
+            /*capturar el formato de fecha ingresado*/
+            SimpleDateFormat formatIn = new SimpleDateFormat("yyyy-MM-dd");
+            Date ahora = formatIn.parse(fecha);
+
+            /*dar nuevo formato de fecha*/
+            SimpleDateFormat formateador = new SimpleDateFormat("MMMM", new Locale("es", "CO"));
+            mes = formateador.format(ahora);
+        } catch (ParseException ex) {
+            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return mes;
+    }
 
     /**
      * Metodo para obtener la fecha actual del sistema

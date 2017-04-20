@@ -5,12 +5,15 @@
  */
 package co.com.servicentroguerrero.gui;
 
-import co.com.servicentro.util.DateLabelFormatter;
+import co.com.servicentro.util.DocumentTypeDouble;
+import co.com.servicentro.util.Util;
 import co.com.servicentroguerrero.controler.ControllerBO;
-import java.util.Properties;
-import org.jdatepicker.impl.JDatePanelImpl;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import org.jdatepicker.impl.JDatePickerImpl;
-import org.jdatepicker.impl.UtilDateModel;
 
 /**
  *
@@ -23,14 +26,18 @@ public class JFrameCalibracion extends javax.swing.JFrame {
      * Constante para indicar una posicion por defecto en combobox.
      */
     private static final int POSITION_DEFAULT = 0x00;
+    
+    
 
     /**
      * Creates new form JFrameCalibracion
      */
     public JFrameCalibracion() {
         initComponents();
-        mostrarPicker();
+        /*Validar que los campos sean numericos tipo double*/
+        setDocumentsDouble();
         cargarSurtidores();
+        cargarFechaActual();
     }
 
     /**
@@ -47,8 +54,9 @@ public class JFrameCalibracion extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jComboBoxSurtidores = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        jTextFieldGalonesUsados = new javax.swing.JTextField();
         jPanelPicker = new javax.swing.JPanel();
+        jTextFieldFecha = new javax.swing.JTextField();
         jPanelFecha = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
 
@@ -71,9 +79,15 @@ public class JFrameCalibracion extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel1.setText("Galones Usados: ");
 
-        jTextField1.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTextFieldGalonesUsados.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
 
         jPanelPicker.setLayout(new java.awt.GridLayout(1, 1));
+
+        jTextFieldFecha.setEditable(false);
+        jTextFieldFecha.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jTextFieldFecha.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        jTextFieldFecha.setEnabled(false);
+        jPanelPicker.add(jTextFieldFecha);
 
         jPanelFecha.setLayout(new java.awt.GridLayout(1, 1));
 
@@ -91,13 +105,13 @@ public class JFrameCalibracion extends javax.swing.JFrame {
                     .addComponent(jComboBoxSurtidores, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanelFecha, javax.swing.GroupLayout.DEFAULT_SIZE, 103, Short.MAX_VALUE)
+                            .addComponent(jPanelFecha, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel1)
                                 .addGap(0, 0, Short.MAX_VALUE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
+                            .addComponent(jTextFieldGalonesUsados, javax.swing.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE)
                             .addComponent(jPanelPicker, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
@@ -112,7 +126,7 @@ public class JFrameCalibracion extends javax.swing.JFrame {
                     .addComponent(jPanelFecha, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextFieldGalonesUsados, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -135,7 +149,7 @@ public class JFrameCalibracion extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jButtonIngresarCalibracion, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(32, Short.MAX_VALUE))
+                .addContainerGap(26, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanelCalibracion);
@@ -144,7 +158,28 @@ public class JFrameCalibracion extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonIngresarCalibracionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonIngresarCalibracionActionPerformed
-        // TODO add your handling code here:
+        try {
+            /*capturar el id del surtidor seleccionado*/
+            int position = jComboBoxSurtidores.getSelectedIndex() - 1;
+
+            /*Si hay una posicion valida, capturar los datos necesarios*/
+            if (position != JComboBox.UNDEFINED_CONDITION) {
+                int idSurtidor = ControllerBO.cargarListaSurtidores().get(position).getIdSurtidor();
+                String galonesUsados = jTextFieldGalonesUsados.getText().trim();
+                String descripcion = "Calibrado : " + Util.getHoraActual();
+
+                /*intentar el registro de la calibracion en base de datos para el surtidor seleccionado*/
+                if (ControllerBO.insertarCalibracion(idSurtidor, galonesUsados, descripcion) > 0) {
+                    jComboBoxSurtidores.setSelectedIndex(POSITION_DEFAULT);
+                    jTextFieldGalonesUsados.setText("");
+                    JOptionPane.showMessageDialog(this, "Calibracion registrada de forma correcta.", "CALIBRADO", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } else {
+                throw new Exception("Seleccione un surtidor para registrar su calibracion.");
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_jButtonIngresarCalibracionActionPerformed
 
 
@@ -157,7 +192,8 @@ public class JFrameCalibracion extends javax.swing.JFrame {
     private javax.swing.JPanel jPanelCalibracion;
     private javax.swing.JPanel jPanelFecha;
     private javax.swing.JPanel jPanelPicker;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextFieldFecha;
+    private javax.swing.JTextField jTextFieldGalonesUsados;
     // End of variables declaration//GEN-END:variables
 
     
@@ -176,18 +212,19 @@ public class JFrameCalibracion extends javax.swing.JFrame {
     }
 
     /**
-     * MOstrar el picker en la ventana de calibracion
+     * Cargar en pantalla la fecha actual. para calibracion
      */
-    private void mostrarPicker() {
-        UtilDateModel model = new UtilDateModel();
-        Properties p = new Properties();
-        /*Propiedades para idioma español*/
-        p.put("text.today", "hoy ");
-        p.put("text.month", "mes");
-        p.put("text.year", "a\u00f1o");
-        p.put("text.clear", "Clear");
-        JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
-        JDatePickerImpl datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
-        jPanelPicker.add(datePicker);
+    private void cargarFechaActual() {
+        Date ahora = new Date();
+        SimpleDateFormat formateador = new SimpleDateFormat("yyyy-MM-dd", new Locale("es", "CO"));
+        jTextFieldFecha.setText(formateador.format(ahora));
+    }
+
+    
+    /**
+     * Validar ingreso de texto solo numerico double
+     */
+    private void setDocumentsDouble() {
+        jTextFieldGalonesUsados.setDocument(new DocumentTypeDouble());
     }
 }

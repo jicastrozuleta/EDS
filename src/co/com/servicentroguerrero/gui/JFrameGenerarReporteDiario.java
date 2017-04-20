@@ -160,6 +160,7 @@ public class JFrameGenerarReporteDiario extends javax.swing.JFrame {
         p.put("text.clear", "Clear");
         JDatePanelImpl datePanel = new JDatePanelImpl(model, p);
         datePicker = new JDatePickerImpl(datePanel, new DateLabelFormatter());
+        datePicker.setEnabled(false);
         jPanelPicker.add(datePicker);
     }
 }

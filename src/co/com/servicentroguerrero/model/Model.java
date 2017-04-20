@@ -5,6 +5,7 @@
  */
 package co.com.servicentroguerrero.model;
 
+import co.com.servicentro.util.Util;
 import co.com.servicentroguerrero.conexion.Instance;
 import co.com.servicentroguerrero.modelos.Calibraciones;
 import co.com.servicentroguerrero.modelos.Cilindro;
@@ -762,5 +763,72 @@ public class Model {
         } catch (SQLException e) {
             Logger.getLogger(Model.class.getName()).log(Level.SEVERE, null, e);
         }
+    }
+
+    
+    /**
+     * Insertar un nuevo registro de precios de planta de combustibles.
+     * EL nuevo registro insertado sera el vigente.
+     * @param precioCorriente
+     * @param precioAcpm
+     * @return 
+     */
+    public int actualizarPrecioCombustiblesPlanta(double precioCorriente, double precioAcpm) {
+        int validate = 0;
+        try {
+            /*Query para actualizar el registro*/
+            String insert = "CALL sp_actualizarPreciosPlanta('" + precioCorriente + "','" + precioAcpm + "');";
+ 
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(insert);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                validate = resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        }
+        return validate;
+    }
+
+    
+    /**
+     * 
+     * @return 
+     */
+    public ArrayList<Object[]> cargarResumenLiquidaciones() {
+        /*lista inicial vacia para conservar los objetos cargados de BD*/
+        ArrayList<Object[]> lista = new ArrayList<>();
+        try {
+            /*Query para cargar la informacion necesaria*/
+            String query = ""
+                    + "SELECT 	v.fecha,"
+                    + "		v.dia, "
+                    + "		v.galonesCorriente, "
+                    + "		v.gananciaUnitaria, "
+                    + "		v.gananciaCorriente "
+                    + "FROM view_resumenLiquidacion v;";
+ 
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(query);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                do {
+                    /*llenar la lista con los datos obtenidos*/
+                    lista.add(new Object[]{
+                        Util.devolverMesDeFecha(resultSet.getString(1).trim()),
+                        resultSet.getString(2).trim(),
+                        resultSet.getString(3).trim(),
+                        Util.formatearMiles(resultSet.getDouble(4)),
+                        Util.formatearMiles(resultSet.getDouble(5))                        
+                    });
+                } while (resultSet.next());
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        }
+        return lista;
     }
 }

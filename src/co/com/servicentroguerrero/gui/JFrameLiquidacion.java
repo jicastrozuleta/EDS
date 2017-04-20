@@ -16,9 +16,9 @@ import co.com.servicentroguerrero.modelos.Existencias;
 import co.com.servicentroguerrero.modelos.Liquidacion;
 import co.com.servicentroguerrero.modelos.LiquidacionDispensador;
 import java.awt.Color;
-import java.awt.event.WindowEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -26,6 +26,7 @@ import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -80,6 +81,12 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
      * Constante para indicar una posicion por defecto en combobox.
      */
     private static final int POSITION_DEFAULT = 0x00;
+    
+    
+    /**
+     * Referencia al modelo que permite asignar datos a la tabla.
+     */
+    private DefaultTableModel model;
 
     /**
      * Representa el total de dinero liquidado por surtidores y aceites
@@ -155,6 +162,12 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
 
         /*Inicializar la lsta de liquidaciones por dispensador*/
         crearArrayLiquidaciones();
+        
+        /*asignar el modelo a la tabla de resumen de liquidaciones*/
+        setTableModel();
+        
+        /*cargar el resumen de liquidaciones en la tabla*/
+        cargarResumenLiquidaciones();
 
     }
 
@@ -411,7 +424,8 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jPanelS3D2DiferenciaDinero = new javax.swing.JPanel();
         jLabelS3D2Diferencia = new javax.swing.JLabel();
         jTextFieldS3D2Diferencia = new javax.swing.JTextField();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTableResumenLiquidacion = new javax.swing.JTable();
         jMenuBar = new javax.swing.JMenuBar();
         jMenuArchivo = new javax.swing.JMenu();
         jMenuItemSalir = new javax.swing.JMenuItem();
@@ -422,11 +436,13 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jMenuBaseDeDatos = new javax.swing.JMenu();
         jMenuItemBackUp = new javax.swing.JMenuItem();
         jMenuItemRestaurar = new javax.swing.JMenuItem();
-        jMenuItemActualizarPrecios = new javax.swing.JMenuItem();
         jMenuItemCalibracion = new javax.swing.JMenuItem();
         jMenuItemExtraLiquidacion = new javax.swing.JMenuItem();
         jMenuItemMedicionRegla = new javax.swing.JMenuItem();
         jMenuItemGenerarReporteDiario = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItemActualizarPreciosVenta = new javax.swing.JMenuItem();
+        jMenuItemActualizarPrecioPlanta = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Servicentro Guerrero");
@@ -741,7 +757,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
             .addGroup(jPanelIngresoDineroLayout.createSequentialGroup()
                 .addGap(4, 4, 4)
                 .addGroup(jPanelIngresoDineroLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanelResumenLiquidacion, javax.swing.GroupLayout.DEFAULT_SIZE, 1319, Short.MAX_VALUE)
+                    .addComponent(jPanelResumenLiquidacion, javax.swing.GroupLayout.DEFAULT_SIZE, 1317, Short.MAX_VALUE)
                     .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jButtonIngresarDinero, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -1616,7 +1632,22 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         );
 
         jTabbedPane.addTab("Liquidacion", jPanelLiquidacion);
-        jTabbedPane.addTab("Resumen Diario", jTabbedPane1);
+
+        jTableResumenLiquidacion.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        jTableResumenLiquidacion.setFocusable(false);
+        jScrollPane2.setViewportView(jTableResumenLiquidacion);
+
+        jTabbedPane.addTab("Resumen Liquidacion", jScrollPane2);
 
         jMenuArchivo.setText("Archivo");
 
@@ -1672,14 +1703,6 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
 
         jMenuHerramientas.add(jMenuBaseDeDatos);
 
-        jMenuItemActualizarPrecios.setText("Actualizar Precios");
-        jMenuItemActualizarPrecios.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemActualizarPreciosActionPerformed(evt);
-            }
-        });
-        jMenuHerramientas.add(jMenuItemActualizarPrecios);
-
         jMenuItemCalibracion.setText("Calibracion");
         jMenuItemCalibracion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1708,6 +1731,26 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jMenuHerramientas.add(jMenuItemGenerarReporteDiario);
 
         jMenuBar.add(jMenuHerramientas);
+
+        jMenu1.setText("Precios");
+
+        jMenuItemActualizarPreciosVenta.setText("Actualizar Precios Venta");
+        jMenuItemActualizarPreciosVenta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemActualizarPreciosVentaActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItemActualizarPreciosVenta);
+
+        jMenuItemActualizarPrecioPlanta.setText("Actualizar Precios Planta");
+        jMenuItemActualizarPrecioPlanta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemActualizarPrecioPlantaActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItemActualizarPrecioPlanta);
+
+        jMenuBar.add(jMenu1);
 
         setJMenuBar(jMenuBar);
 
@@ -1758,27 +1801,559 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         }
     }//GEN-LAST:event_jMenuItemRestaurarActionPerformed
 
-    private void jButtonIngresarDineroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonIngresarDineroActionPerformed
+    private void jMenuItemActualizarPreciosVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemActualizarPreciosVentaActionPerformed
+        JFrameActualizarPrecios jFrameActualizarPrecios = new JFrameActualizarPrecios();
+        jFrameActualizarPrecios.setLocationRelativeTo(this);
+        jFrameActualizarPrecios.setVisible(true);
+    }//GEN-LAST:event_jMenuItemActualizarPreciosVentaActionPerformed
 
-        /*Cargar la ventana solo si es nula*/
-        if (jFrameIngresoDinero == null) {
-            jFrameIngresoDinero = new JFrameIngresoDinero(this);
-            jFrameIngresoDinero.setLocationRelativeTo(this);
+    /**
+     * Evento de ventana abierta para cargar la informacion de la ultima
+     * liquidacion registrada en base de datos.
+     *
+     * @param evt
+     */
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        /*Poner el focus inicial en el islero a liquidar*/
+        jButtonIngresarDinero.requestFocusInWindow();
+
+        /*intentar cargar la infromacion de la ultima liquidacion registrada en base de datos*/
+        try {
+            this.ultimaLiquidacion = ControllerBO.cargarUltimaLiquidacion();
+            if (this.ultimaLiquidacion != null) {
+                this.listaUltimaLiquidacionDispensador = ControllerBO.cargarLiquidacionDispensadores(ultimaLiquidacion);
+                if (this.listaUltimaLiquidacionDispensador.isEmpty()) {
+                    throw new Exception("No se logra cargar informacion de la liquidacion de surtidores anterior.\nIntente restaurar la ultima base de datos.");
+                }
+            } else {
+                throw new Exception("No se logra cargar informacion de la liquidacion anterior.\nIntente restaurar la ultima base de datos.");
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR DE LECTURA EN BASE DE DATOS", JOptionPane.ERROR_MESSAGE);
+            jButtonIngresarDinero.setEnabled(false);
+            jButtonGuardarLiquidacion.setEnabled(false);
         }
-        jFrameIngresoDinero.setVisible(true);
-    }//GEN-LAST:event_jButtonIngresarDineroActionPerformed
+    }//GEN-LAST:event_formWindowOpened
+
+    private void jMenuItemCalibracionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemCalibracionActionPerformed
+        if(jFrameCalibracion == null)
+            jFrameCalibracion = new JFrameCalibracion();
+        jFrameCalibracion.setLocationRelativeTo(this);
+        jFrameCalibracion.setVisible(true);
+    }//GEN-LAST:event_jMenuItemCalibracionActionPerformed
+
+    private void jMenuItemEmpleadosAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemEmpleadosAgregarActionPerformed
+        if (jFrameAgregarEmpleados == null) {
+            jFrameAgregarEmpleados = new JFrameAgregarEmpleados();
+        }
+        jFrameAgregarEmpleados.setLocationRelativeTo(this);
+        jFrameAgregarEmpleados.setVisible(true);
+
+    }//GEN-LAST:event_jMenuItemEmpleadosAgregarActionPerformed
+
+    private void jMenuItemBackUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemBackUpActionPerformed
+        if (BackUp.generarBackUp()) {
+            JOptionPane.showMessageDialog(this, "BackUp Generado de forma correcta.", "BACKUP OK", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Error generando backup. Intente nuevamente", "BACKUP ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_jMenuItemBackUpActionPerformed
+
+    private void jMenuItemEmpleadosEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemEmpleadosEliminarActionPerformed
+        if (jFrameEliminarEmpleados == null) {
+            jFrameEliminarEmpleados = new JFrameEliminarEmpleados();
+        }
+        jFrameEliminarEmpleados.setLocationRelativeTo(this);
+        jFrameEliminarEmpleados.setVisible(true);
+    }//GEN-LAST:event_jMenuItemEmpleadosEliminarActionPerformed
+
+    private void jMenuItemMedicionReglaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemMedicionReglaActionPerformed
+        if(jFrameMedidaRegla == null)
+            jFrameMedidaRegla = new JFrameMedidaRegla();
+        jFrameMedidaRegla.setLocationRelativeTo(this);
+        jFrameMedidaRegla.setVisible(true);
+    }//GEN-LAST:event_jMenuItemMedicionReglaActionPerformed
+
+    private void jMenuItemGenerarReporteDiarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGenerarReporteDiarioActionPerformed
+    
+        if (jFrameGenerarReporteDiario == null) {
+            jFrameGenerarReporteDiario = new JFrameGenerarReporteDiario();
+        }
+        jFrameGenerarReporteDiario.setLocationRelativeTo(this);
+        jFrameGenerarReporteDiario.setVisible(true);
+    }//GEN-LAST:event_jMenuItemGenerarReporteDiarioActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+     
+    }//GEN-LAST:event_formWindowClosing
+
+    private void jMenuItemActualizarPrecioPlantaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemActualizarPrecioPlantaActionPerformed
+        JFrameActualizarPreciosPlanta jFrameActualizarPrecios = new JFrameActualizarPreciosPlanta();
+        jFrameActualizarPrecios.setLocationRelativeTo(this);
+        jFrameActualizarPrecios.setVisible(true);
+    }//GEN-LAST:event_jMenuItemActualizarPrecioPlantaActionPerformed
+
+    private void jTextFieldS3D2TotalDineroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS3D2TotalDineroActionPerformed
+        jButtonGuardarLiquidacion.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS3D2TotalDineroActionPerformed
+
+    private void jTextFieldS3D2TotalDineroFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS3D2TotalDineroFocusLost
+        String dineroEntregado = jTextFieldS3D2TotalDinero.getText().trim();
+        if (jTextFieldS3D2Recibido.getText().trim().length() > 1 && jTextFieldS3D2Entregado.getText().trim().length() > 0 && Util.isNumeric(jTextFieldS3D2GalonesIngresados.getText().trim())) {
+            if (dineroEntregado.length() == 0 || !Util.isNumeric(dineroEntregado)) {
+                jTextFieldS3D2TotalDinero.setBackground(Color.red);
+                jTextFieldS3D2TotalDinero.requestFocusInWindow();
+            } else if (Util.isNumeric(dineroEntregado)) {
+                jTextFieldS3D2TotalDinero.setBackground(Color.white);
+                double dineroCalculado = Double.parseDouble(jTextFieldS3D2TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                jTextFieldS3D2Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
+
+                {
+                    /*crear el objeto liquidacion actual*/
+                    double numeroEntregado = Double.parseDouble(jTextFieldS3D2Entregado.getText().trim());
+                    double numeroRecibido = Double.parseDouble(jTextFieldS3D2Entregado.getText().trim());
+                    double galones = Double.parseDouble(jTextFieldS3D2GalonesIngresados.getText().trim());
+                    double galonesCalculados = Double.parseDouble(jTextFieldS3D2GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    double diferencia = Double.parseDouble(jTextFieldS3D2Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    int position = DISPENSADOR6 - 1;
+
+                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
+                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
+                    /*calcular el total de liquidacion de combustibles*/
+                    calcularTotalCombustibles();
+                }
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS3D2TotalDineroFocusLost
+
+    private void jTextFieldS3D2GalonesIngresadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS3D2GalonesIngresadosActionPerformed
+        jTextFieldS3D2TotalDinero.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS3D2GalonesIngresadosActionPerformed
+
+    private void jTextFieldS3D2GalonesIngresadosFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS3D2GalonesIngresadosFocusLost
+        String galonesIngresados = jTextFieldS3D2GalonesIngresados.getText().trim();
+        if (jTextFieldS3D2Recibido.getText().trim().length() > 1 && jTextFieldS3D2Entregado.getText().trim().length() > 0) {
+            if (galonesIngresados.length() == 0 || !Util.isNumeric(galonesIngresados)) {
+                jTextFieldS3D2GalonesIngresados.setBackground(Color.red);
+                jTextFieldS3D2GalonesIngresados.requestFocusInWindow();
+            } else if (Util.isNumeric(galonesIngresados)) {
+                jTextFieldS3D2GalonesIngresados.setBackground(Color.white);
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS3D2GalonesIngresadosFocusLost
+
+    private void jTextFieldS3D2EntregadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS3D2EntregadoActionPerformed
+        jTextFieldS3D2GalonesIngresados.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS3D2EntregadoActionPerformed
+
+    private void jTextFieldS3D2EntregadoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS3D2EntregadoFocusLost
+        String numeroEntregado = jTextFieldS3D2Entregado.getText().trim();
+        if (jTextFieldS3D2Recibido.getText().trim().length() > 1 && (numeroEntregado.length() == 0 || !Util.isNumeric(numeroEntregado))) {
+            jTextFieldS3D2Entregado.setBackground(Color.red);
+            jTextFieldS3D2Entregado.requestFocusInWindow();
+            return;
+        }
+        if (numeroEntregado.length() > 3 && !Util.isNumeric(numeroEntregado)) {
+            jTextFieldS3D2Entregado.setBackground(Color.red);
+            jTextFieldS3D2Entregado.requestFocusInWindow();
+        } else if (Util.isNumeric(numeroEntregado)) {
+            jTextFieldS3D2Entregado.setBackground(Color.white);
+            /*cargar liquidacion del dispensador 1 del surtidor 1*/
+            cargarLiquidacionSurtidor(SURTIDOR3, DISPENSADOR6);
+            /*Si ya se ingreso dinero, recalcular la diferencia*/
+            if (jTextFieldS3D2TotalDinero.getText().trim().length() > 0) {
+                jTextFieldS3D2TotalDineroFocusLost(null);
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS3D2EntregadoFocusLost
+
+    private void jTextFieldS3D1TotalDineroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS3D1TotalDineroActionPerformed
+        jTextFieldS3D2Entregado.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS3D1TotalDineroActionPerformed
+
+    private void jTextFieldS3D1TotalDineroFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS3D1TotalDineroFocusLost
+        String dineroEntregado = jTextFieldS3D1TotalDinero.getText().trim();
+        if (jTextFieldS3D1Recibido.getText().trim().length() > 1 && jTextFieldS3D1Entregado.getText().trim().length() > 0 && Util.isNumeric(jTextFieldS3D1GalonesIngresados.getText().trim())) {
+            if (dineroEntregado.length() == 0 || !Util.isNumeric(dineroEntregado)) {
+                jTextFieldS3D1TotalDinero.setBackground(Color.red);
+                jTextFieldS3D1TotalDinero.requestFocusInWindow();
+            } else if (Util.isNumeric(dineroEntregado)) {
+                jTextFieldS3D1TotalDinero.setBackground(Color.white);
+                double dineroCalculado = Double.parseDouble(jTextFieldS3D1TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                jTextFieldS3D1Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
+
+                {
+                    /*crear el objeto liquidacion actual*/
+                    double numeroEntregado = Double.parseDouble(jTextFieldS3D1Entregado.getText().trim());
+                    double numeroRecibido = Double.parseDouble(jTextFieldS3D1Entregado.getText().trim());
+                    double galones = Double.parseDouble(jTextFieldS3D1GalonesIngresados.getText().trim());
+                    double galonesCalculados = Double.parseDouble(jTextFieldS3D1GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    double diferencia = Double.parseDouble(jTextFieldS3D1Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    int position = DISPENSADOR5 - 1;
+
+                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
+                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
+                    /*calcular el total de liquidacion de combustibles*/
+                    calcularTotalCombustibles();
+                }
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS3D1TotalDineroFocusLost
+
+    private void jTextFieldS3D1GalonesIngresadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS3D1GalonesIngresadosActionPerformed
+        jTextFieldS3D1TotalDinero.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS3D1GalonesIngresadosActionPerformed
+
+    private void jTextFieldS3D1GalonesIngresadosFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS3D1GalonesIngresadosFocusLost
+        String galonesIngresados = jTextFieldS3D1GalonesIngresados.getText().trim();
+        if (jTextFieldS3D1Recibido.getText().trim().length() > 1 && jTextFieldS3D1Entregado.getText().trim().length() > 0) {
+            if (galonesIngresados.length() == 0 || !Util.isNumeric(galonesIngresados)) {
+                jTextFieldS3D1GalonesIngresados.setBackground(Color.red);
+                jTextFieldS3D1GalonesIngresados.requestFocusInWindow();
+            } else if (Util.isNumeric(galonesIngresados)) {
+                jTextFieldS3D1GalonesIngresados.setBackground(Color.white);
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS3D1GalonesIngresadosFocusLost
+
+    private void jTextFieldS3D1EntregadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS3D1EntregadoActionPerformed
+        jTextFieldS3D1GalonesIngresados.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS3D1EntregadoActionPerformed
+
+    private void jTextFieldS3D1EntregadoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS3D1EntregadoFocusLost
+        String numeroEntregado = jTextFieldS3D1Entregado.getText().trim();
+        if (jTextFieldS3D1Recibido.getText().trim().length() > 1 && (numeroEntregado.length() == 0 || !Util.isNumeric(numeroEntregado))) {
+            jTextFieldS3D1Entregado.setBackground(Color.red);
+            jTextFieldS3D1Entregado.requestFocusInWindow();
+            return;
+        }
+        if (numeroEntregado.length() > 3 && !Util.isNumeric(numeroEntregado)) {
+            jTextFieldS3D1Entregado.setBackground(Color.red);
+            jTextFieldS3D1Entregado.requestFocusInWindow();
+        } else if (Util.isNumeric(numeroEntregado)) {
+            jTextFieldS3D1Entregado.setBackground(Color.white);
+            /*cargar liquidacion del dispensador 1 del surtidor 1*/
+            cargarLiquidacionSurtidor(SURTIDOR3, DISPENSADOR5);
+            /*Si ya se ingreso dinero, recalcular la diferencia*/
+            if (jTextFieldS3D1TotalDinero.getText().trim().length() > 0) {
+                jTextFieldS3D1TotalDineroFocusLost(null);
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS3D1EntregadoFocusLost
+
+    private void jTextFieldS2D2TotalDineroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS2D2TotalDineroActionPerformed
+        jTextFieldS3D1Entregado.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS2D2TotalDineroActionPerformed
+
+    private void jTextFieldS2D2TotalDineroFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS2D2TotalDineroFocusLost
+        String dineroEntregado = jTextFieldS2D2TotalDinero.getText().trim();
+        if (jTextFieldS2D2Recibido.getText().trim().length() > 1 && jTextFieldS2D2Entregado.getText().trim().length() > 0 && Util.isNumeric(jTextFieldS2D2GalonesIngresados.getText().trim())) {
+            if (dineroEntregado.length() == 0 || !Util.isNumeric(dineroEntregado)) {
+                jTextFieldS2D2TotalDinero.setBackground(Color.red);
+                jTextFieldS2D2TotalDinero.requestFocusInWindow();
+            } else if (Util.isNumeric(dineroEntregado)) {
+                jTextFieldS2D2TotalDinero.setBackground(Color.white);
+                double dineroCalculado = Double.parseDouble(jTextFieldS2D2TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                jTextFieldS2D2Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
+
+                {
+                    /*crear el objeto liquidacion actual*/
+                    double numeroEntregado = Double.parseDouble(jTextFieldS2D2Entregado.getText().trim());
+                    double numeroRecibido = Double.parseDouble(jTextFieldS2D2Entregado.getText().trim());
+                    double galones = Double.parseDouble(jTextFieldS2D2GalonesIngresados.getText().trim());
+                    double galonesCalculados = Double.parseDouble(jTextFieldS2D2GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    double diferencia = Double.parseDouble(jTextFieldS2D2Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    int position = DISPENSADOR4 - 1;
+
+                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
+                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
+                    /*calcular el total de liquidacion de combustibles*/
+                    calcularTotalCombustibles();
+                }
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS2D2TotalDineroFocusLost
+
+    private void jTextFieldS2D2GalonesIngresadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS2D2GalonesIngresadosActionPerformed
+        jTextFieldS2D2TotalDinero.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS2D2GalonesIngresadosActionPerformed
+
+    private void jTextFieldS2D2GalonesIngresadosFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS2D2GalonesIngresadosFocusLost
+        String galonesIngresados = jTextFieldS2D2GalonesIngresados.getText().trim();
+        if (jTextFieldS2D2Recibido.getText().trim().length() > 1 && jTextFieldS2D2Entregado.getText().trim().length() > 0) {
+            if (galonesIngresados.length() == 0 || !Util.isNumeric(galonesIngresados)) {
+                jTextFieldS2D2GalonesIngresados.setBackground(Color.red);
+                jTextFieldS2D2GalonesIngresados.requestFocusInWindow();
+            } else if (Util.isNumeric(galonesIngresados)) {
+                jTextFieldS2D2GalonesIngresados.setBackground(Color.white);
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS2D2GalonesIngresadosFocusLost
+
+    private void jTextFieldS2D2EntregadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS2D2EntregadoActionPerformed
+        jTextFieldS2D2GalonesIngresados.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS2D2EntregadoActionPerformed
+
+    private void jTextFieldS2D2EntregadoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS2D2EntregadoFocusLost
+        String numeroEntregado = jTextFieldS2D2Entregado.getText().trim();
+        if (jTextFieldS2D2Recibido.getText().trim().length() > 1 && (numeroEntregado.length() == 0 || !Util.isNumeric(numeroEntregado))) {
+            jTextFieldS2D2Entregado.setBackground(Color.red);
+            jTextFieldS2D2Entregado.requestFocusInWindow();
+            return;
+        }
+        if (numeroEntregado.length() > 3 && !Util.isNumeric(numeroEntregado)) {
+            jTextFieldS2D2Entregado.setBackground(Color.red);
+            jTextFieldS2D2Entregado.requestFocusInWindow();
+        } else if (Util.isNumeric(numeroEntregado)) {
+            jTextFieldS2D2Entregado.setBackground(Color.white);
+            /*cargar liquidacion del dispensador 1 del surtidor 1*/
+            cargarLiquidacionSurtidor(SURTIDOR2, DISPENSADOR4);
+            /*Si ya se ingreso dinero, recalcular la diferencia*/
+            if (jTextFieldS2D2TotalDinero.getText().trim().length() > 0) {
+                jTextFieldS2D2TotalDineroFocusLost(null);
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS2D2EntregadoFocusLost
+
+    private void jTextFieldS2D1TotalDineroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS2D1TotalDineroActionPerformed
+        jTextFieldS2D2Entregado.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS2D1TotalDineroActionPerformed
+
+    private void jTextFieldS2D1TotalDineroFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS2D1TotalDineroFocusLost
+        String dineroEntregado = jTextFieldS2D1TotalDinero.getText().trim();
+        if (jTextFieldS2D1Recibido.getText().trim().length() > 1 && jTextFieldS2D1Entregado.getText().trim().length() > 0 && Util.isNumeric(jTextFieldS2D1GalonesIngresados.getText().trim())) {
+            if (dineroEntregado.length() == 0 || !Util.isNumeric(dineroEntregado)) {
+                jTextFieldS2D1TotalDinero.setBackground(Color.red);
+                jTextFieldS2D1TotalDinero.requestFocusInWindow();
+            } else if (Util.isNumeric(dineroEntregado)) {
+                jTextFieldS2D1TotalDinero.setBackground(Color.white);
+                double dineroCalculado = Double.parseDouble(jTextFieldS2D1TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                jTextFieldS2D1Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
+
+                {
+                    /*crear el objeto liquidacion actual*/
+                    double numeroEntregado = Double.parseDouble(jTextFieldS2D1Entregado.getText().trim());
+                    double numeroRecibido = Double.parseDouble(jTextFieldS2D1Entregado.getText().trim());
+                    double galones = Double.parseDouble(jTextFieldS2D1GalonesIngresados.getText().trim());
+                    double galonesCalculados = Double.parseDouble(jTextFieldS2D1GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    double diferencia = Double.parseDouble(jTextFieldS2D1Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    int position = DISPENSADOR3 - 1;
+
+                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
+                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
+                    /*calcular el total de liquidacion de combustibles*/
+                    calcularTotalCombustibles();
+                }
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS2D1TotalDineroFocusLost
+
+    private void jTextFieldS2D1GalonesIngresadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS2D1GalonesIngresadosActionPerformed
+        jTextFieldS2D1TotalDinero.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS2D1GalonesIngresadosActionPerformed
+
+    private void jTextFieldS2D1GalonesIngresadosFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS2D1GalonesIngresadosFocusLost
+        String galonesIngresados = jTextFieldS2D1GalonesIngresados.getText().trim();
+        if (jTextFieldS2D1Recibido.getText().trim().length() > 1 && jTextFieldS2D1Entregado.getText().trim().length() > 0) {
+            if (galonesIngresados.length() == 0 || !Util.isNumeric(galonesIngresados)) {
+                jTextFieldS2D1GalonesIngresados.setBackground(Color.red);
+                jTextFieldS2D1GalonesIngresados.requestFocusInWindow();
+            } else if (Util.isNumeric(galonesIngresados)) {
+                jTextFieldS2D1GalonesIngresados.setBackground(Color.white);
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS2D1GalonesIngresadosFocusLost
+
+    private void jTextFieldS2D1EntregadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS2D1EntregadoActionPerformed
+        jTextFieldS2D1GalonesIngresados.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS2D1EntregadoActionPerformed
+
+    private void jTextFieldS2D1EntregadoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS2D1EntregadoFocusLost
+        String numeroEntregado = jTextFieldS2D1Entregado.getText().trim();
+
+        if (jTextFieldS2D1Recibido.getText().trim().length() > 1 && (numeroEntregado.length() == 0 || !Util.isNumeric(numeroEntregado))) {
+            jTextFieldS2D1Entregado.setBackground(Color.red);
+            jTextFieldS2D1Entregado.requestFocusInWindow();
+            return;
+        }
+        if (numeroEntregado.length() > 3 && !Util.isNumeric(numeroEntregado)) {
+            jTextFieldS2D1Entregado.setBackground(Color.red);
+            jTextFieldS2D1Entregado.requestFocusInWindow();
+        } else if (Util.isNumeric(numeroEntregado)) {
+            jTextFieldS2D1Entregado.setBackground(Color.white);
+            /*cargar liquidacion del dispensador 1 del surtidor 1*/
+            cargarLiquidacionSurtidor(SURTIDOR2, DISPENSADOR3);
+            /*Si ya se ingreso dinero, recalcular la diferencia*/
+            if (jTextFieldS2D1TotalDinero.getText().trim().length() > 0) {
+                jTextFieldS2D1TotalDineroFocusLost(null);
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS2D1EntregadoFocusLost
+
+    private void jTextFieldS1D2TotalDineroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS1D2TotalDineroActionPerformed
+        jTextFieldS2D1Entregado.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS1D2TotalDineroActionPerformed
+
+    private void jTextFieldS1D2TotalDineroFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS1D2TotalDineroFocusLost
+        String dineroEntregado = jTextFieldS1D2TotalDinero.getText().trim();
+        if (jTextFieldS1D2Recibido.getText().trim().length() > 1 && jTextFieldS1D2Entregado.getText().trim().length() > 0 && Util.isNumeric(jTextFieldS1D2GalonesIngresados.getText().trim())) {
+            if (dineroEntregado.length() == 0 || !Util.isNumeric(dineroEntregado)) {
+                jTextFieldS1D2TotalDinero.setBackground(Color.red);
+                jTextFieldS1D2TotalDinero.requestFocusInWindow();
+            } else if (Util.isNumeric(dineroEntregado)) {
+                jTextFieldS1D2TotalDinero.setBackground(Color.white);
+                double dineroCalculado = Double.parseDouble(jTextFieldS1D2TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                jTextFieldS1D2Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
+
+                {
+                    /*crear el objeto liquidacion actual*/
+                    double numeroEntregado = Double.parseDouble(jTextFieldS1D2Entregado.getText().trim());
+                    double numeroRecibido = Double.parseDouble(jTextFieldS1D2Entregado.getText().trim());
+                    double galones = Double.parseDouble(jTextFieldS1D2GalonesIngresados.getText().trim());
+                    double galonesCalculados = Double.parseDouble(jTextFieldS1D2GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    double diferencia = Double.parseDouble(jTextFieldS1D2Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    int position = DISPENSADOR2 - 1;
+
+                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
+                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
+                    /*calcular el total de liquidacion de combustibles*/
+                    calcularTotalCombustibles();
+                }
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS1D2TotalDineroFocusLost
+
+    private void jTextFieldS1D2GalonesIngresadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS1D2GalonesIngresadosActionPerformed
+        jTextFieldS1D2TotalDinero.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS1D2GalonesIngresadosActionPerformed
+
+    private void jTextFieldS1D2GalonesIngresadosFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS1D2GalonesIngresadosFocusLost
+        String galonesIngresados = jTextFieldS1D2GalonesIngresados.getText().trim();
+        if (jTextFieldS1D2Recibido.getText().trim().length() > 1 && jTextFieldS1D2Entregado.getText().trim().length() > 0) {
+            if (galonesIngresados.length() == 0 || !Util.isNumeric(galonesIngresados)) {
+                jTextFieldS1D2GalonesIngresados.setBackground(Color.red);
+                jTextFieldS1D2GalonesIngresados.requestFocusInWindow();
+            } else if (Util.isNumeric(galonesIngresados)) {
+                jTextFieldS1D2GalonesIngresados.setBackground(Color.white);
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS1D2GalonesIngresadosFocusLost
+
+    private void jTextFieldS1D2EntregadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS1D2EntregadoActionPerformed
+        jTextFieldS1D2GalonesIngresados.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS1D2EntregadoActionPerformed
+
+    private void jTextFieldS1D2EntregadoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS1D2EntregadoFocusLost
+        String numeroEntregado = jTextFieldS1D2Entregado.getText().trim();
+        if (jTextFieldS1D2Recibido.getText().trim().length() > 1 && (numeroEntregado.length() == 0 || !Util.isNumeric(numeroEntregado))) {
+            jTextFieldS1D2Entregado.setBackground(Color.red);
+            jTextFieldS1D2Entregado.requestFocusInWindow();
+            return;
+        }
+        if (numeroEntregado.length() > 3 && !Util.isNumeric(numeroEntregado)) {
+            jTextFieldS1D2Entregado.setBackground(Color.red);
+            jTextFieldS1D2Entregado.requestFocusInWindow();
+        } else if (Util.isNumeric(numeroEntregado)) {
+            jTextFieldS1D2Entregado.setBackground(Color.white);
+            cargarLiquidacionSurtidor(SURTIDOR1, DISPENSADOR2);
+            /*Si ya se ingreso dinero, recalcular la diferencia*/
+            if (jTextFieldS1D2TotalDinero.getText().trim().length() > 0) {
+                jTextFieldS1D2TotalDineroFocusLost(null);
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS1D2EntregadoFocusLost
+
+    private void jTextFieldS1D1TotalDineroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS1D1TotalDineroActionPerformed
+        jTextFieldS1D2Entregado.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS1D1TotalDineroActionPerformed
+
+    private void jTextFieldS1D1TotalDineroFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS1D1TotalDineroFocusLost
+        String dineroEntregado = jTextFieldS1D1TotalDinero.getText().trim();
+        if (jTextFieldS1D1Recibido.getText().trim().length() > 1 && jTextFieldS1D1Entregado.getText().trim().length() > 0 && Util.isNumeric(jTextFieldS1D1GalonesIngresados.getText().trim())) {
+            if (dineroEntregado.length() == 0 || !Util.isNumeric(dineroEntregado)) {
+                jTextFieldS1D1TotalDinero.setBackground(Color.red);
+                jTextFieldS1D1TotalDinero.requestFocusInWindow();
+            } else if (Util.isNumeric(dineroEntregado)) {
+                jTextFieldS1D1TotalDinero.setBackground(Color.white);
+                double dineroCalculado = Double.parseDouble(jTextFieldS1D1TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                jTextFieldS1D1Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
+
+                {
+                    /*crear el objeto liquidacion actual*/
+                    double numeroEntregado = Double.parseDouble(jTextFieldS1D1Entregado.getText().trim());
+                    double numeroRecibido = Double.parseDouble(jTextFieldS1D1Entregado.getText().trim());
+                    double galones = Double.parseDouble(jTextFieldS1D1GalonesIngresados.getText().trim());
+                    double galonesCalculados = Double.parseDouble(jTextFieldS1D1GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    double diferencia = Double.parseDouble(jTextFieldS1D1Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
+                    int position = DISPENSADOR1 - 1;
+
+                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
+                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
+                    /*calcular el total de liquidacion de combustibles*/
+                    calcularTotalCombustibles();
+                }
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS1D1TotalDineroFocusLost
+
+    private void jTextFieldS1D1GalonesIngresadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS1D1GalonesIngresadosActionPerformed
+        jTextFieldS1D1TotalDinero.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS1D1GalonesIngresadosActionPerformed
+
+    private void jTextFieldS1D1GalonesIngresadosFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS1D1GalonesIngresadosFocusLost
+        String galonesIngresados = jTextFieldS1D1GalonesIngresados.getText().trim();
+        if (jTextFieldS1D1Recibido.getText().trim().length() > 1 && jTextFieldS1D1Entregado.getText().trim().length() > 0) {
+            if (galonesIngresados.length() == 0 || !Util.isNumeric(galonesIngresados)) {
+                jTextFieldS1D1GalonesIngresados.setBackground(Color.red);
+                jTextFieldS1D1GalonesIngresados.requestFocusInWindow();
+            } else if (Util.isNumeric(galonesIngresados)) {
+                jTextFieldS1D1GalonesIngresados.setBackground(Color.white);
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS1D1GalonesIngresadosFocusLost
+
+    private void jTextFieldS1D1EntregadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS1D1EntregadoActionPerformed
+        jTextFieldS1D1GalonesIngresados.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldS1D1EntregadoActionPerformed
+
+    /**
+     * Iniciar el calculo de la liquidacion despues de ingresar un valor en el
+     * numero de lectura del dispensador 1.
+     *
+     * @param evt
+     */
+    private void jTextFieldS1D1EntregadoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS1D1EntregadoFocusLost
+        String numeroEntregado = jTextFieldS1D1Entregado.getText().trim();
+        if (jTextFieldS1D1Recibido.getText().trim().length() > 1 && (numeroEntregado.length() == 0 || !Util.isNumeric(numeroEntregado))) {
+            jTextFieldS1D1Entregado.setBackground(Color.red);
+            jTextFieldS1D1Entregado.requestFocusInWindow();
+            return;
+        }
+        if (numeroEntregado.length() > 3 && !Util.isNumeric(numeroEntregado)) {
+            jTextFieldS1D1Entregado.setBackground(Color.red);
+            jTextFieldS1D1Entregado.requestFocusInWindow();
+        } else if (Util.isNumeric(numeroEntregado)) {
+            jTextFieldS1D1Entregado.setBackground(Color.white);
+            /*cargar liquidacion del dispensador 1 del surtidor 1*/
+            cargarLiquidacionSurtidor(SURTIDOR1, DISPENSADOR1);
+            /*Si ya se ingreso dinero, recalcular la diferencia*/
+            if (jTextFieldS1D1TotalDinero.getText().trim().length() > 0) {
+                jTextFieldS1D1TotalDineroFocusLost(null);
+            }
+        }
+    }//GEN-LAST:event_jTextFieldS1D1EntregadoFocusLost
 
     private void jButtonGuardarLiquidacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGuardarLiquidacionActionPerformed
 
         /*re-calcular todas las liquidaciones*/
         iniciarRecalculoDeLiquidaciones();
-        
+
         /*verificar que ya se realizo el registro de mededias por regla mojada*/
         if(verficarMedidasDeExistenciasActuales()){
             JOptionPane.showMessageDialog(this, "Debe registrar todas las medidas de regla en los cilindros.", "ERROR DE MEDIDA REGLA", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         /*validar islero seleccionado*/
         int position = jComboBoxCambiarIslero.getSelectedIndex();
         if (position == JComboBox.UNDEFINED_CONDITION || position == 0) {
@@ -1835,512 +2410,48 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         mostrarResumenDeLiquidacion();
     }//GEN-LAST:event_jButtonGuardarLiquidacionActionPerformed
 
-    private void jMenuItemActualizarPreciosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemActualizarPreciosActionPerformed
-        JFrameActualizarPrecios jFrameActualizarPrecios = new JFrameActualizarPrecios();
-        jFrameActualizarPrecios.setLocationRelativeTo(this);
-        jFrameActualizarPrecios.setVisible(true);
-    }//GEN-LAST:event_jMenuItemActualizarPreciosActionPerformed
+    private void jTextFieldCompraCombustibleSurtidor3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldCompraCombustibleSurtidor3ActionPerformed
+        jButtonGuardarLiquidacion.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldCompraCombustibleSurtidor3ActionPerformed
 
-    /**
-     * Evento de ventana abierta para cargar la informacion de la ultima
-     * liquidacion registrada en base de datos.
-     *
-     * @param evt
-     */
-    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        /*Poner el focus inicial en el islero a liquidar*/
-        jButtonIngresarDinero.requestFocusInWindow();
-
-        /*intentar cargar la infromacion de la ultima liquidacion registrada en base de datos*/
-        try {
-            this.ultimaLiquidacion = ControllerBO.cargarUltimaLiquidacion();
-            if (this.ultimaLiquidacion != null) {
-                this.listaUltimaLiquidacionDispensador = ControllerBO.cargarLiquidacionDispensadores(ultimaLiquidacion);
-                if (this.listaUltimaLiquidacionDispensador.isEmpty()) {
-                    throw new Exception("No se logra cargar informacion de la liquidacion de surtidores anterior.\nIntente restaurar la ultima base de datos.");
-                }
-            } else {
-                throw new Exception("No se logra cargar informacion de la liquidacion anterior.\nIntente restaurar la ultima base de datos.");
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR DE LECTURA EN BASE DE DATOS", JOptionPane.ERROR_MESSAGE);
-            jButtonIngresarDinero.setEnabled(false);
-            jButtonGuardarLiquidacion.setEnabled(false);
+    private void jTextFieldCompraCombustibleSurtidor3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldCompraCombustibleSurtidor3FocusLost
+        String sTotalComprado = jTextFieldCompraCombustibleSurtidor3.getText().trim();
+        if (sTotalComprado.length() > 1 && !Util.isNumeric(sTotalComprado)) {
+            jTextFieldCompraCombustibleSurtidor3.setBackground(Color.red);
+        } else if (Util.isNumeric(sTotalComprado)) {
+            jTextFieldCompraCombustibleSurtidor3.setBackground(Color.white);
         }
-    }//GEN-LAST:event_formWindowOpened
-
-    private void jTextFieldS1D1EntregadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS1D1EntregadoActionPerformed
-        jTextFieldS1D1GalonesIngresados.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS1D1EntregadoActionPerformed
-
-    private void jTextFieldS1D1GalonesIngresadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS1D1GalonesIngresadosActionPerformed
-        jTextFieldS1D1TotalDinero.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS1D1GalonesIngresadosActionPerformed
-
-    private void jTextFieldS1D1TotalDineroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS1D1TotalDineroActionPerformed
-        jTextFieldS1D2Entregado.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS1D1TotalDineroActionPerformed
-
-    private void jTextFieldS1D2EntregadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS1D2EntregadoActionPerformed
-        jTextFieldS1D2GalonesIngresados.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS1D2EntregadoActionPerformed
-
-    private void jTextFieldS1D2GalonesIngresadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS1D2GalonesIngresadosActionPerformed
-        jTextFieldS1D2TotalDinero.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS1D2GalonesIngresadosActionPerformed
-
-    private void jTextFieldS1D2TotalDineroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS1D2TotalDineroActionPerformed
-        jTextFieldS2D1Entregado.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS1D2TotalDineroActionPerformed
-
-    private void jTextFieldS2D1EntregadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS2D1EntregadoActionPerformed
-        jTextFieldS2D1GalonesIngresados.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS2D1EntregadoActionPerformed
-
-    private void jTextFieldS2D1GalonesIngresadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS2D1GalonesIngresadosActionPerformed
-        jTextFieldS2D1TotalDinero.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS2D1GalonesIngresadosActionPerformed
-
-    private void jTextFieldS2D1TotalDineroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS2D1TotalDineroActionPerformed
-        jTextFieldS2D2Entregado.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS2D1TotalDineroActionPerformed
-
-    private void jTextFieldS2D2EntregadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS2D2EntregadoActionPerformed
-        jTextFieldS2D2GalonesIngresados.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS2D2EntregadoActionPerformed
-
-    private void jTextFieldS2D2GalonesIngresadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS2D2GalonesIngresadosActionPerformed
-        jTextFieldS2D2TotalDinero.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS2D2GalonesIngresadosActionPerformed
-
-    private void jTextFieldS2D2TotalDineroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS2D2TotalDineroActionPerformed
-        jTextFieldS3D1Entregado.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS2D2TotalDineroActionPerformed
-
-    private void jTextFieldS3D1EntregadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS3D1EntregadoActionPerformed
-        jTextFieldS3D1GalonesIngresados.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS3D1EntregadoActionPerformed
-
-    private void jTextFieldS3D1GalonesIngresadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS3D1GalonesIngresadosActionPerformed
-        jTextFieldS3D1TotalDinero.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS3D1GalonesIngresadosActionPerformed
-
-    private void jTextFieldS3D1TotalDineroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS3D1TotalDineroActionPerformed
-        jTextFieldS3D2Entregado.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS3D1TotalDineroActionPerformed
-
-    private void jTextFieldS3D2EntregadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS3D2EntregadoActionPerformed
-        jTextFieldS3D2GalonesIngresados.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS3D2EntregadoActionPerformed
-
-    private void jTextFieldS3D2GalonesIngresadosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS3D2GalonesIngresadosActionPerformed
-        jTextFieldS3D2TotalDinero.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS3D2GalonesIngresadosActionPerformed
-
-    private void jComboBoxCambiarIsleroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxCambiarIsleroActionPerformed
-        int position = jComboBoxCambiarIslero.getSelectedIndex() - 1;
-        if (position != JComboBox.UNDEFINED_CONDITION) {
-            int idEmpleado = ControllerBO.cargarListaEmpleadosIsleros().get(position).getIdEmpleado();
-            for (LiquidacionDispensador liquidacionDispensador : liquidacionesPorDispensador) {
-                liquidacionDispensador.setIdEmpleadoLiquidado(idEmpleado);
-            }
-        }
-    }//GEN-LAST:event_jComboBoxCambiarIsleroActionPerformed
-
-    private void jTextFieldCompraCombustibleSurtidor1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldCompraCombustibleSurtidor1ActionPerformed
-        jTextFieldCompraCombustibleSurtidor2.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldCompraCombustibleSurtidor1ActionPerformed
+    }//GEN-LAST:event_jTextFieldCompraCombustibleSurtidor3FocusLost
 
     private void jTextFieldCompraCombustibleSurtidor2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldCompraCombustibleSurtidor2ActionPerformed
         jTextFieldCompraCombustibleSurtidor3.requestFocusInWindow();
     }//GEN-LAST:event_jTextFieldCompraCombustibleSurtidor2ActionPerformed
 
-    private void jTextFieldCompraCombustibleSurtidor3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldCompraCombustibleSurtidor3ActionPerformed
-        jButtonGuardarLiquidacion.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldCompraCombustibleSurtidor3ActionPerformed
-
-    /**
-     * Iniciar el calculo de la liquidacion despues de ingresar un valor en el
-     * numero de lectura del dispensador 1.
-     *
-     * @param evt
-     */
-    private void jTextFieldS1D1EntregadoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS1D1EntregadoFocusLost
-        String numeroEntregado = jTextFieldS1D1Entregado.getText().trim();
-        if (jTextFieldS1D1Recibido.getText().trim().length() > 1 && (numeroEntregado.length() == 0 || !Util.isNumeric(numeroEntregado))) {
-            jTextFieldS1D1Entregado.setBackground(Color.red);
-            jTextFieldS1D1Entregado.requestFocusInWindow();
-            return;
+    private void jTextFieldCompraCombustibleSurtidor2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldCompraCombustibleSurtidor2FocusLost
+        String sTotalComprado = jTextFieldCompraCombustibleSurtidor2.getText().trim();
+        if (sTotalComprado.length() > 1 && !Util.isNumeric(sTotalComprado)) {
+            jTextFieldCompraCombustibleSurtidor2.setBackground(Color.red);
+        } else if (Util.isNumeric(sTotalComprado)) {
+            jTextFieldCompraCombustibleSurtidor2.setBackground(Color.white);
         }
-        if (numeroEntregado.length() > 3 && !Util.isNumeric(numeroEntregado)) {
-            jTextFieldS1D1Entregado.setBackground(Color.red);
-            jTextFieldS1D1Entregado.requestFocusInWindow();
-        } else if (Util.isNumeric(numeroEntregado)) {
-            jTextFieldS1D1Entregado.setBackground(Color.white);
-            /*cargar liquidacion del dispensador 1 del surtidor 1*/
-            cargarLiquidacionSurtidor(SURTIDOR1, DISPENSADOR1);
-            /*Si ya se ingreso dinero, recalcular la diferencia*/
-            if (jTextFieldS1D1TotalDinero.getText().trim().length() > 0) {
-                jTextFieldS1D1TotalDineroFocusLost(null);
-            }
+    }//GEN-LAST:event_jTextFieldCompraCombustibleSurtidor2FocusLost
+
+    private void jTextFieldCompraCombustibleSurtidor1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldCompraCombustibleSurtidor1ActionPerformed
+        jTextFieldCompraCombustibleSurtidor2.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldCompraCombustibleSurtidor1ActionPerformed
+
+    private void jTextFieldCompraCombustibleSurtidor1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldCompraCombustibleSurtidor1FocusLost
+        String sTotalComprado = jTextFieldCompraCombustibleSurtidor1.getText().trim();
+        if (sTotalComprado.length() > 1 && !Util.isNumeric(sTotalComprado)) {
+            jTextFieldCompraCombustibleSurtidor1.setBackground(Color.red);
+        } else if (Util.isNumeric(sTotalComprado)) {
+            jTextFieldCompraCombustibleSurtidor1.setBackground(Color.white);
         }
+    }//GEN-LAST:event_jTextFieldCompraCombustibleSurtidor1FocusLost
 
-    }//GEN-LAST:event_jTextFieldS1D1EntregadoFocusLost
-
-    private void jTextFieldS1D1TotalDineroFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS1D1TotalDineroFocusLost
-        String dineroEntregado = jTextFieldS1D1TotalDinero.getText().trim();
-        if (jTextFieldS1D1Recibido.getText().trim().length() > 1 && jTextFieldS1D1Entregado.getText().trim().length() > 0 && Util.isNumeric(jTextFieldS1D1GalonesIngresados.getText().trim())) {
-            if (dineroEntregado.length() == 0 || !Util.isNumeric(dineroEntregado)) {
-                jTextFieldS1D1TotalDinero.setBackground(Color.red);
-                jTextFieldS1D1TotalDinero.requestFocusInWindow();
-            } else if (Util.isNumeric(dineroEntregado)) {
-                jTextFieldS1D1TotalDinero.setBackground(Color.white);
-                double dineroCalculado = Double.parseDouble(jTextFieldS1D1TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                jTextFieldS1D1Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
-
-                {
-                    /*crear el objeto liquidacion actual*/
-                    double numeroEntregado = Double.parseDouble(jTextFieldS1D1Entregado.getText().trim());
-                    double numeroRecibido = Double.parseDouble(jTextFieldS1D1Entregado.getText().trim());
-                    double galones = Double.parseDouble(jTextFieldS1D1GalonesIngresados.getText().trim());
-                    double galonesCalculados = Double.parseDouble(jTextFieldS1D1GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                    double diferencia = Double.parseDouble(jTextFieldS1D1Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                    int position = DISPENSADOR1 - 1;
-
-                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
-                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
-                    /*calcular el total de liquidacion de combustibles*/
-                    calcularTotalCombustibles();
-                }
-            }
-        }
-    }//GEN-LAST:event_jTextFieldS1D1TotalDineroFocusLost
-
-    private void jTextFieldS1D2EntregadoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS1D2EntregadoFocusLost
-        String numeroEntregado = jTextFieldS1D2Entregado.getText().trim();
-        if (jTextFieldS1D2Recibido.getText().trim().length() > 1 && (numeroEntregado.length() == 0 || !Util.isNumeric(numeroEntregado))) {
-            jTextFieldS1D2Entregado.setBackground(Color.red);
-            jTextFieldS1D2Entregado.requestFocusInWindow();
-            return;
-        }
-        if (numeroEntregado.length() > 3 && !Util.isNumeric(numeroEntregado)) {
-            jTextFieldS1D2Entregado.setBackground(Color.red);
-            jTextFieldS1D2Entregado.requestFocusInWindow();
-        } else if (Util.isNumeric(numeroEntregado)) {
-            jTextFieldS1D2Entregado.setBackground(Color.white);
-            cargarLiquidacionSurtidor(SURTIDOR1, DISPENSADOR2);
-            /*Si ya se ingreso dinero, recalcular la diferencia*/
-            if (jTextFieldS1D2TotalDinero.getText().trim().length() > 0) {
-                jTextFieldS1D2TotalDineroFocusLost(null);
-            }
-        }
-    }//GEN-LAST:event_jTextFieldS1D2EntregadoFocusLost
-
-    private void jTextFieldS2D1EntregadoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS2D1EntregadoFocusLost
-        String numeroEntregado = jTextFieldS2D1Entregado.getText().trim();
-
-        if (jTextFieldS2D1Recibido.getText().trim().length() > 1 && (numeroEntregado.length() == 0 || !Util.isNumeric(numeroEntregado))) {
-            jTextFieldS2D1Entregado.setBackground(Color.red);
-            jTextFieldS2D1Entregado.requestFocusInWindow();
-            return;
-        }
-        if (numeroEntregado.length() > 3 && !Util.isNumeric(numeroEntregado)) {
-            jTextFieldS2D1Entregado.setBackground(Color.red);
-            jTextFieldS2D1Entregado.requestFocusInWindow();
-        } else if (Util.isNumeric(numeroEntregado)) {
-            jTextFieldS2D1Entregado.setBackground(Color.white);
-            /*cargar liquidacion del dispensador 1 del surtidor 1*/
-            cargarLiquidacionSurtidor(SURTIDOR2, DISPENSADOR3);
-            /*Si ya se ingreso dinero, recalcular la diferencia*/
-            if (jTextFieldS2D1TotalDinero.getText().trim().length() > 0) {
-                jTextFieldS2D1TotalDineroFocusLost(null);
-            }
-        }
-    }//GEN-LAST:event_jTextFieldS2D1EntregadoFocusLost
-
-    private void jTextFieldS2D2EntregadoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS2D2EntregadoFocusLost
-        String numeroEntregado = jTextFieldS2D2Entregado.getText().trim();
-        if (jTextFieldS2D2Recibido.getText().trim().length() > 1 && (numeroEntregado.length() == 0 || !Util.isNumeric(numeroEntregado))) {
-            jTextFieldS2D2Entregado.setBackground(Color.red);
-            jTextFieldS2D2Entregado.requestFocusInWindow();
-            return;
-        }
-        if (numeroEntregado.length() > 3 && !Util.isNumeric(numeroEntregado)) {
-            jTextFieldS2D2Entregado.setBackground(Color.red);
-            jTextFieldS2D2Entregado.requestFocusInWindow();
-        } else if (Util.isNumeric(numeroEntregado)) {
-            jTextFieldS2D2Entregado.setBackground(Color.white);
-            /*cargar liquidacion del dispensador 1 del surtidor 1*/
-            cargarLiquidacionSurtidor(SURTIDOR2, DISPENSADOR4);
-            /*Si ya se ingreso dinero, recalcular la diferencia*/
-            if (jTextFieldS2D2TotalDinero.getText().trim().length() > 0) {
-                jTextFieldS2D2TotalDineroFocusLost(null);
-            }
-        }
-    }//GEN-LAST:event_jTextFieldS2D2EntregadoFocusLost
-
-    private void jTextFieldS3D1EntregadoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS3D1EntregadoFocusLost
-        String numeroEntregado = jTextFieldS3D1Entregado.getText().trim();
-        if (jTextFieldS3D1Recibido.getText().trim().length() > 1 && (numeroEntregado.length() == 0 || !Util.isNumeric(numeroEntregado))) {
-            jTextFieldS3D1Entregado.setBackground(Color.red);
-            jTextFieldS3D1Entregado.requestFocusInWindow();
-            return;
-        }
-        if (numeroEntregado.length() > 3 && !Util.isNumeric(numeroEntregado)) {
-            jTextFieldS3D1Entregado.setBackground(Color.red);
-            jTextFieldS3D1Entregado.requestFocusInWindow();
-        } else if (Util.isNumeric(numeroEntregado)) {
-            jTextFieldS3D1Entregado.setBackground(Color.white);
-            /*cargar liquidacion del dispensador 1 del surtidor 1*/
-            cargarLiquidacionSurtidor(SURTIDOR3, DISPENSADOR5);
-            /*Si ya se ingreso dinero, recalcular la diferencia*/
-            if (jTextFieldS3D1TotalDinero.getText().trim().length() > 0) {
-                jTextFieldS3D1TotalDineroFocusLost(null);
-            }
-        }
-    }//GEN-LAST:event_jTextFieldS3D1EntregadoFocusLost
-
-    private void jTextFieldS3D2EntregadoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS3D2EntregadoFocusLost
-        String numeroEntregado = jTextFieldS3D2Entregado.getText().trim();
-        if (jTextFieldS3D2Recibido.getText().trim().length() > 1 && (numeroEntregado.length() == 0 || !Util.isNumeric(numeroEntregado))) {
-            jTextFieldS3D2Entregado.setBackground(Color.red);
-            jTextFieldS3D2Entregado.requestFocusInWindow();
-            return;
-        }
-        if (numeroEntregado.length() > 3 && !Util.isNumeric(numeroEntregado)) {
-            jTextFieldS3D2Entregado.setBackground(Color.red);
-            jTextFieldS3D2Entregado.requestFocusInWindow();
-        } else if (Util.isNumeric(numeroEntregado)) {
-            jTextFieldS3D2Entregado.setBackground(Color.white);
-            /*cargar liquidacion del dispensador 1 del surtidor 1*/
-            cargarLiquidacionSurtidor(SURTIDOR3, DISPENSADOR6);
-            /*Si ya se ingreso dinero, recalcular la diferencia*/
-            if (jTextFieldS3D2TotalDinero.getText().trim().length() > 0) {
-                jTextFieldS3D2TotalDineroFocusLost(null);
-            }
-        }
-    }//GEN-LAST:event_jTextFieldS3D2EntregadoFocusLost
-
-    private void jTextFieldS2D2TotalDineroFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS2D2TotalDineroFocusLost
-        String dineroEntregado = jTextFieldS2D2TotalDinero.getText().trim();
-        if (jTextFieldS2D2Recibido.getText().trim().length() > 1 && jTextFieldS2D2Entregado.getText().trim().length() > 0 && Util.isNumeric(jTextFieldS2D2GalonesIngresados.getText().trim())) {
-            if (dineroEntregado.length() == 0 || !Util.isNumeric(dineroEntregado)) {
-                jTextFieldS2D2TotalDinero.setBackground(Color.red);
-                jTextFieldS2D2TotalDinero.requestFocusInWindow();
-            } else if (Util.isNumeric(dineroEntregado)) {
-                jTextFieldS2D2TotalDinero.setBackground(Color.white);
-                double dineroCalculado = Double.parseDouble(jTextFieldS2D2TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                jTextFieldS2D2Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
-
-                {
-                    /*crear el objeto liquidacion actual*/
-                    double numeroEntregado = Double.parseDouble(jTextFieldS2D2Entregado.getText().trim());
-                    double numeroRecibido = Double.parseDouble(jTextFieldS2D2Entregado.getText().trim());
-                    double galones = Double.parseDouble(jTextFieldS2D2GalonesIngresados.getText().trim());
-                    double galonesCalculados = Double.parseDouble(jTextFieldS2D2GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                    double diferencia = Double.parseDouble(jTextFieldS2D2Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                    int position = DISPENSADOR4 - 1;
-
-                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
-                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
-                    /*calcular el total de liquidacion de combustibles*/
-                    calcularTotalCombustibles();
-                }
-            }
-        }
-    }//GEN-LAST:event_jTextFieldS2D2TotalDineroFocusLost
-
-    private void jTextFieldS2D1TotalDineroFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS2D1TotalDineroFocusLost
-        String dineroEntregado = jTextFieldS2D1TotalDinero.getText().trim();
-        if (jTextFieldS2D1Recibido.getText().trim().length() > 1 && jTextFieldS2D1Entregado.getText().trim().length() > 0 && Util.isNumeric(jTextFieldS2D1GalonesIngresados.getText().trim())) {
-            if (dineroEntregado.length() == 0 || !Util.isNumeric(dineroEntregado)) {
-                jTextFieldS2D1TotalDinero.setBackground(Color.red);
-                jTextFieldS2D1TotalDinero.requestFocusInWindow();
-            } else if (Util.isNumeric(dineroEntregado)) {
-                jTextFieldS2D1TotalDinero.setBackground(Color.white);
-                double dineroCalculado = Double.parseDouble(jTextFieldS2D1TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                jTextFieldS2D1Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
-
-                {
-                    /*crear el objeto liquidacion actual*/
-                    double numeroEntregado = Double.parseDouble(jTextFieldS2D1Entregado.getText().trim());
-                    double numeroRecibido = Double.parseDouble(jTextFieldS2D1Entregado.getText().trim());
-                    double galones = Double.parseDouble(jTextFieldS2D1GalonesIngresados.getText().trim());
-                    double galonesCalculados = Double.parseDouble(jTextFieldS2D1GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                    double diferencia = Double.parseDouble(jTextFieldS2D1Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                    int position = DISPENSADOR3 - 1;
-
-                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
-                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
-                    /*calcular el total de liquidacion de combustibles*/
-                    calcularTotalCombustibles();
-                }
-            }
-        }
-    }//GEN-LAST:event_jTextFieldS2D1TotalDineroFocusLost
-
-    private void jTextFieldS1D2TotalDineroFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS1D2TotalDineroFocusLost
-        String dineroEntregado = jTextFieldS1D2TotalDinero.getText().trim();
-        if (jTextFieldS1D2Recibido.getText().trim().length() > 1 && jTextFieldS1D2Entregado.getText().trim().length() > 0 && Util.isNumeric(jTextFieldS1D2GalonesIngresados.getText().trim())) {
-            if (dineroEntregado.length() == 0 || !Util.isNumeric(dineroEntregado)) {
-                jTextFieldS1D2TotalDinero.setBackground(Color.red);
-                jTextFieldS1D2TotalDinero.requestFocusInWindow();
-            } else if (Util.isNumeric(dineroEntregado)) {
-                jTextFieldS1D2TotalDinero.setBackground(Color.white);
-                double dineroCalculado = Double.parseDouble(jTextFieldS1D2TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                jTextFieldS1D2Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
-
-                {
-                    /*crear el objeto liquidacion actual*/
-                    double numeroEntregado = Double.parseDouble(jTextFieldS1D2Entregado.getText().trim());
-                    double numeroRecibido = Double.parseDouble(jTextFieldS1D2Entregado.getText().trim());
-                    double galones = Double.parseDouble(jTextFieldS1D2GalonesIngresados.getText().trim());
-                    double galonesCalculados = Double.parseDouble(jTextFieldS1D2GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                    double diferencia = Double.parseDouble(jTextFieldS1D2Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                    int position = DISPENSADOR2 - 1;
-
-                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
-                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
-                    /*calcular el total de liquidacion de combustibles*/
-                    calcularTotalCombustibles();
-                }
-            }
-        }
-    }//GEN-LAST:event_jTextFieldS1D2TotalDineroFocusLost
-
-    private void jTextFieldS3D1TotalDineroFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS3D1TotalDineroFocusLost
-        String dineroEntregado = jTextFieldS3D1TotalDinero.getText().trim();
-        if (jTextFieldS3D1Recibido.getText().trim().length() > 1 && jTextFieldS3D1Entregado.getText().trim().length() > 0 && Util.isNumeric(jTextFieldS3D1GalonesIngresados.getText().trim())) {
-            if (dineroEntregado.length() == 0 || !Util.isNumeric(dineroEntregado)) {
-                jTextFieldS3D1TotalDinero.setBackground(Color.red);
-                jTextFieldS3D1TotalDinero.requestFocusInWindow();
-            } else if (Util.isNumeric(dineroEntregado)) {
-                jTextFieldS3D1TotalDinero.setBackground(Color.white);
-                double dineroCalculado = Double.parseDouble(jTextFieldS3D1TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                jTextFieldS3D1Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
-
-                {
-                    /*crear el objeto liquidacion actual*/
-                    double numeroEntregado = Double.parseDouble(jTextFieldS3D1Entregado.getText().trim());
-                    double numeroRecibido = Double.parseDouble(jTextFieldS3D1Entregado.getText().trim());
-                    double galones = Double.parseDouble(jTextFieldS3D1GalonesIngresados.getText().trim());
-                    double galonesCalculados = Double.parseDouble(jTextFieldS3D1GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                    double diferencia = Double.parseDouble(jTextFieldS3D1Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                    int position = DISPENSADOR5 - 1;
-
-                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
-                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
-                    /*calcular el total de liquidacion de combustibles*/
-                    calcularTotalCombustibles();
-                }
-            }
-        }
-    }//GEN-LAST:event_jTextFieldS3D1TotalDineroFocusLost
-
-    private void jTextFieldS3D2TotalDineroFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS3D2TotalDineroFocusLost
-        String dineroEntregado = jTextFieldS3D2TotalDinero.getText().trim();
-        if (jTextFieldS3D2Recibido.getText().trim().length() > 1 && jTextFieldS3D2Entregado.getText().trim().length() > 0 && Util.isNumeric(jTextFieldS3D2GalonesIngresados.getText().trim())) {
-            if (dineroEntregado.length() == 0 || !Util.isNumeric(dineroEntregado)) {
-                jTextFieldS3D2TotalDinero.setBackground(Color.red);
-                jTextFieldS3D2TotalDinero.requestFocusInWindow();
-            } else if (Util.isNumeric(dineroEntregado)) {
-                jTextFieldS3D2TotalDinero.setBackground(Color.white);
-                double dineroCalculado = Double.parseDouble(jTextFieldS3D2TotalDineroCalculado.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                jTextFieldS3D2Diferencia.setText("$" + Util.formatearMiles(calcularDiferenciaDinero(Double.parseDouble(dineroEntregado), dineroCalculado)));
-
-                {
-                    /*crear el objeto liquidacion actual*/
-                    double numeroEntregado = Double.parseDouble(jTextFieldS3D2Entregado.getText().trim());
-                    double numeroRecibido = Double.parseDouble(jTextFieldS3D2Entregado.getText().trim());
-                    double galones = Double.parseDouble(jTextFieldS3D2GalonesIngresados.getText().trim());
-                    double galonesCalculados = Double.parseDouble(jTextFieldS3D2GalonesCalculados.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                    double diferencia = Double.parseDouble(jTextFieldS3D2Diferencia.getText().trim().replace("$", "").replace(".", "").replace(",", "."));
-                    int position = DISPENSADOR6 - 1;
-
-                    /*Guardar la liquidacion del dispensador 1 en el array en la posicion por parametro*/
-                    guardarLiquidacionDispensadorEnLista(numeroEntregado, numeroRecibido, galones, galonesCalculados, Double.parseDouble(dineroEntregado), dineroCalculado, diferencia, position);
-                    /*calcular el total de liquidacion de combustibles*/
-                    calcularTotalCombustibles();
-                }
-            }
-        }
-    }//GEN-LAST:event_jTextFieldS3D2TotalDineroFocusLost
-
-    private void jTextFieldS3D2TotalDineroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldS3D2TotalDineroActionPerformed
-        jButtonGuardarLiquidacion.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldS3D2TotalDineroActionPerformed
-
-    private void jTextFieldS1D1GalonesIngresadosFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS1D1GalonesIngresadosFocusLost
-        String galonesIngresados = jTextFieldS1D1GalonesIngresados.getText().trim();
-        if (jTextFieldS1D1Recibido.getText().trim().length() > 1 && jTextFieldS1D1Entregado.getText().trim().length() > 0) {
-            if (galonesIngresados.length() == 0 || !Util.isNumeric(galonesIngresados)) {
-                jTextFieldS1D1GalonesIngresados.setBackground(Color.red);
-                jTextFieldS1D1GalonesIngresados.requestFocusInWindow();
-            } else if (Util.isNumeric(galonesIngresados)) {
-                jTextFieldS1D1GalonesIngresados.setBackground(Color.white);
-            }
-        }
-    }//GEN-LAST:event_jTextFieldS1D1GalonesIngresadosFocusLost
-
-    private void jTextFieldS1D2GalonesIngresadosFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS1D2GalonesIngresadosFocusLost
-        String galonesIngresados = jTextFieldS1D2GalonesIngresados.getText().trim();
-        if (jTextFieldS1D2Recibido.getText().trim().length() > 1 && jTextFieldS1D2Entregado.getText().trim().length() > 0) {
-            if (galonesIngresados.length() == 0 || !Util.isNumeric(galonesIngresados)) {
-                jTextFieldS1D2GalonesIngresados.setBackground(Color.red);
-                jTextFieldS1D2GalonesIngresados.requestFocusInWindow();
-            } else if (Util.isNumeric(galonesIngresados)) {
-                jTextFieldS1D2GalonesIngresados.setBackground(Color.white);
-            }
-        }
-    }//GEN-LAST:event_jTextFieldS1D2GalonesIngresadosFocusLost
-
-    private void jTextFieldS2D1GalonesIngresadosFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS2D1GalonesIngresadosFocusLost
-        String galonesIngresados = jTextFieldS2D1GalonesIngresados.getText().trim();
-        if (jTextFieldS2D1Recibido.getText().trim().length() > 1 && jTextFieldS2D1Entregado.getText().trim().length() > 0) {
-            if (galonesIngresados.length() == 0 || !Util.isNumeric(galonesIngresados)) {
-                jTextFieldS2D1GalonesIngresados.setBackground(Color.red);
-                jTextFieldS2D1GalonesIngresados.requestFocusInWindow();
-            } else if (Util.isNumeric(galonesIngresados)) {
-                jTextFieldS2D1GalonesIngresados.setBackground(Color.white);
-            }
-        }
-    }//GEN-LAST:event_jTextFieldS2D1GalonesIngresadosFocusLost
-
-    private void jTextFieldS2D2GalonesIngresadosFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS2D2GalonesIngresadosFocusLost
-        String galonesIngresados = jTextFieldS2D2GalonesIngresados.getText().trim();
-        if (jTextFieldS2D2Recibido.getText().trim().length() > 1 && jTextFieldS2D2Entregado.getText().trim().length() > 0) {
-            if (galonesIngresados.length() == 0 || !Util.isNumeric(galonesIngresados)) {
-                jTextFieldS2D2GalonesIngresados.setBackground(Color.red);
-                jTextFieldS2D2GalonesIngresados.requestFocusInWindow();
-            } else if (Util.isNumeric(galonesIngresados)) {
-                jTextFieldS2D2GalonesIngresados.setBackground(Color.white);
-            }
-        }
-    }//GEN-LAST:event_jTextFieldS2D2GalonesIngresadosFocusLost
-
-    private void jTextFieldS3D1GalonesIngresadosFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS3D1GalonesIngresadosFocusLost
-        String galonesIngresados = jTextFieldS3D1GalonesIngresados.getText().trim();
-        if (jTextFieldS3D1Recibido.getText().trim().length() > 1 && jTextFieldS3D1Entregado.getText().trim().length() > 0) {
-            if (galonesIngresados.length() == 0 || !Util.isNumeric(galonesIngresados)) {
-                jTextFieldS3D1GalonesIngresados.setBackground(Color.red);
-                jTextFieldS3D1GalonesIngresados.requestFocusInWindow();
-            } else if (Util.isNumeric(galonesIngresados)) {
-                jTextFieldS3D1GalonesIngresados.setBackground(Color.white);
-            }
-        }
-    }//GEN-LAST:event_jTextFieldS3D1GalonesIngresadosFocusLost
-
-    private void jTextFieldS3D2GalonesIngresadosFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldS3D2GalonesIngresadosFocusLost
-        String galonesIngresados = jTextFieldS3D2GalonesIngresados.getText().trim();
-        if (jTextFieldS3D2Recibido.getText().trim().length() > 1 && jTextFieldS3D2Entregado.getText().trim().length() > 0) {
-            if (galonesIngresados.length() == 0 || !Util.isNumeric(galonesIngresados)) {
-                jTextFieldS3D2GalonesIngresados.setBackground(Color.red);
-                jTextFieldS3D2GalonesIngresados.requestFocusInWindow();
-            } else if (Util.isNumeric(galonesIngresados)) {
-                jTextFieldS3D2GalonesIngresados.setBackground(Color.white);
-            }
-        }
-    }//GEN-LAST:event_jTextFieldS3D2GalonesIngresadosFocusLost
+    private void jTextFieldVentasAceitesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldVentasAceitesActionPerformed
+        jTextFieldCompraCombustibleSurtidor1.requestFocusInWindow();
+    }//GEN-LAST:event_jTextFieldVentasAceitesActionPerformed
 
     /**
      * Validar que el total de aceites ingresados sea un numero valido.
@@ -2357,88 +2468,25 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         }
     }//GEN-LAST:event_jTextFieldVentasAceitesFocusLost
 
-    private void jTextFieldCompraCombustibleSurtidor1FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldCompraCombustibleSurtidor1FocusLost
-        String sTotalComprado = jTextFieldCompraCombustibleSurtidor1.getText().trim();
-        if (sTotalComprado.length() > 1 && !Util.isNumeric(sTotalComprado)) {
-            jTextFieldCompraCombustibleSurtidor1.setBackground(Color.red);
-        } else if (Util.isNumeric(sTotalComprado)) {
-            jTextFieldCompraCombustibleSurtidor1.setBackground(Color.white);
+    private void jComboBoxCambiarIsleroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxCambiarIsleroActionPerformed
+        int position = jComboBoxCambiarIslero.getSelectedIndex() - 1;
+        if (position != JComboBox.UNDEFINED_CONDITION) {
+            int idEmpleado = ControllerBO.cargarListaEmpleadosIsleros().get(position).getIdEmpleado();
+            for (LiquidacionDispensador liquidacionDispensador : liquidacionesPorDispensador) {
+                liquidacionDispensador.setIdEmpleadoLiquidado(idEmpleado);
+            }
         }
-    }//GEN-LAST:event_jTextFieldCompraCombustibleSurtidor1FocusLost
+    }//GEN-LAST:event_jComboBoxCambiarIsleroActionPerformed
 
-    private void jTextFieldCompraCombustibleSurtidor2FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldCompraCombustibleSurtidor2FocusLost
-        String sTotalComprado = jTextFieldCompraCombustibleSurtidor2.getText().trim();
-        if (sTotalComprado.length() > 1 && !Util.isNumeric(sTotalComprado)) {
-            jTextFieldCompraCombustibleSurtidor2.setBackground(Color.red);
-        } else if (Util.isNumeric(sTotalComprado)) {
-            jTextFieldCompraCombustibleSurtidor2.setBackground(Color.white);
+    private void jButtonIngresarDineroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonIngresarDineroActionPerformed
+
+        /*Cargar la ventana solo si es nula*/
+        if (jFrameIngresoDinero == null) {
+            jFrameIngresoDinero = new JFrameIngresoDinero(this);
+            jFrameIngresoDinero.setLocationRelativeTo(this);
         }
-    }//GEN-LAST:event_jTextFieldCompraCombustibleSurtidor2FocusLost
-
-    private void jTextFieldCompraCombustibleSurtidor3FocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTextFieldCompraCombustibleSurtidor3FocusLost
-        String sTotalComprado = jTextFieldCompraCombustibleSurtidor3.getText().trim();
-        if (sTotalComprado.length() > 1 && !Util.isNumeric(sTotalComprado)) {
-            jTextFieldCompraCombustibleSurtidor3.setBackground(Color.red);
-        } else if (Util.isNumeric(sTotalComprado)) {
-            jTextFieldCompraCombustibleSurtidor3.setBackground(Color.white);
-        }
-    }//GEN-LAST:event_jTextFieldCompraCombustibleSurtidor3FocusLost
-
-    private void jTextFieldVentasAceitesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldVentasAceitesActionPerformed
-        jTextFieldCompraCombustibleSurtidor1.requestFocusInWindow();
-    }//GEN-LAST:event_jTextFieldVentasAceitesActionPerformed
-
-    private void jMenuItemCalibracionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemCalibracionActionPerformed
-        if(jFrameCalibracion == null)
-            jFrameCalibracion = new JFrameCalibracion();
-        jFrameCalibracion.setLocationRelativeTo(this);
-        jFrameCalibracion.setVisible(true);
-    }//GEN-LAST:event_jMenuItemCalibracionActionPerformed
-
-    private void jMenuItemEmpleadosAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemEmpleadosAgregarActionPerformed
-        if (jFrameAgregarEmpleados == null) {
-            jFrameAgregarEmpleados = new JFrameAgregarEmpleados();
-        }
-        jFrameAgregarEmpleados.setLocationRelativeTo(this);
-        jFrameAgregarEmpleados.setVisible(true);
-
-    }//GEN-LAST:event_jMenuItemEmpleadosAgregarActionPerformed
-
-    private void jMenuItemBackUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemBackUpActionPerformed
-        if (BackUp.generarBackUp()) {
-            JOptionPane.showMessageDialog(this, "BackUp Generado de forma correcta.", "BACKUP OK", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-            JOptionPane.showMessageDialog(this, "Error generando backup. Intente nuevamente", "BACKUP ERROR", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_jMenuItemBackUpActionPerformed
-
-    private void jMenuItemEmpleadosEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemEmpleadosEliminarActionPerformed
-        if (jFrameEliminarEmpleados == null) {
-            jFrameEliminarEmpleados = new JFrameEliminarEmpleados();
-        }
-        jFrameEliminarEmpleados.setLocationRelativeTo(this);
-        jFrameEliminarEmpleados.setVisible(true);
-    }//GEN-LAST:event_jMenuItemEmpleadosEliminarActionPerformed
-
-    private void jMenuItemMedicionReglaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemMedicionReglaActionPerformed
-        if(jFrameMedidaRegla == null)
-            jFrameMedidaRegla = new JFrameMedidaRegla();
-        jFrameMedidaRegla.setLocationRelativeTo(this);
-        jFrameMedidaRegla.setVisible(true);
-    }//GEN-LAST:event_jMenuItemMedicionReglaActionPerformed
-
-    private void jMenuItemGenerarReporteDiarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGenerarReporteDiarioActionPerformed
-    
-        if (jFrameGenerarReporteDiario == null) {
-            jFrameGenerarReporteDiario = new JFrameGenerarReporteDiario();
-        }
-        jFrameGenerarReporteDiario.setLocationRelativeTo(this);
-        jFrameGenerarReporteDiario.setVisible(true);
-    }//GEN-LAST:event_jMenuItemGenerarReporteDiarioActionPerformed
-
-    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-     
-    }//GEN-LAST:event_formWindowClosing
+        jFrameIngresoDinero.setVisible(true);
+    }//GEN-LAST:event_jButtonIngresarDineroActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -2500,12 +2548,14 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private javax.swing.JLabel jLabelS3D2Recibido;
     private javax.swing.JLabel jLabelS3D2TotalDinero;
     private javax.swing.JLabel jLabelS3D2TotalDineroCalculado;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenuArchivo;
     private javax.swing.JMenuBar jMenuBar;
     private javax.swing.JMenu jMenuBaseDeDatos;
     private javax.swing.JMenu jMenuEmpleados;
     private javax.swing.JMenu jMenuHerramientas;
-    private javax.swing.JMenuItem jMenuItemActualizarPrecios;
+    private javax.swing.JMenuItem jMenuItemActualizarPrecioPlanta;
+    private javax.swing.JMenuItem jMenuItemActualizarPreciosVenta;
     private javax.swing.JMenuItem jMenuItemBackUp;
     private javax.swing.JMenuItem jMenuItemCalibracion;
     private javax.swing.JMenuItem jMenuItemEmpleadosAgregar;
@@ -2586,9 +2636,10 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private javax.swing.JPanel jPanelSurtidor1;
     private javax.swing.JPanel jPanelSurtidor2;
     private javax.swing.JPanel jPanelSurtidor3;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane;
-    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTable jTableResumenLiquidacion;
     private javax.swing.JTextField jTextFieldCompraCombustibleSurtidor1;
     private javax.swing.JTextField jTextFieldCompraCombustibleSurtidor2;
     private javax.swing.JTextField jTextFieldCompraCombustibleSurtidor3;
@@ -3091,5 +3142,40 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
      */
     private boolean verficarMedidasDeExistenciasActuales() {
         return (ControllerBO.cargarExistenciasDeCombustible().size() < TOTAL_CILINDROS);
+    }
+    
+    
+    /**
+     * Definir el modelo de la tabla de resumen de liquidaciones
+     */
+     private void setTableModel() {
+        /*Crear el modelo solo si no se ha asignado uno antes.*/
+        if (this.model == null) {
+            this.model = new DefaultTableModel(
+                    new Object[][]{},
+                    new String[]{"Mes", "Dia", "Galones", "Ganancia Unitaria", "Ganancia Corriente"}
+            ) {
+                /*Inpedir que se puedan editar los valores ingresados*/
+                boolean[] canEdit = new boolean[]{
+                    false, false
+                };
+
+                @Override
+                public boolean isCellEditable(int rowIndex, int columnIndex) {
+                    return canEdit[columnIndex];
+                }
+            };
+            jTableResumenLiquidacion.setModel(this.model);
+        }
+    }
+
+     /**
+      * Cargar el resumen de liquidaciones ejecutadas a la fecha actual
+      */
+    private void cargarResumenLiquidaciones() {
+        /*llenar la tabla con la informacion obtenida*/
+        for (Iterator<Object[]> it = ControllerBO.cargarResumenLiquidaciones().iterator(); it.hasNext();) {
+            this.model.addRow(it.next());
+        }
     }
 }
