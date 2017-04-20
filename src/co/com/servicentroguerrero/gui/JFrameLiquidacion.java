@@ -424,7 +424,14 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jPanelS3D2DiferenciaDinero = new javax.swing.JPanel();
         jLabelS3D2Diferencia = new javax.swing.JLabel();
         jTextFieldS3D2Diferencia = new javax.swing.JTextField();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        jPanel4 = new javax.swing.JPanel();
+        jPanelResumen = new javax.swing.JPanel();
+        jLabel11 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        jPanelTable = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
         jTableResumenLiquidacion = new javax.swing.JTable();
         jMenuBar = new javax.swing.JMenuBar();
         jMenuArchivo = new javax.swing.JMenu();
@@ -1628,10 +1635,53 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
                 .addComponent(jPanelIngresoDinero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanelContenedorSurtidores, javax.swing.GroupLayout.PREFERRED_SIZE, 470, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(218, Short.MAX_VALUE))
+                .addContainerGap(237, Short.MAX_VALUE))
         );
 
         jTabbedPane.addTab("Liquidacion", jPanelLiquidacion);
+
+        jLabel11.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel11.setText("Total Galones Corriente:");
+
+        jLabel12.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel12.setText("Total Ganancias Corriente:");
+
+        jLabel13.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel13.setText("$7.531.635");
+
+        jLabel14.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel14.setText("163.30");
+
+        javax.swing.GroupLayout jPanelResumenLayout = new javax.swing.GroupLayout(jPanelResumen);
+        jPanelResumen.setLayout(jPanelResumenLayout);
+        jPanelResumenLayout.setHorizontalGroup(
+            jPanelResumenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelResumenLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelResumenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelResumenLayout.createSequentialGroup()
+                        .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanelResumenLayout.createSequentialGroup()
+                        .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanelResumenLayout.setVerticalGroup(
+            jPanelResumenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelResumenLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addGroup(jPanelResumenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11)
+                    .addComponent(jLabel14))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanelResumenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel12)
+                    .addComponent(jLabel13))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
         jTableResumenLiquidacion.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1644,10 +1694,45 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
 
             }
         ));
-        jTableResumenLiquidacion.setFocusable(false);
-        jScrollPane2.setViewportView(jTableResumenLiquidacion);
+        jScrollPane1.setViewportView(jTableResumenLiquidacion);
 
-        jTabbedPane.addTab("Resumen Liquidacion", jScrollPane2);
+        javax.swing.GroupLayout jPanelTableLayout = new javax.swing.GroupLayout(jPanelTable);
+        jPanelTable.setLayout(jPanelTableLayout);
+        jPanelTableLayout.setHorizontalGroup(
+            jPanelTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelTableLayout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1337, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        jPanelTableLayout.setVerticalGroup(
+            jPanelTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelTableLayout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 533, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 246, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanelResumen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanelTable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanelResumen, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jPanelTable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jTabbedPane.addTab("Resumen Corriente", jPanel4);
 
         jMenuArchivo.setText("Archivo");
 
@@ -2495,6 +2580,10 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private javax.swing.JComboBox<String> jComboBoxCambiarIslero;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -2569,6 +2658,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
@@ -2584,6 +2674,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private javax.swing.JPanel jPanelPreciosActualesAcpm;
     private javax.swing.JPanel jPanelPreciosActualesFecha;
     private javax.swing.JPanel jPanelPreciosActualesGasolinaCorriente;
+    private javax.swing.JPanel jPanelResumen;
     private javax.swing.JPanel jPanelResumenLiquidacion;
     private javax.swing.JPanel jPanelS1D1DiferenciaDinero;
     private javax.swing.JPanel jPanelS1D1Entregado;
@@ -2636,7 +2727,8 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private javax.swing.JPanel jPanelSurtidor1;
     private javax.swing.JPanel jPanelSurtidor2;
     private javax.swing.JPanel jPanelSurtidor3;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JPanel jPanelTable;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JTable jTableResumenLiquidacion;
@@ -3153,11 +3245,11 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         if (this.model == null) {
             this.model = new DefaultTableModel(
                     new Object[][]{},
-                    new String[]{"Mes", "Dia", "Galones", "Ganancia Unitaria", "Ganancia Corriente"}
+                    new String[]{"Mes", "Dia", "Galones", "Precio Venta", "Precio Planta", "Ganancia Parcial", "Ganancia Corriente"}
             ) {
-                /*Inpedir que se puedan editar los valores ingresados*/
+                /*Inpedir que se puedan editar los valores ingresados, false por cada columna*/
                 boolean[] canEdit = new boolean[]{
-                    false, false
+                    false, false, false, false, false, false, false
                 };
 
                 @Override

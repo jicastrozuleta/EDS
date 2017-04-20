@@ -805,7 +805,9 @@ public class Model {
             String query = ""
                     + "SELECT 	v.fecha,"
                     + "		v.dia, "
-                    + "		v.galonesCorriente, "
+                    + "		v.galonesCorriente,"
+                    + "         v.pVenta,"
+                    + "         v.pCompra, "
                     + "		v.gananciaUnitaria, "
                     + "		v.gananciaCorriente "
                     + "FROM view_resumenLiquidacion v;";
@@ -822,7 +824,9 @@ public class Model {
                         resultSet.getString(2).trim(),
                         resultSet.getString(3).trim(),
                         Util.formatearMiles(resultSet.getDouble(4)),
-                        Util.formatearMiles(resultSet.getDouble(5))                        
+                        Util.formatearMiles(resultSet.getDouble(5)),
+                        Util.formatearMiles(resultSet.getDouble(6)),
+                        Util.formatearMiles(resultSet.getDouble(7))                        
                     });
                 } while (resultSet.next());
             }
