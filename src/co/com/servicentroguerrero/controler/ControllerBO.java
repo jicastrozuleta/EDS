@@ -376,6 +376,19 @@ public class ControllerBO {
         reports.liquidacionDiariaToPDF(fechaReporte);
     }
     
+     /**
+     * generar el reporte de liquidacion diaria de la fecha seleccioanda
+     * @param fechaReporte fecha del reporte.
+     * @throws Exception si se genera algun error generando el reporte
+     */
+    public static void generarReporteLiquidacionExtra(final String fechaReporte) throws Exception{
+        if(fechaReporte == null || fechaReporte.length() == 0)
+            throw new Exception("Ingrese la fecha para generar el reporte.");
+        /*Iniciar la ejecucion del reporte*/
+        Reports reports = new Reports();
+        reports.liquidacionExtraToPDF(fechaReporte);
+    }
+    
     
     /**
      * cargar la existencias de combustible que se han ingresado el dia actual
@@ -419,11 +432,41 @@ public class ControllerBO {
     
     /**
      * cargar el resumen de liquidaciones realizados a la fecha actual
-     *
+     * en Corriente.
      * @return Lista que contiene los objectos que representaran la informacion
      * de cada fila de la tabla de resumen
      */
-    public static ArrayList<Object[]> cargarResumenLiquidaciones() {
-        return MODELO.cargarResumenLiquidaciones();
+    public static ArrayList<Object[]> cargarResumenLiquidacionesCorriente() {
+        return MODELO.cargarResumenLiquidacionesCorriente();
+    }
+    
+    
+    /**
+     * cargar el resumen de liquidaciones realizados a la fecha actual
+     * en ACPM
+     * @return Lista que contiene los objectos que representaran la informacion
+     * de cada fila de la tabla de resumen
+     */
+    public static ArrayList<Object[]> cargarResumenLiquidacionesAcpm() {
+        return MODELO.cargarResumenLiquidacionesAcpm();
+    }
+
+    /**
+     * Calcular los  valores para galones y ganacias generadas a la fecha actual.
+     * CORRIENTE
+     * @return 
+     */
+    public static String[] calcularDatosGeneralesResumenLiquidacionCorriente() {
+        return MODELO.calcularDatosGeneralesResumenLiquidacionCorriente();
+    }
+
+    
+    /**
+     * Calcular los  valores para galones y ganacias generadas a la fecha actual.
+     * ACPM
+     * @return 
+     */
+    public static String[] calcularDatosGeneralesResumenLiquidacionAcpm() {
+        return MODELO.calcularDatosGeneralesResumenLiquidacionAcpm();
     }
 }

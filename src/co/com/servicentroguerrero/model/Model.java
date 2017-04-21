@@ -313,7 +313,7 @@ public class Model {
                 + "LEFT JOIN volumenes v ON v.idCilindro = c.idCilindro "
                 + "WHERE c.idCilindro NOT IN ( "
                 + "	SELECT v.idCilindro FROM volumenes v "
-                + "	WHERE TIMESTAMPDIFF(DAY,v.fecha,CURRENT_DATE()) <= 0 "
+                + "	WHERE TIMESTAMPDIFF(DAY,DATE_FORMAT(v.fecha,'%Y-%m-%d'), CURRENT_DATE()) <= 0 "
                 + ") "
                 + "GROUP BY s.idSurtidor "
                 + "ORDER BY s.idSurtidor;";
@@ -797,7 +797,7 @@ public class Model {
      * 
      * @return 
      */
-    public ArrayList<Object[]> cargarResumenLiquidaciones() {
+    public ArrayList<Object[]> cargarResumenLiquidacionesCorriente() {
         /*lista inicial vacia para conservar los objetos cargados de BD*/
         ArrayList<Object[]> lista = new ArrayList<>();
         try {
@@ -835,4 +835,121 @@ public class Model {
         }
         return lista;
     }
+
+    
+    public ArrayList<Object[]> cargarResumenLiquidacionesAcpm() {
+        /*lista inicial vacia para conservar los objetos cargados de BD*/
+        ArrayList<Object[]> lista = new ArrayList<>();
+        try {
+            /*Query para cargar la informacion necesaria*/
+            String query = ""
+                    + "SELECT   v.fecha,"
+                    + "         v.dia, "
+                    + "		 v.aceites, "
+                    + "		 v.galonesAcpm, "
+                    + "		 v.totalDineroAcpm, "
+                    + "		 v.total "
+                    + "FROM view_resumenAcpm v;";
+ 
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(query);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                do {
+                    /*llenar la lista con los datos obtenidos*/
+                    lista.add(new Object[]{
+                        Util.devolverMesDeFecha(resultSet.getString(1).trim()),
+                        resultSet.getString(2).trim(),
+                        "$" + Util.formatearMiles(resultSet.getDouble(3)),
+                        Util.formatearMiles(resultSet.getDouble(4)),
+                        "$" + Util.formatearMiles(resultSet.getDouble(5)),
+                        "$" + Util.formatearMiles(resultSet.getDouble(6))                        
+                    });
+                } while (resultSet.next());
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        }
+        return lista;
+    }
+    
+    
+    
+
+    /**
+     * Metodo para  generar los datos recumenidos globales de las liquidaciones
+     * que se han realizado a fecha actual.
+     * @return array con posicion cero = Acumulado de galones,
+     * posicion 1 = Acumulado de ganancias percibidas por combustible de tipo corriente.
+     */
+    public String[] calcularDatosGeneralesResumenLiquidacionCorriente() {
+        /*lista inicial vacia para conservar los objetos cargados de BD*/
+        String[] datosGenerales = new String[]{"0","0"};
+        try {
+            /*Query para cargar la informacion necesaria*/
+            String query = ""
+                    + "SELECT SUM(vrl.galonesCorriente), "
+                    + "       SUM(vrl.gananciaCorriente) "
+                    + "FROM view_resumenliquidacion vrl;";
+ 
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(query);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                do {
+                    /*llenar la lista con los datos obtenidos*/
+                    datosGenerales[0] = Util.formatearMiles(resultSet.getDouble(1)) + " gls.";
+                    datosGenerales[1] = "$" + Util.formatearMiles(resultSet.getDouble(2));
+                } while (resultSet.next());
+            }
+            
+            if(resultSet != null && !resultSet.isClosed())
+                resultSet.close();
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        }
+        return datosGenerales;
+    }
+
+    
+    /**
+     * Metodo para  generar los datos recumenidos globales de las liquidaciones
+     * que se han realizado a fecha actual. ACPM
+     * @return 
+     */
+    public String[] calcularDatosGeneralesResumenLiquidacionAcpm() {
+        /*lista inicial vacia para conservar los objetos cargados de BD*/
+        String[] datosGenerales = new String[]{"0","0","0"};
+        try {
+            /*Query para cargar la informacion necesaria*/
+            String query = ""
+                    + "SELECT SUM(v.aceites), "
+                    + "       SUM(v.totalDineroAcpm),"
+                    + "       SUM(v.total) "
+                    + "FROM view_resumenAcpm v;";
+ 
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(query);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                do {
+                    /*llenar la lista con los datos obtenidos*/
+                    datosGenerales[0] = Util.formatearMiles(resultSet.getDouble(1)) + " gls.";
+                    datosGenerales[1] = "$" + Util.formatearMiles(resultSet.getDouble(2));
+                    datosGenerales[2] = "$" + Util.formatearMiles(resultSet.getDouble(3));
+                } while (resultSet.next());
+            }
+            
+            if(resultSet != null && !resultSet.isClosed())
+                resultSet.close();
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        }
+        return datosGenerales;
+    }
+
+    
 }

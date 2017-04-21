@@ -38,7 +38,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private static final int SURTIDOR1 = 0X01;
     private static final int SURTIDOR2 = 0X02;
     private static final int SURTIDOR3 = 0X03;
-    
+
     /*cantidad de cilindros*/
     private static final int TOTAL_CILINDROS = 0x03;
 
@@ -81,12 +81,16 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
      * Constante para indicar una posicion por defecto en combobox.
      */
     private static final int POSITION_DEFAULT = 0x00;
-    
-    
+
     /**
-     * Referencia al modelo que permite asignar datos a la tabla.
+     * Referencia al modelo que permite asignar datos a la tabla de correinte.
      */
-    private DefaultTableModel model;
+    private DefaultTableModel modelCorriente;
+
+    /**
+     * Referencia al modelo que permite asignar datos a la tablade acpm.
+     */
+    private DefaultTableModel modelAcpm;
 
     /**
      * Representa el total de dinero liquidado por surtidores y aceites
@@ -114,22 +118,28 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
      * Objeto que representa la ventana de insercion de empleados.
      */
     private JFrameAgregarEmpleados jFrameAgregarEmpleados;
-    
+
     /**
      * Objeto que representa la ventana de insercion de calibraciones.
      */
     private JFrameCalibracion jFrameCalibracion;
-    
+
     /**
      * Objeto que representa la ventana de registro de medida de regla mojada.
      */
     private JFrameMedidaRegla jFrameMedidaRegla;
-    
-    
+
     /**
-     * Objeto que representa la ventana para generar el reporte de liquidacion diaria.
+     * Objeto que representa la ventana para generar el reporte de liquidacion
+     * diaria.
      */
     private JFrameGenerarReporteDiario jFrameGenerarReporteDiario;
+
+    /**
+     * Objeto que representa la ventana para generar el reporte de liquidacion
+     * extra.
+     */
+    private JFrameGenerarReporteExtra jFrameGenerarReporteExtra;
 
     /**
      * Creates new form JFrameLiquidacion
@@ -162,12 +172,14 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
 
         /*Inicializar la lsta de liquidaciones por dispensador*/
         crearArrayLiquidaciones();
-        
+
         /*asignar el modelo a la tabla de resumen de liquidaciones*/
-        setTableModel();
-        
+        setTableModelResumenCorriente();
+        setTableModelResumenAcpm();
+
         /*cargar el resumen de liquidaciones en la tabla*/
-        cargarResumenLiquidaciones();
+        cargarResumenLiquidacionesCorriente();
+        cargarResumenLiquidacionesAcpm();
 
     }
 
@@ -424,15 +436,26 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jPanelS3D2DiferenciaDinero = new javax.swing.JPanel();
         jLabelS3D2Diferencia = new javax.swing.JLabel();
         jTextFieldS3D2Diferencia = new javax.swing.JTextField();
-        jPanel4 = new javax.swing.JPanel();
+        jPanelResumenCorriente = new javax.swing.JPanel();
         jPanelResumen = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
+        jLabelTotalGananciaCorriente = new javax.swing.JLabel();
+        jLabelTotalGalonesCorriente = new javax.swing.JLabel();
         jPanelTable = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTableResumenLiquidacion = new javax.swing.JTable();
+        jPanelResumenAcpm = new javax.swing.JPanel();
+        jPanelResumenAcpmGeneral = new javax.swing.JPanel();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
+        jLabelTotalAcpm = new javax.swing.JLabel();
+        jLabelTotalAceites = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        jLabelTotalLiquidadoAcpm = new javax.swing.JLabel();
+        jPanelTableResumeAcpm = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTableResumenAcpm = new javax.swing.JTable();
         jMenuBar = new javax.swing.JMenuBar();
         jMenuArchivo = new javax.swing.JMenu();
         jMenuItemSalir = new javax.swing.JMenuItem();
@@ -444,8 +467,8 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jMenuItemBackUp = new javax.swing.JMenuItem();
         jMenuItemRestaurar = new javax.swing.JMenuItem();
         jMenuItemCalibracion = new javax.swing.JMenuItem();
-        jMenuItemExtraLiquidacion = new javax.swing.JMenuItem();
         jMenuItemMedicionRegla = new javax.swing.JMenuItem();
+        jMenuItemExtraLiquidacion = new javax.swing.JMenuItem();
         jMenuItemGenerarReporteDiario = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
         jMenuItemActualizarPreciosVenta = new javax.swing.JMenuItem();
@@ -1646,11 +1669,11 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jLabel12.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         jLabel12.setText("Total Ganancias Corriente:");
 
-        jLabel13.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel13.setText("$7.531.635");
+        jLabelTotalGananciaCorriente.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabelTotalGananciaCorriente.setText("$7.531.635");
 
-        jLabel14.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-        jLabel14.setText("163.30");
+        jLabelTotalGalonesCorriente.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabelTotalGalonesCorriente.setText("163.30");
 
         javax.swing.GroupLayout jPanelResumenLayout = new javax.swing.GroupLayout(jPanelResumen);
         jPanelResumen.setLayout(jPanelResumenLayout);
@@ -1662,11 +1685,11 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
                     .addGroup(jPanelResumenLayout.createSequentialGroup()
                         .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jLabelTotalGalonesCorriente, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanelResumenLayout.createSequentialGroup()
                         .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jLabelTotalGananciaCorriente, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanelResumenLayout.setVerticalGroup(
@@ -1675,11 +1698,11 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
                 .addGap(6, 6, 6)
                 .addGroup(jPanelResumenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel11)
-                    .addComponent(jLabel14))
+                    .addComponent(jLabelTotalGalonesCorriente))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanelResumenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel12)
-                    .addComponent(jLabel13))
+                    .addComponent(jLabelTotalGananciaCorriente))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1711,20 +1734,20 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
                 .addGap(0, 246, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+        javax.swing.GroupLayout jPanelResumenCorrienteLayout = new javax.swing.GroupLayout(jPanelResumenCorriente);
+        jPanelResumenCorriente.setLayout(jPanelResumenCorrienteLayout);
+        jPanelResumenCorrienteLayout.setHorizontalGroup(
+            jPanelResumenCorrienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelResumenCorrienteLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanelResumenCorrienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanelResumen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanelTable, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+        jPanelResumenCorrienteLayout.setVerticalGroup(
+            jPanelResumenCorrienteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelResumenCorrienteLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanelResumen, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -1732,7 +1755,108 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
                 .addContainerGap())
         );
 
-        jTabbedPane.addTab("Resumen Corriente", jPanel4);
+        jTabbedPane.addTab("Resumen Corriente", jPanelResumenCorriente);
+
+        jLabel13.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel13.setText("Total Aceites:");
+
+        jLabel14.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel14.setText("Total ACPM:");
+
+        jLabelTotalAcpm.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+
+        jLabelTotalAceites.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+
+        jLabel15.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel15.setText("Total :");
+
+        jLabelTotalLiquidadoAcpm.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+
+        javax.swing.GroupLayout jPanelResumenAcpmGeneralLayout = new javax.swing.GroupLayout(jPanelResumenAcpmGeneral);
+        jPanelResumenAcpmGeneral.setLayout(jPanelResumenAcpmGeneralLayout);
+        jPanelResumenAcpmGeneralLayout.setHorizontalGroup(
+            jPanelResumenAcpmGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelResumenAcpmGeneralLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelResumenAcpmGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, 142, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelResumenAcpmGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabelTotalAceites, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabelTotalAcpm, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jLabel15, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jLabelTotalLiquidadoAcpm, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanelResumenAcpmGeneralLayout.setVerticalGroup(
+            jPanelResumenAcpmGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelResumenAcpmGeneralLayout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addGroup(jPanelResumenAcpmGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel13)
+                    .addComponent(jLabel15)
+                    .addComponent(jLabelTotalLiquidadoAcpm, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabelTotalAceites, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanelResumenAcpmGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabelTotalAcpm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        jTableResumenAcpm.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane2.setViewportView(jTableResumenAcpm);
+
+        javax.swing.GroupLayout jPanelTableResumeAcpmLayout = new javax.swing.GroupLayout(jPanelTableResumeAcpm);
+        jPanelTableResumeAcpm.setLayout(jPanelTableResumeAcpmLayout);
+        jPanelTableResumeAcpmLayout.setHorizontalGroup(
+            jPanelTableResumeAcpmLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelTableResumeAcpmLayout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 1337, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
+        );
+        jPanelTableResumeAcpmLayout.setVerticalGroup(
+            jPanelTableResumeAcpmLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelTableResumeAcpmLayout.createSequentialGroup()
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 533, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 246, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout jPanelResumenAcpmLayout = new javax.swing.GroupLayout(jPanelResumenAcpm);
+        jPanelResumenAcpm.setLayout(jPanelResumenAcpmLayout);
+        jPanelResumenAcpmLayout.setHorizontalGroup(
+            jPanelResumenAcpmLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelResumenAcpmLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelResumenAcpmLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanelResumenAcpmGeneral, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanelTableResumeAcpm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanelResumenAcpmLayout.setVerticalGroup(
+            jPanelResumenAcpmLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelResumenAcpmLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanelResumenAcpmGeneral, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jPanelTableResumeAcpm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        jTabbedPane.addTab("Resumen ACPM", jPanelResumenAcpm);
 
         jMenuArchivo.setText("Archivo");
 
@@ -1796,9 +1920,6 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         });
         jMenuHerramientas.add(jMenuItemCalibracion);
 
-        jMenuItemExtraLiquidacion.setText("Extra Liquidacion");
-        jMenuHerramientas.add(jMenuItemExtraLiquidacion);
-
         jMenuItemMedicionRegla.setText("Medicion Regla");
         jMenuItemMedicionRegla.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1806,6 +1927,14 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
             }
         });
         jMenuHerramientas.add(jMenuItemMedicionRegla);
+
+        jMenuItemExtraLiquidacion.setText("Extra Liquidacion");
+        jMenuItemExtraLiquidacion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemExtraLiquidacionActionPerformed(evt);
+            }
+        });
+        jMenuHerramientas.add(jMenuItemExtraLiquidacion);
 
         jMenuItemGenerarReporteDiario.setText("Generar Reporte Diario");
         jMenuItemGenerarReporteDiario.addActionListener(new java.awt.event.ActionListener() {
@@ -1921,8 +2050,9 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     }//GEN-LAST:event_formWindowOpened
 
     private void jMenuItemCalibracionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemCalibracionActionPerformed
-        if(jFrameCalibracion == null)
+        if (jFrameCalibracion == null) {
             jFrameCalibracion = new JFrameCalibracion();
+        }
         jFrameCalibracion.setLocationRelativeTo(this);
         jFrameCalibracion.setVisible(true);
     }//GEN-LAST:event_jMenuItemCalibracionActionPerformed
@@ -1953,14 +2083,15 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     }//GEN-LAST:event_jMenuItemEmpleadosEliminarActionPerformed
 
     private void jMenuItemMedicionReglaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemMedicionReglaActionPerformed
-        if(jFrameMedidaRegla == null)
+        if (jFrameMedidaRegla == null) {
             jFrameMedidaRegla = new JFrameMedidaRegla();
+        }
         jFrameMedidaRegla.setLocationRelativeTo(this);
         jFrameMedidaRegla.setVisible(true);
     }//GEN-LAST:event_jMenuItemMedicionReglaActionPerformed
 
     private void jMenuItemGenerarReporteDiarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemGenerarReporteDiarioActionPerformed
-    
+
         if (jFrameGenerarReporteDiario == null) {
             jFrameGenerarReporteDiario = new JFrameGenerarReporteDiario();
         }
@@ -1969,7 +2100,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     }//GEN-LAST:event_jMenuItemGenerarReporteDiarioActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-     
+
     }//GEN-LAST:event_formWindowClosing
 
     private void jMenuItemActualizarPrecioPlantaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemActualizarPrecioPlantaActionPerformed
@@ -2434,7 +2565,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         iniciarRecalculoDeLiquidaciones();
 
         /*verificar que ya se realizo el registro de mededias por regla mojada*/
-        if(verficarMedidasDeExistenciasActuales()){
+        if (verficarMedidasDeExistenciasActuales()) {
             JOptionPane.showMessageDialog(this, "Debe registrar todas las medidas de regla en los cilindros.", "ERROR DE MEDIDA REGLA", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -2573,6 +2704,14 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jFrameIngresoDinero.setVisible(true);
     }//GEN-LAST:event_jButtonIngresarDineroActionPerformed
 
+    private void jMenuItemExtraLiquidacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemExtraLiquidacionActionPerformed
+        if (jFrameGenerarReporteExtra == null) {
+            jFrameGenerarReporteExtra = new JFrameGenerarReporteExtra();
+        }
+        jFrameGenerarReporteExtra.setLocationRelativeTo(this);
+        jFrameGenerarReporteExtra.setVisible(true);
+    }//GEN-LAST:event_jMenuItemExtraLiquidacionActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonGuardarLiquidacion;
@@ -2584,6 +2723,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -2637,6 +2777,11 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private javax.swing.JLabel jLabelS3D2Recibido;
     private javax.swing.JLabel jLabelS3D2TotalDinero;
     private javax.swing.JLabel jLabelS3D2TotalDineroCalculado;
+    private javax.swing.JLabel jLabelTotalAceites;
+    private javax.swing.JLabel jLabelTotalAcpm;
+    private javax.swing.JLabel jLabelTotalGalonesCorriente;
+    private javax.swing.JLabel jLabelTotalGananciaCorriente;
+    private javax.swing.JLabel jLabelTotalLiquidadoAcpm;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenuArchivo;
     private javax.swing.JMenuBar jMenuBar;
@@ -2658,7 +2803,6 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
@@ -2675,6 +2819,9 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private javax.swing.JPanel jPanelPreciosActualesFecha;
     private javax.swing.JPanel jPanelPreciosActualesGasolinaCorriente;
     private javax.swing.JPanel jPanelResumen;
+    private javax.swing.JPanel jPanelResumenAcpm;
+    private javax.swing.JPanel jPanelResumenAcpmGeneral;
+    private javax.swing.JPanel jPanelResumenCorriente;
     private javax.swing.JPanel jPanelResumenLiquidacion;
     private javax.swing.JPanel jPanelS1D1DiferenciaDinero;
     private javax.swing.JPanel jPanelS1D1Entregado;
@@ -2728,9 +2875,12 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     private javax.swing.JPanel jPanelSurtidor2;
     private javax.swing.JPanel jPanelSurtidor3;
     private javax.swing.JPanel jPanelTable;
+    private javax.swing.JPanel jPanelTableResumeAcpm;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane;
+    private javax.swing.JTable jTableResumenAcpm;
     private javax.swing.JTable jTableResumenLiquidacion;
     private javax.swing.JTextField jTextFieldCompraCombustibleSurtidor1;
     private javax.swing.JTextField jTextFieldCompraCombustibleSurtidor2;
@@ -3171,18 +3321,21 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
                     + liquidacionDispensador.getDineroEntregado() + ";"
                     + liquidacionDispensador.getDineroCalculado() + ";"
                     + liquidacionDispensador.getDiferenciaDinero() + "*";
-            
+
             /*calcular la salida de combustible de cada surtidor*/
-            if(liquidacionDispensador.getIdSurtidor() == SURTIDOR1)
+            if (liquidacionDispensador.getIdSurtidor() == SURTIDOR1) {
                 galonesVendidosSurtidor1 += liquidacionDispensador.getGalones();
-            
-            if(liquidacionDispensador.getIdSurtidor() == SURTIDOR2)
+            }
+
+            if (liquidacionDispensador.getIdSurtidor() == SURTIDOR2) {
                 galonesVendidosSurtidor2 += liquidacionDispensador.getGalones();
-            
-            if(liquidacionDispensador.getIdSurtidor() == SURTIDOR3)
+            }
+
+            if (liquidacionDispensador.getIdSurtidor() == SURTIDOR3) {
                 galonesVendidosSurtidor3 += liquidacionDispensador.getGalones();
+            }
         }
-        
+
         /*calcular movimiento de existencias de combustibles*/
         ArrayList<Existencias> listaExistencias = ControllerBO.cargarExistenciasDeCombustible();
         {
@@ -3190,22 +3343,22 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
             double comprasSurtidor1 = Double.parseDouble(jTextFieldCompraCombustibleSurtidor1.getText().trim());
             double comprasSurtidor2 = Double.parseDouble(jTextFieldCompraCombustibleSurtidor2.getText().trim());
             double comprasSurtidor3 = Double.parseDouble(jTextFieldCompraCombustibleSurtidor3.getText().trim());
-            
+
             /*realizar movimientos de entrada y salida de galones de combustibles*/
             for (Existencias existencia : listaExistencias) {
-                if(existencia.getIdSurtidor() == SURTIDOR1){
+                if (existencia.getIdSurtidor() == SURTIDOR1) {
                     existencia.setGalonesComprados(comprasSurtidor1);
                     existencia.setGalonesVendidos(galonesVendidosSurtidor1);
                     existencia.setGalonesExistentes(existencia.getMedidaGalonesInicial() + comprasSurtidor1 - galonesVendidosSurtidor1);
                 }
-                
-                if(existencia.getIdSurtidor() == SURTIDOR2){
+
+                if (existencia.getIdSurtidor() == SURTIDOR2) {
                     existencia.setGalonesComprados(comprasSurtidor2);
                     existencia.setGalonesVendidos(galonesVendidosSurtidor2);
                     existencia.setGalonesExistentes(existencia.getMedidaGalonesInicial() + comprasSurtidor2 - galonesVendidosSurtidor2);
                 }
-                
-                if(existencia.getIdSurtidor() == SURTIDOR3){
+
+                if (existencia.getIdSurtidor() == SURTIDOR3) {
                     existencia.setGalonesComprados(comprasSurtidor3);
                     existencia.setGalonesVendidos(galonesVendidosSurtidor3);
                     existencia.setGalonesExistentes(existencia.getMedidaGalonesInicial() + comprasSurtidor3 - galonesVendidosSurtidor3);
@@ -3225,25 +3378,27 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         );
         worked.execute();
         JOptionPane.showMessageDialog(this, "Liquidacion terminada de forma correcta.", "DATOS INSERTADOS", JOptionPane.INFORMATION_MESSAGE);
+        cargarResumenLiquidacionesCorriente();
+        cargarResumenLiquidacionesAcpm();
     }
-    
 
     /**
-     * validar que ya se registraron las medidas de regla de cada cilindro el dia actual
+     * validar que ya se registraron las medidas de regla de cada cilindro el
+     * dia actual
+     *
      * @return true si ya estan los registros, false en caso contrario.
      */
     private boolean verficarMedidasDeExistenciasActuales() {
         return (ControllerBO.cargarExistenciasDeCombustible().size() < TOTAL_CILINDROS);
     }
-    
-    
+
     /**
-     * Definir el modelo de la tabla de resumen de liquidaciones
+     * Definir el modelo de la tabla de resumen de liquidaciones en corriente
      */
-     private void setTableModel() {
+    private void setTableModelResumenCorriente() {
         /*Crear el modelo solo si no se ha asignado uno antes.*/
-        if (this.model == null) {
-            this.model = new DefaultTableModel(
+        if (this.modelCorriente == null) {
+            this.modelCorriente = new DefaultTableModel(
                     new Object[][]{},
                     new String[]{"Mes", "Dia", "Galones", "Precio Venta", "Precio Planta", "Ganancia Parcial", "Ganancia Corriente"}
             ) {
@@ -3257,17 +3412,78 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
                     return canEdit[columnIndex];
                 }
             };
-            jTableResumenLiquidacion.setModel(this.model);
+            jTableResumenLiquidacion.setModel(this.modelCorriente);
         }
     }
 
-     /**
-      * Cargar el resumen de liquidaciones ejecutadas a la fecha actual
-      */
-    private void cargarResumenLiquidaciones() {
-        /*llenar la tabla con la informacion obtenida*/
-        for (Iterator<Object[]> it = ControllerBO.cargarResumenLiquidaciones().iterator(); it.hasNext();) {
-            this.model.addRow(it.next());
+    /**
+     * Definir el modelo de la tabla de resumen de liquidaciones en corriente
+     */
+    private void setTableModelResumenAcpm() {
+        /*Crear el modelo solo si no se ha asignado uno antes.*/
+        if (this.modelAcpm == null) {
+            this.modelAcpm = new DefaultTableModel(
+                    new Object[][]{},
+                    new String[]{"Mes", "Dia", "Aceites", "Galones ACPM", "Total ACPM", "TOTAL"}
+            ) {
+                /*Inpedir que se puedan editar los valores ingresados, false por cada columna*/
+                boolean[] canEdit = new boolean[]{
+                    false, false, false, false, false, false
+                };
+
+                @Override
+                public boolean isCellEditable(int rowIndex, int columnIndex) {
+                    return canEdit[columnIndex];
+                }
+            };
+            jTableResumenAcpm.setModel(this.modelAcpm);
         }
+    }
+
+    /**
+     * Cargar el resumen de liquidaciones ejecutadas a la fecha actual
+     */
+    private void cargarResumenLiquidacionesCorriente() {
+        /*llenar la tabla con la informacion obtenida*/
+        for (Iterator<Object[]> it = ControllerBO.cargarResumenLiquidacionesCorriente().iterator(); it.hasNext();) {
+            this.modelCorriente.addRow(it.next());
+        }
+
+        /*Mostrar el acmulado */
+        mostrarDatosGeneralesResumenLiquidacionCorriente();
+    }
+
+    /**
+     * Cargar el resumen de liquidaciones ejecutadas a la fecha actual
+     */
+    private void cargarResumenLiquidacionesAcpm() {
+        /*llenar la tabla con la informacion obtenida*/
+        for (Iterator<Object[]> it = ControllerBO.cargarResumenLiquidacionesAcpm().iterator(); it.hasNext();) {
+            this.modelAcpm.addRow(it.next());
+        }
+
+        /*Mostrar el acmulado */
+        mostrarDatosGeneralesResumenLiquidacionAcpm();
+    }
+
+    /**
+     * Metodo para mostrar la informacion de galones vendidos de corriente y su
+     * respectiva ganancia a la fecha actual.
+     */
+    private void mostrarDatosGeneralesResumenLiquidacionCorriente() {
+        String[] resumen = ControllerBO.calcularDatosGeneralesResumenLiquidacionCorriente();
+        jLabelTotalGalonesCorriente.setText(resumen[0].trim());
+        jLabelTotalGananciaCorriente.setText(resumen[1].trim());
+    }
+
+    /**
+     * Metodo para mostrar la informacion de galones vendidos de corriente y su
+     * respectiva ganancia a la fecha actual.
+     */
+    private void mostrarDatosGeneralesResumenLiquidacionAcpm() {
+        String[] resumen = ControllerBO.calcularDatosGeneralesResumenLiquidacionAcpm();
+        jLabelTotalAceites.setText(resumen[0].trim());
+        jLabelTotalAcpm.setText(resumen[1].trim());
+        jLabelTotalLiquidadoAcpm.setText(resumen[2].trim());
     }
 }
