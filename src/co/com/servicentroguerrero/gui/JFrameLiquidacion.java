@@ -22,6 +22,8 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.control.ComboBox;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -32,7 +34,7 @@ import javax.swing.table.DefaultTableModel;
  *
  * @author JICZ4
  */
-public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
+public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IRefresh {
 
     /*Constantes para identificar los surtidores disponibles.*/
     private static final int SURTIDOR1 = 0X01;
@@ -1795,11 +1797,12 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
             jPanelResumenAcpmGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelResumenAcpmGeneralLayout.createSequentialGroup()
                 .addGap(6, 6, 6)
-                .addGroup(jPanelResumenAcpmGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel13)
-                    .addComponent(jLabel15)
-                    .addComponent(jLabelTotalLiquidadoAcpm, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabelTotalAceites, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanelResumenAcpmGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabelTotalAceites, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanelResumenAcpmGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel13)
+                        .addComponent(jLabel15)
+                        .addComponent(jLabelTotalLiquidadoAcpm, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanelResumenAcpmGeneralLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -2008,7 +2011,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         /*validar que el archivo sea correcto.*/
         if (file.exists() && file.getAbsolutePath().contains(".bkp")) {
             if (BackUp.restaurarBackup(file.getAbsolutePath())) {
-                JOptionPane.showMessageDialog(this, "Restauracion Completada correctamente.", "Restauracion OK", JOptionPane.OK_OPTION);
+                JOptionPane.showMessageDialog(this, "Restauracion Completada correctamente.", "Restauracion OK", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Error en la restauracion de la base de datos. Intente nuevamente.", "ERROR", JOptionPane.ERROR_MESSAGE);
             }
@@ -2016,7 +2019,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     }//GEN-LAST:event_jMenuItemRestaurarActionPerformed
 
     private void jMenuItemActualizarPreciosVentaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemActualizarPreciosVentaActionPerformed
-        JFrameActualizarPrecios jFrameActualizarPrecios = new JFrameActualizarPrecios();
+        JFrameActualizarPrecios jFrameActualizarPrecios = new JFrameActualizarPrecios(this);
         jFrameActualizarPrecios.setLocationRelativeTo(this);
         jFrameActualizarPrecios.setVisible(true);
     }//GEN-LAST:event_jMenuItemActualizarPreciosVentaActionPerformed
@@ -2051,16 +2054,20 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
 
     private void jMenuItemCalibracionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemCalibracionActionPerformed
         if (jFrameCalibracion == null) {
-            jFrameCalibracion = new JFrameCalibracion();
+            jFrameCalibracion.removeAll();
+            jFrameCalibracion = null;
         }
+        jFrameCalibracion = new JFrameCalibracion();
         jFrameCalibracion.setLocationRelativeTo(this);
         jFrameCalibracion.setVisible(true);
     }//GEN-LAST:event_jMenuItemCalibracionActionPerformed
 
     private void jMenuItemEmpleadosAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemEmpleadosAgregarActionPerformed
-        if (jFrameAgregarEmpleados == null) {
-            jFrameAgregarEmpleados = new JFrameAgregarEmpleados();
+        if (jFrameAgregarEmpleados != null) {
+            jFrameAgregarEmpleados.removeAll();
+            jFrameAgregarEmpleados = null;
         }
+        jFrameAgregarEmpleados = new JFrameAgregarEmpleados(this);
         jFrameAgregarEmpleados.setLocationRelativeTo(this);
         jFrameAgregarEmpleados.setVisible(true);
 
@@ -2075,17 +2082,21 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     }//GEN-LAST:event_jMenuItemBackUpActionPerformed
 
     private void jMenuItemEmpleadosEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemEmpleadosEliminarActionPerformed
-        if (jFrameEliminarEmpleados == null) {
-            jFrameEliminarEmpleados = new JFrameEliminarEmpleados();
+        if (jFrameEliminarEmpleados != null) {
+            jFrameEliminarEmpleados.removeAll();
+            jFrameEliminarEmpleados = null;
         }
+        jFrameEliminarEmpleados = new JFrameEliminarEmpleados(this);
         jFrameEliminarEmpleados.setLocationRelativeTo(this);
         jFrameEliminarEmpleados.setVisible(true);
     }//GEN-LAST:event_jMenuItemEmpleadosEliminarActionPerformed
 
     private void jMenuItemMedicionReglaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemMedicionReglaActionPerformed
-        if (jFrameMedidaRegla == null) {
-            jFrameMedidaRegla = new JFrameMedidaRegla();
+        if (jFrameMedidaRegla != null) {
+            jFrameMedidaRegla.removeAll();
+            jFrameMedidaRegla = null;
         }
+        jFrameMedidaRegla = new JFrameMedidaRegla();
         jFrameMedidaRegla.setLocationRelativeTo(this);
         jFrameMedidaRegla.setVisible(true);
     }//GEN-LAST:event_jMenuItemMedicionReglaActionPerformed
@@ -2104,7 +2115,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
     }//GEN-LAST:event_formWindowClosing
 
     private void jMenuItemActualizarPrecioPlantaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemActualizarPrecioPlantaActionPerformed
-        JFrameActualizarPreciosPlanta jFrameActualizarPrecios = new JFrameActualizarPreciosPlanta();
+        JFrameActualizarPreciosPlanta jFrameActualizarPrecios = new JFrameActualizarPreciosPlanta(this);
         jFrameActualizarPrecios.setLocationRelativeTo(this);
         jFrameActualizarPrecios.setVisible(true);
     }//GEN-LAST:event_jMenuItemActualizarPrecioPlantaActionPerformed
@@ -2561,6 +2572,13 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
 
     private void jButtonGuardarLiquidacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonGuardarLiquidacionActionPerformed
 
+               
+        /*validar si ya se ha realizado una liquidacion el dia actual*/
+        if(ControllerBO.tieneRegistroLiquidacionActual()){
+            JOptionPane.showMessageDialog(this, "Ya se realizo un registro de liquidacion en la fecha actual.", "ERROR LIQUIDACION", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+            
         /*re-calcular todas las liquidaciones*/
         iniciarRecalculoDeLiquidaciones();
 
@@ -2686,7 +2704,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
 
     private void jComboBoxCambiarIsleroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxCambiarIsleroActionPerformed
         int position = jComboBoxCambiarIslero.getSelectedIndex() - 1;
-        if (position != JComboBox.UNDEFINED_CONDITION) {
+        if (position > JComboBox.UNDEFINED_CONDITION) {
             int idEmpleado = ControllerBO.cargarListaEmpleadosIsleros().get(position).getIdEmpleado();
             for (LiquidacionDispensador liquidacionDispensador : liquidacionesPorDispensador) {
                 liquidacionDispensador.setIdEmpleadoLiquidado(idEmpleado);
@@ -2940,10 +2958,9 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
      */
     private void cargarComboIsleros() {
         /*Marcar posicion por defecto y asignarla al combo*/
+        jComboBoxCambiarIslero.removeAllItems();
         jComboBoxCambiarIslero.insertItemAt("Seleccione Islero - ", POSITION_DEFAULT);
         jComboBoxCambiarIslero.setSelectedIndex(POSITION_DEFAULT);
-
-        /*Agregar los items con los datos de los empleados con rol islero.*/
         ControllerBO.cargarListaEmpleadosIsleros().forEach((islero) -> {
             jComboBoxCambiarIslero.addItem(islero.getNombres() + " " + islero.getApellidos());
         });
@@ -3209,6 +3226,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         String fecha = Util.getFechaActual().toUpperCase(new Locale("es", "CO"));
         String hora = Util.getHoraActual().toUpperCase(new Locale("es", "CO"));
         String islero = jComboBoxCambiarIslero.getSelectedItem().toString().trim();
+        String liquidador = empleadoLiquidador.getNombres() + " " + empleadoLiquidador.getApellidos();
         String mensajeResumen = "<html><h3><U><p align=center>RESUMEN</p></U></h3>"
                 + "<ul>"
                 + "<li>FECHA:&nbsp;&nbsp;&nbsp;"
@@ -3217,7 +3235,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
                 + "<li>HORA:&nbsp;&nbsp;&nbsp;"
                 + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
                 + "<b>" + hora + "</b></li>"
-                + "<li>LIQUIDADOR:&nbsp;&nbsp;&nbsp;&nbsp;<b>JORGE CASTRO</b></li>"
+                + "<li>LIQUIDADOR:&nbsp;&nbsp;&nbsp;&nbsp;<b>" + liquidador + "</b></li>"
                 + "<li>ISLERO:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
                 + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
                 + "<b>" + islero + " </li>"
@@ -3380,6 +3398,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         JOptionPane.showMessageDialog(this, "Liquidacion terminada de forma correcta.", "DATOS INSERTADOS", JOptionPane.INFORMATION_MESSAGE);
         cargarResumenLiquidacionesCorriente();
         cargarResumenLiquidacionesAcpm();
+        mostrarDialogLiquidacionExtra();
     }
 
     /**
@@ -3424,11 +3443,11 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         if (this.modelAcpm == null) {
             this.modelAcpm = new DefaultTableModel(
                     new Object[][]{},
-                    new String[]{"Mes", "Dia", "Aceites", "Galones ACPM", "Total ACPM", "TOTAL"}
+                    new String[]{"Mes", "Dia", "Aceites", "Galones ACPM", "Total ACPM", "TOTAL", "Precio Planta", "Precio Venta"}
             ) {
                 /*Inpedir que se puedan editar los valores ingresados, false por cada columna*/
                 boolean[] canEdit = new boolean[]{
-                    false, false, false, false, false, false
+                    false, false, false, false, false, false, false, false
                 };
 
                 @Override
@@ -3485,5 +3504,40 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero {
         jLabelTotalAceites.setText(resumen[0].trim());
         jLabelTotalAcpm.setText(resumen[1].trim());
         jLabelTotalLiquidadoAcpm.setText(resumen[2].trim());
+    }
+
+    @Override
+    public void refrescarVentanaLiquidacion() {
+        
+        /*Poner la fecha del dia*/
+        cargarFechaActual();
+        /*Llenar el combo de isleros */
+        cargarComboIsleros();
+        /*Cargar los precios vigentes de combustibles.*/
+        cargarPreciosCombustiblesVigente();
+        /*cargar identificacion de surtidores*/
+        cargarIdentificadorDeSurtidores();
+
+
+
+        /*cargar el resumen de liquidaciones en la tabla*/
+        cargarResumenLiquidacionesCorriente();
+        cargarResumenLiquidacionesAcpm();
+
+    }
+
+    /**
+     * Mostrar el dialog para registrar la informacion de la liquidacion extra.
+     */
+    private void mostrarDialogLiquidacionExtra() {
+        DineroLiquidacionExtra dialog = new DineroLiquidacionExtra(new javax.swing.JFrame(), true);
+        dialog.setLocationRelativeTo(this);
+        dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                dialog.dispose();
+            }
+        });
+        dialog.setVisible(true);
     }
 }

@@ -23,9 +23,15 @@ public class JFrameEliminarEmpleados extends javax.swing.JFrame {
     private Empleado empleadoEliminar = null;
 
     /**
-     * Creates new form JFrameAgregarEmpleados
+     * Interface para actualizar datos de ventana.
      */
-    public JFrameEliminarEmpleados() {
+    private IRefresh refresh;
+    /**
+     * Creates new form JFrameAgregarEmpleados
+     * @param iRefresh
+     */
+    public JFrameEliminarEmpleados(IRefresh iRefresh) {
+        this.refresh = iRefresh;
         initComponents();
     }
 
@@ -202,6 +208,7 @@ public class JFrameEliminarEmpleados extends javax.swing.JFrame {
                 if (ControllerBO.desactivarEmpleado(empleadoEliminar)) {
                     JOptionPane.showMessageDialog(this, "EL empleado ha sido desactivado.", "ELIMINADO CORRECTO", JOptionPane.ERROR_MESSAGE);
                     this.dispose();
+                    this.refresh.refrescarVentanaLiquidacion();
                 } else {
                     JOptionPane.showMessageDialog(this, "Error eliminando el empleado, intente nuevamente.", "ERROR", JOptionPane.ERROR_MESSAGE);
                 }

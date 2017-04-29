@@ -44,9 +44,14 @@ public class BackUp {
 
     /**
      * Directorio donde esta el ejecutable mysqldump del motor de bd Mysql o
-     * MariaDB
+     * Directorio MariaDB_64 = "C:\\Program Files\\MariaDB 10.1\\bin\\"
+     * MariaDB_32 = "C:\Program Files (x86)\MariaDB 10.1\bin"
+     * MYSQL_32 = "C:\\mysql\\bin\\"
+     * 
      */
-    private static final String MYSQLDUMP_PATH = "C:\\Program Files\\MariaDB 10.1\\bin\\";
+    private static final String MYSQLDUMP_PATH = "C:\\Program Files (x86)\\MariaDB 10.1\\bin\\";
+    
+    
 
     /**
      * Metodo para generar un BackUp de la base de datos del proyecto actual
@@ -73,7 +78,7 @@ public class BackUp {
 
 
             /*crear el comando que se ejecutara para generar el backUp*/
-            String executeCmd = "mysqldump --user=" + user + " -p" + pass + " --routines " + db + " > " + savePath;
+            String executeCmd = "mysqldump --port=3307 --user=" + user + " -p" + pass + " --routines " + db + " > " + savePath;
             String[] cmd = new String[]{"cmd.exe", "/C", executeCmd};
             /*Aqui se ejecuta el comando*/
             Process runtimeProcess = Runtime.getRuntime().exec(cmd, null, fileMysqlDump);
@@ -106,6 +111,7 @@ public class BackUp {
     /**
      * 
      * @param fileRestorePath
+     * @return 
      */
     public static boolean restaurarBackup(String fileRestorePath) {
         boolean complete = false;
@@ -119,8 +125,8 @@ public class BackUp {
             File fileMysqlDump = new File(MYSQLDUMP_PATH);
             
             
-            /*crear el comando que se ejecutara para generar el backUp*/
-            String executeCmd = "mysql --user=" + user + " --password=" + pass + " " + db + " < " + fileRestorePath;
+            /*crear el comando que se ejecutara para RESTAURAR el backUp*/
+            String executeCmd = "mysql --port=3307  --user=" + user + " --password=" + pass + " " + db + " < " + fileRestorePath;
             System.out.println(executeCmd);
             String[] cmd = new String[]{"cmd.exe", "/C", executeCmd};
 

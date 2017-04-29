@@ -40,16 +40,23 @@ public class JFrameActualizarPrecios extends javax.swing.JFrame {
      * Lista que contiene los combustibles disponibles;
      */
     private final ArrayList<Combustible> listaCombustibles;
+    
+     /**
+     * Actualizar datos en ventana princilpal
+     */
+    private final IRefresh refresh;
 
     /**
      * Creates new form JFrameActualizarPrecios
+     * @param iRefresh
      */
-    public JFrameActualizarPrecios() {
+    public JFrameActualizarPrecios(IRefresh iRefresh) {
         /*Instanciar la lista de combustibles*/
         this.listaCombustibles = new ArrayList<>();
         initComponents();
         cargarCombustiblesDisponibles();
         jTextFieldnuevoPrecio.setDocument(new DocumentTypeInteger());
+        this.refresh = iRefresh;
     }
 
     /**
@@ -237,6 +244,7 @@ public class JFrameActualizarPrecios extends javax.swing.JFrame {
                 if(ControllerBO.actualizarPrecioCombustible(listaCombustibles.get(index).getIdCombustible(), nuevoPrecio)){
                     JOptionPane.showMessageDialog(this, "Precio actualizado.", "Correcto", JOptionPane.INFORMATION_MESSAGE);
                     JFrameActualizarPrecios.this.dispose();
+                    this.refresh.refrescarVentanaLiquidacion();
                 }      
             }
         } catch (Exception ex) {

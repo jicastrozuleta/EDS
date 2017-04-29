@@ -5,11 +5,7 @@
  */
 package co.com.servicentroguerrero;
 
-import co.com.reports.Reports;
-import co.com.servicentroguerrero.backup.BackUp;
-import co.com.servicentroguerrero.controler.ControllerBO;
-import co.com.servicentroguerrero.modelos.Existencias;
-import java.util.ArrayList;
+import co.com.servicentroguerrero.gui.JFrameLogin;
 
 /**
  *
@@ -21,33 +17,23 @@ public class ServicentroGuerrero {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-    
-     /*calcular movimiento de existencias de combustibles*/
-        ArrayList<Existencias> listaExistencias = ControllerBO.cargarExistenciasDeCombustible();
-        
-        for (Existencias existencia : listaExistencias) {
-                if(existencia.getIdSurtidor() == 1){
-                    existencia.setGalonesComprados(0);
-                    existencia.setGalonesVendidos(414.690);
-                    existencia.setGalonesExistentes(existencia.getMedidaGalonesInicial() + 0 - 414.690);
-                }
-                
-                if(existencia.getIdSurtidor() == 2){
-                    existencia.setGalonesComprados(0);
-                    existencia.setGalonesVendidos(443.530);
-                    existencia.setGalonesExistentes(existencia.getMedidaGalonesInicial() + 0 - 443.530);
-                }
-                
-                if(existencia.getIdSurtidor() == 3){
-                    existencia.setGalonesComprados(0);
-                    existencia.setGalonesVendidos(106.660);
-                    existencia.setGalonesExistentes(existencia.getMedidaGalonesInicial() + 0 - 106.660);
+
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
                 }
             }
-        
-        ControllerBO.registrarMovimientoDeCombustibles(listaExistencias);
-    
-    
+            /* Create and display the form */
+            java.awt.EventQueue.invokeLater(() -> {
+                JFrameLogin jfl = new JFrameLogin();
+                jfl.setLocationRelativeTo(null);
+                jfl.setVisible(true);
+            });
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(JFrameLogin.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
     }
 
 }

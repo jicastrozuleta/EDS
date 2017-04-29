@@ -15,6 +15,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.text.DefaultFormatterFactory;
+import javax.swing.text.NumberFormatter;
 
 /**
  *
@@ -150,5 +152,18 @@ public class Util {
         Date ahora = new Date();
         SimpleDateFormat formateador = new SimpleDateFormat("hh:mm a", new Locale("es", "CO"));
         return formateador.format(ahora);
+    }
+    
+    /**
+     * Generar el formato numerico decimal para las cajas de texto.
+     * @return 
+     */
+    public static javax.swing.text.DefaultFormatterFactory formatoNumericoDecimal(){
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("es","CO"));
+        symbols.setDecimalSeparator('.');
+        symbols.setGroupingSeparator(','); 
+        NumberFormat numberFormat = new DecimalFormat("#0.00#", symbols );
+        NumberFormatter numberFormatter = new NumberFormatter(numberFormat);
+        return(new javax.swing.text.DefaultFormatterFactory(numberFormatter));    
     }
 }

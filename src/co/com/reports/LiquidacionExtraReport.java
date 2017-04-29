@@ -33,9 +33,15 @@ public class LiquidacionExtraReport {
                     + "SELECT	ROUND(SUM(l.dineroEntregado),2)," 
                     + "         ROUND(lq.totalAceites,2),"
                     + "		ROUND((SUM(l.dineroEntregado) + lq.totalAceites),2), "
-                    + "         lq.fechaLiquidacion "
+                    + "         lq.fechaLiquidacion, "
+                    + "		COALESCE(le.bauches, 0), "
+                    + "		COALESCE(le.moneda, 0), "
+                    + "		COALESCE(le.vales, 0), "
+                    + "		COALESCE(le.efectivo, 0),"
+                    + "         SUM(l.galones) "
                     + "FROM liquidaciondispensador l "
                     + "INNER JOIN liquidaciones lq ON lq.numeroLiquidacion = l.numeroLiquidacion "
+                    + "LEFT JOIN liquidacionextra le ON le.numeroLiquidacion = l.numeroLiquidacion "
                     + "INNER JOIN dispensadores d ON d.idDispensador = l.idDispensador "
                     + "INNER JOIN cilindros c ON c.idCilindro = d.idCilindro "
                     + "INNER JOIN combustibles cb ON cb.idCombustible = c.idCombustible "
@@ -51,6 +57,11 @@ public class LiquidacionExtraReport {
                 hashMap.put("totalAceites", "$" + Util.formatearMiles(resultSet.getDouble(2)));
                 hashMap.put("totalDia", "$" + Util.formatearMiles(resultSet.getDouble(3)));
                 hashMap.put("fechaLiquidacion", Util.formatoTextoFecha(resultSet.getString(4)));
+                hashMap.put("bauches", "$" + Util.formatearMiles(resultSet.getDouble(5)));
+                hashMap.put("moneda", "$" + Util.formatearMiles(resultSet.getDouble(6)));
+                hashMap.put("vales", "$" + Util.formatearMiles(resultSet.getDouble(7)));
+                hashMap.put("efectivo", "$" + Util.formatearMiles(resultSet.getDouble(8)));
+                hashMap.put("glAcpm", Util.formatearMiles(resultSet.getDouble(9)));
             }
             
             /*cerrar el resultset */

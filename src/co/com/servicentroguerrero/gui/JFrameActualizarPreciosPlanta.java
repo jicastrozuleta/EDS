@@ -38,13 +38,20 @@ public class JFrameActualizarPreciosPlanta extends javax.swing.JFrame {
      * Lista que contiene los combustibles disponibles;
      */
     private final ArrayList<Combustible> listaCombustibles;
+    
+    /**
+     * LLamar interface para recargar datos de ventana.
+     */
+    private IRefresh ventanaActualizar;
 
     /**
      * Creates new form JFrameActualizarPrecios
+     * @param iRefresh
      */
-    public JFrameActualizarPreciosPlanta() {
+    public JFrameActualizarPreciosPlanta(IRefresh iRefresh) {
         /*Instanciar la lista de combustibles*/
         this.listaCombustibles = new ArrayList<>();
+        this.ventanaActualizar = iRefresh;
         initComponents();
         /*habilitar numeros double en los textfield*/
         jTextFieldPrecioAcpm.setDocument(new DocumentTypeDouble());
@@ -153,6 +160,7 @@ public class JFrameActualizarPreciosPlanta extends javax.swing.JFrame {
                 jTextFieldPrecioCorriente.setText("");
                 jTextFieldPrecioAcpm.setText("");
                 JOptionPane.showMessageDialog(this, "Precios actualizados de forma correcta.", "ACTUALIZADO", JOptionPane.INFORMATION_MESSAGE);
+                ventanaActualizar.refrescarVentanaLiquidacion();
             }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);

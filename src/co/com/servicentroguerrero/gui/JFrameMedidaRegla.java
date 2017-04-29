@@ -136,9 +136,9 @@ public class JFrameMedidaRegla extends javax.swing.JFrame {
                 int idSurtidor = ControllerBO.cargarSurtidoresSinMedidaRegla().get(position).getIdSurtidor();
                 
                 /*Iniciar el calculo del volumen*/
-                double volumenInsertado = ControllerBO.insertarVolumenes(String.valueOf(idSurtidor), medidaRegla);
-                if(volumenInsertado > 0){
-                    String mensaje = "El volumen registrado para este surtidor es de: " + volumenInsertado + " m3.";
+                double galonesInsertado = ControllerBO.insertarVolumenes(String.valueOf(idSurtidor), medidaRegla);
+                if(galonesInsertado > 0){
+                    String mensaje = "El volumen registrado para este surtidor es de: " + galonesInsertado + " gls.";
                     JOptionPane.showMessageDialog(this, mensaje, "VOLUMEN CALCULADO", JOptionPane.INFORMATION_MESSAGE);
                     cargarSurtidores();
                     jTextFieldMedidaRegla.setText("");

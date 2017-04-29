@@ -14,6 +14,7 @@ import co.com.servicentroguerrero.modelos.Empleado;
 import co.com.servicentroguerrero.modelos.Existencias;
 import co.com.servicentroguerrero.modelos.Liquidacion;
 import co.com.servicentroguerrero.modelos.LiquidacionDispensador;
+import co.com.servicentroguerrero.modelos.Rol;
 import co.com.servicentroguerrero.modelos.Surtidores;
 import co.com.servicentroguerrero.modelos.Volumenes;
 import java.sql.PreparedStatement;
@@ -562,7 +563,8 @@ public class Model {
                 + "'" + empleado.getNombres() + "', "
                 + "'" + empleado.getApellidos() + "', "
                 + "'" + empleado.getTelefono() + "', "
-                + "'" + empleado.getDireccion() + "'  "
+                + "'" + empleado.getDireccion() + "',  "
+                + "'" + empleado.getIdRol() + "'  "
                 + ");";
         
         try {
@@ -848,7 +850,9 @@ public class Model {
                     + "		 v.aceites, "
                     + "		 v.galonesAcpm, "
                     + "		 v.totalDineroAcpm, "
-                    + "		 v.total "
+                    + "		 v.total,"
+                    + "          v.pCompra, "
+                    + "		 v.pVenta "
                     + "FROM view_resumenAcpm v;";
  
             /*Ejecutar la consulta para obtener el set de datos*/
@@ -864,7 +868,9 @@ public class Model {
                         "$" + Util.formatearMiles(resultSet.getDouble(3)),
                         Util.formatearMiles(resultSet.getDouble(4)),
                         "$" + Util.formatearMiles(resultSet.getDouble(5)),
-                        "$" + Util.formatearMiles(resultSet.getDouble(6))                        
+                        "$" + Util.formatearMiles(resultSet.getDouble(6)),
+                        "$" + Util.formatearMiles(resultSet.getDouble(7)),
+                        "$" + Util.formatearMiles(resultSet.getDouble(8))                        
                     });
                 } while (resultSet.next());
             }
@@ -952,4 +958,99 @@ public class Model {
     }
 
     
+    /**
+     * CArgar la lista de roles disponible para crear empleados
+     * @return lista con los roles identificados
+     */
+    public ArrayList<Rol> cargarRoles() {
+        /*lista inicial vacia para conservar los objetos cargados de BD*/
+        ArrayList<Rol> listaRoles = new ArrayList<>();
+        try {
+            /*Query para cargar la informacion necesaria*/
+            String query = ""
+                    + "SELECT idRol,"
+                    + "	      rol "
+                    + "FROM roles "
+                    + "WHERE idRol IN (3,4,6);";
+ 
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(query);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                do {
+                    /*llenar la lista con los datos obtenidos*/
+                    listaRoles.add(new Rol(
+                            resultSet.getInt(1),
+                            resultSet.getString(2)
+                    ));
+                } while (resultSet.next());
+            }
+            if(resultSet != null && !resultSet.isClosed())
+                resultSet.close();
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        }
+        return listaRoles;
+    }
+
+    
+    /**
+     * Metodo que permite conocer si ya se ha realizado una liquidacion el dia actual.
+     * @return true si ya se realizo una liquidacion en dia actual, false en caso contrario.
+     */
+    public boolean isLiquidacionHoy(){
+        boolean tieneLiquidacionHoy = false;
+        try {
+            /*Query para cargar la informacion necesaria*/
+            String query = ""
+                    + "SELECT COUNT(1) "
+                    + "FROM liquidaciones l "
+                    + "WHERE DATEDIFF(DATE_FORMAT(CURRENT_DATE(),'%Y%m%d'), DATE_FORMAT(l.fechaLiquidacion,'%Y%m%d')) = 0;";
+ 
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(query);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                do {
+                    tieneLiquidacionHoy = (resultSet.getInt(1) > 0);
+                } while (resultSet.next());
+            }
+            if(resultSet != null && !resultSet.isClosed())
+                resultSet.close();
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        }
+        return tieneLiquidacionHoy;
+    }
+
+    
+    /**
+     * Metodo que permite insertar la informacion de pago de la liquidacion Extra.
+     * @param liquidacionExtra 
+     * @return  
+     */
+    public double insertarLiquidacionExtra(double[] liquidacionExtra) {
+        double validate = 0;
+        try {
+            /*Query para actualizar el registro*/
+            String insert = ""
+                    + "CALL sp_insertar_liquidacion_extra('" + liquidacionExtra[0] +"',"
+                    + " '" + liquidacionExtra[1] + "',"
+                    + " '" + liquidacionExtra[2] + "',"
+                    + " '" + liquidacionExtra[3] + "');";
+ 
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(insert);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                validate = resultSet.getDouble(1);
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        }
+        return validate;
+    }
 }

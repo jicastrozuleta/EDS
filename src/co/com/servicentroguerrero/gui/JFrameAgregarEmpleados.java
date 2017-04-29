@@ -7,6 +7,8 @@ package co.com.servicentroguerrero.gui;
 
 import co.com.servicentroguerrero.controler.ControllerBO;
 import co.com.servicentroguerrero.modelos.Empleado;
+import co.com.servicentroguerrero.modelos.Rol;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 
 /**
@@ -16,10 +18,25 @@ import javax.swing.JOptionPane;
 public class JFrameAgregarEmpleados extends javax.swing.JFrame {
 
     /**
-     * Creates new form JFrameAgregarEmpleados
+     *
+     * Constante para indicar una posicion por defecto en combobox.
      */
-    public JFrameAgregarEmpleados() {
+    private static final int POSITION_DEFAULT = 0x00;
+
+    /**
+     * Actualizar datos en ventana princilpal
+     */
+    private final IRefresh refresh;
+
+    /**
+     * Creates new form JFrameAgregarEmpleados
+     *
+     * @param iRefresh
+     */
+    public JFrameAgregarEmpleados(IRefresh iRefresh) {
+        this.refresh = iRefresh;
         initComponents();
+        cargarRoles();
     }
 
     /**
@@ -45,6 +62,8 @@ public class JFrameAgregarEmpleados extends javax.swing.JFrame {
         jTextFieldTelefono = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jTextFieldDireccion = new javax.swing.JTextField();
+        jComboBoxRoles = new javax.swing.JComboBox<>();
+        jLabel8 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
@@ -111,13 +130,21 @@ public class JFrameAgregarEmpleados extends javax.swing.JFrame {
         jTextFieldDireccion.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jPanelIngresoDatos.add(jTextFieldDireccion);
 
+        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel8.setText("Rol:");
+
         javax.swing.GroupLayout jPanelDatosPersonalesLayout = new javax.swing.GroupLayout(jPanelDatosPersonales);
         jPanelDatosPersonales.setLayout(jPanelDatosPersonalesLayout);
         jPanelDatosPersonalesLayout.setHorizontalGroup(
             jPanelDatosPersonalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelDatosPersonalesLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanelIngresoDatos, javax.swing.GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
+                .addGroup(jPanelDatosPersonalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanelIngresoDatos, javax.swing.GroupLayout.DEFAULT_SIZE, 342, Short.MAX_VALUE)
+                    .addGroup(jPanelDatosPersonalesLayout.createSequentialGroup()
+                        .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jComboBoxRoles, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         jPanelDatosPersonalesLayout.setVerticalGroup(
@@ -125,6 +152,10 @@ public class JFrameAgregarEmpleados extends javax.swing.JFrame {
             .addGroup(jPanelDatosPersonalesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanelIngresoDatos, javax.swing.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelDatosPersonalesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jComboBoxRoles, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel8))
                 .addContainerGap())
         );
 
@@ -184,7 +215,7 @@ public class JFrameAgregarEmpleados extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         getContentPane().add(jPanelAgregarEmpleado);
@@ -204,6 +235,14 @@ public class JFrameAgregarEmpleados extends javax.swing.JFrame {
             String usuario = jTextFieldUser.getText().trim();
             String password = jTextFieldPassword.getText().trim();
 
+            /*validar islero seleccionado*/
+            int position = jComboBoxRoles.getSelectedIndex() - 1;
+            if (position <= JComboBox.UNDEFINED_CONDITION) {
+                jComboBoxRoles.requestFocusInWindow();
+                JOptionPane.showMessageDialog(this, "Selecione un rol de la lista.", "ERROR DE ROL", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             /*validar los datos ingresados*/
             if (usuario.length() == 0) {
                 usuario = null;
@@ -213,12 +252,18 @@ public class JFrameAgregarEmpleados extends javax.swing.JFrame {
                 password = null;
             }
 
+            /*cargar informacion del rol seleccionado*/
+            Rol rol = ControllerBO.cargarRoles().get(position);
+
+
             /*insertar  empleado*/
-            Empleado empleado = new Empleado(0, 0, 0, identificacion, nombres, apellidos, telefono, direccion, 0, null);
+            Empleado empleado = new Empleado(0, 0, 0, identificacion, nombres, apellidos, telefono, direccion, rol.getIdRol(), rol.getRol());
 
             if (ControllerBO.guardarEmpleado(empleado, usuario, password)) {
                 JOptionPane.showMessageDialog(this, "Se registro el empleado de forma correcta.", "REGISTRADO OK", JOptionPane.INFORMATION_MESSAGE);
                 this.dispose();
+                refresh.refrescarVentanaLiquidacion();
+
             } else {
                 throw new Exception("No se registro el empleado, verifique los datos e intente nuevamente.");
             }
@@ -238,6 +283,7 @@ public class JFrameAgregarEmpleados extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JComboBox<String> jComboBoxRoles;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -245,6 +291,7 @@ public class JFrameAgregarEmpleados extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanelAgregarEmpleado;
@@ -258,4 +305,18 @@ public class JFrameAgregarEmpleados extends javax.swing.JFrame {
     private javax.swing.JTextField jTextFieldTelefono;
     private javax.swing.JTextField jTextFieldUser;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * Cargar los roles a los que se puede asignar un empleado nuevo.
+     */
+    private void cargarRoles() {
+        jComboBoxRoles.removeAllItems();
+        /*Marcar posicion por defecto y asignarla al combo*/
+        jComboBoxRoles.insertItemAt("Seleccione Rol - ", POSITION_DEFAULT);
+        jComboBoxRoles.setSelectedIndex(POSITION_DEFAULT);
+        /*Agregar los items con los datos de los roles*/
+        ControllerBO.cargarRoles().forEach((rol) -> {
+            jComboBoxRoles.addItem(rol.getRol());
+        });
+    }
 }

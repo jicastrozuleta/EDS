@@ -17,6 +17,7 @@ import co.com.servicentroguerrero.modelos.Empleado;
 import co.com.servicentroguerrero.modelos.Existencias;
 import co.com.servicentroguerrero.modelos.Liquidacion;
 import co.com.servicentroguerrero.modelos.LiquidacionDispensador;
+import co.com.servicentroguerrero.modelos.Rol;
 import co.com.servicentroguerrero.modelos.Surtidores;
 import co.com.servicentroguerrero.modelos.Volumenes;
 import java.io.File;
@@ -29,6 +30,16 @@ import java.util.ArrayList;
  * @author JICZ4
  */
 public class ControllerBO {
+
+    /**
+     * Usaario para restaurar inicial
+     */
+    private static final String RESTORE_INIT = "RESTORE_INIT";
+
+    /**
+     * PAss para restauracion de BD.
+     */
+    private static final String PASS_RESTORE = "_restore_init_";
 
     /**
      * Modelo de conexcion a la base de datos.
@@ -71,7 +82,8 @@ public class ControllerBO {
      *
      * @param codigoSurtidor
      * @param medidaReglaMojada
-     * @return el volumen insertado en la base de datos.
+     * @return el equivalente en galones del volumen insertado en la base de
+     * datos.
      * @throws Exception si hay datos null.
      */
     public static double insertarVolumenes(String codigoSurtidor, double medidaReglaMojada) throws Exception {
@@ -122,7 +134,7 @@ public class ControllerBO {
         if (rowid < 0) {
             throw new Exception("Error insertando volumen.");
         } else {
-            return Util.round(volumen, 7);
+            return Util.round(volumen * cilindro.getVolumenFijo(), 4);
         }
     }
 
@@ -146,7 +158,7 @@ public class ControllerBO {
         if (descripcion.length() > 499) {
             descripcion = descripcion.substring(0, 499);
         }
-       
+
         /*validar que los galones ingresados sea un numero valido*/
         if (!Util.isNumeric(galonesUsados)) {
             throw new Exception("Ingrese un numero valido de galones usados.");
@@ -187,8 +199,9 @@ public class ControllerBO {
                 combustible = c;
             }
         }
-        if(combustible == null)
+        if (combustible == null) {
             throw new Exception("Error cargando precios de combustibles.");
+        }
         return combustible;
     }
 
@@ -226,112 +239,140 @@ public class ControllerBO {
     public static ArrayList<Empleado> cargarListaEmpleadosIsleros() {
         return MODELO.cargarEmpleadosPorRol(Empleado.ISLERO);
     }
-    
-    
+
     /**
      * Crear una lista con los surtidores disponibles
-     * @return 
+     *
+     * @return
      */
     public static ArrayList<Surtidores> cargarListaSurtidores() {
         return MODELO.cargarSurtidores();
     }
-    
+
     /**
      * Crear una lista con los surtidores disponibles sin medida de regla
-     * @return 
+     *
+     * @return
      */
     public static ArrayList<Surtidores> cargarSurtidoresSinMedidaRegla() {
         return MODELO.cargarSurtidoresSinMedidaRegla();
     }
-    
-    
+
     /**
      * Metodo para cargar la ultima liquidacion disponible.
+     *
      * @return Liquidacion
      */
-    public static Liquidacion cargarUltimaLiquidacion(){
+    public static Liquidacion cargarUltimaLiquidacion() {
         return MODELO.cargarUltimaLiquidacion();
     }
-    
+
     /**
      * Cargar los detalles por dispensador de la ultima liquidacion.
+     *
      * @param liquidacion
-     * @return 
+     * @return
      */
-    public static ArrayList<LiquidacionDispensador> cargarLiquidacionDispensadores(Liquidacion liquidacion){
+    public static ArrayList<LiquidacionDispensador> cargarLiquidacionDispensadores(Liquidacion liquidacion) {
         return MODELO.cargarDetallesUltimaLiquidacion(liquidacion);
     }
-    
-    
+
     /**
      * Insertar la cabecera de liquidacion en la base de datos.
+     *
      * @param liquidacion
-     * @param liquidacionesPorDispensador string donde estan concatenados todos los datos de liquidacion de cada dispensador.
-     * @return el numeroLiquidacion para insertar los detalles de la liquidacion actual, o Long.MIN_VALUE si hay valores no validos
+     * @param liquidacionesPorDispensador string donde estan concatenados todos
+     * los datos de liquidacion de cada dispensador.
+     * @return el numeroLiquidacion para insertar los detalles de la liquidacion
+     * actual, o Long.MIN_VALUE si hay valores no validos
      */
-    public static long insertarCabeceraDeLiquidacion(final Liquidacion liquidacion, final String liquidacionesPorDispensador){
+    public static long insertarCabeceraDeLiquidacion(final Liquidacion liquidacion, final String liquidacionesPorDispensador) {
         /*validar que los datos de la liquidacion basicos sean validos*/
 //        if(liquidacion.getIdEmpleadoLiquidador() <= 0 || liquidacion.getTotalCombustibles() == 0 || liquidacion.getTotalLiquidado() == 0 || liquidacion.getDineroEntregado() == 0)
 //            return Long.MIN_VALUE;
 //        else
-            return MODELO.insertarCabeceraDeLiquidacion(liquidacion, liquidacionesPorDispensador);
+        return MODELO.insertarCabeceraDeLiquidacion(liquidacion, liquidacionesPorDispensador);
     }
-    
-    
-   /**
-    * Metodo para iniciar la autenticacion de usuarios.
-    * @param user
-    * @param password
-    * @return
-    * @throws Exception 
-    */ 
-    public static Empleado login(String user, String password) throws Exception{
-        if(user == null || user.length() == 0)
+
+    /**
+     * Metodo para iniciar la autenticacion de usuarios.
+     *
+     * @param user
+     * @param password
+     * @return
+     * @throws Exception
+     */
+    public static Empleado login(String user, String password) throws Exception {
+        if (user == null || user.length() == 0) {
             throw new Exception("Usuario invalido.");
-        if (password == null || password.length() == 0)
+        }
+        if (password == null || password.length() == 0) {
             throw new Exception("Contraseña invalido.");
-        
-        /*intentar cargar el usuario*/
-        Empleado empleado = MODELO.login(user, password);
-        
-        if(empleado == null)    
+        }
+        /*Referencia al empleado*/
+        Empleado empleado;
+
+        /*Usuario para restaurar Inicial*/
+        if (user.equals(RESTORE_INIT) && password.equals(PASS_RESTORE)) {
+            empleado = new Empleado(0, 0, 0, RESTORE_INIT, user, password, password, user, 0, user);
+        } else {
+            /*intentar cargar el usuario*/
+            empleado = MODELO.login(user, password);
+        }
+
+        /*validar inicio de sesion*/
+        if (empleado == null) {
             throw new Exception("Usuario o Contraseña invalidos.");
-        else
+        } else {
             return empleado;
+        }
     }
-    
+
     /**
      * Registrar un nuevo empleado
+     *
      * @param empleado
      * @param usuario
      * @param password
-     * @return true si el empleado fue ingresado correctamente, false en caso contrario.
+     * @return true si el empleado fue ingresado correctamente, false en caso
+     * contrario.
      * @throws Exception si alguno de los datos del empleado no son correctos.
      */
-    public static boolean guardarEmpleado(Empleado empleado, String usuario, String password) throws Exception{
-        
-        if (empleado == null) 
+    public static boolean guardarEmpleado(Empleado empleado, String usuario, String password) throws Exception {
+
+        if (empleado == null) {
             throw new Exception("Empleado no valido.");
-        
-        if (empleado.getIdentificacion() == null || empleado.getIdentificacion().length() == 0) 
+        }
+
+        if (empleado.getIdentificacion() == null || empleado.getIdentificacion().length() == 0) {
             throw new Exception("Ingrese la identificacion del empleado");
-        
-        if (empleado.getNombres() == null || empleado.getNombres().length() == 0) 
+        }
+
+        if (empleado.getNombres() == null || empleado.getNombres().length() == 0) {
             throw new Exception("Ingrese nombres del empleado");
-        
-        if (empleado.getApellidos() == null || empleado.getApellidos().length() == 0) 
+        }
+
+        if (empleado.getApellidos() == null || empleado.getApellidos().length() == 0) {
             throw new Exception("Ingrese apellidos del empleado");
-        
-        if (empleado.getTelefono() == null || empleado.getTelefono().length() == 0) 
+        }
+
+        if (empleado.getTelefono() == null || empleado.getTelefono().length() == 0) {
             throw new Exception("Ingrese numero de contacto del empleado");
-        
-        if (empleado.getDireccion() == null || empleado.getDireccion().length() == 0) 
+        }
+
+        if (empleado.getDireccion() == null || empleado.getDireccion().length() == 0) {
             throw new Exception("Ingrese direccion del empleado");
-        
+        }
+
+        if (empleado.getIdRol() <= 0) {
+            throw new Exception("Ingrese un rol valido");
+        }
+
         /* si se ingresa un usuario validar que se tenga una contraseña valida.*/
-        if(usuario != null && usuario.length() > 0) {
-            if(password == null || password.length() == 0)
+        if (usuario != null && usuario.length() > 0) {
+            if (password == null || password.length() == 0) {
                 throw new Exception("Ingrese la contraseña del usuario.");
+            }
         }
         /*intentar la insercion en base de datos*/
         return MODELO.insertarEmpleado(empleado, usuario, password);
@@ -339,111 +380,122 @@ public class ControllerBO {
 
     /**
      * BUscar un empleado por su numero de identificacion.
+     *
      * @param identificacion
      * @return objeto empleado con los datos encontrados.
      */
     public static Empleado buscarEmpleadoPorIdentificacion(final String identificacion) {
-        if(identificacion != null && identificacion.length() > 0)
+        if (identificacion != null && identificacion.length() > 0) {
             return MODELO.buscarEmpleadoPorIdentificacion(identificacion);
-        else
+        } else {
             return null;
+        }
     }
 
     /**
      * metodo para desactivar empleados del sistema.
+     *
      * @param empleadoEliminar
      * @return true si el empleado fue desactivado, false en caso contrario.
      */
     public static boolean desactivarEmpleado(final Empleado empleadoEliminar) {
         /*validar que el empleado se un objeto valido*/
-        if(empleadoEliminar != null && empleadoEliminar.getIdEmpleado() > 0)
+        if (empleadoEliminar != null && empleadoEliminar.getIdEmpleado() > 0) {
             return MODELO.desactivarEmpleado(empleadoEliminar.getIdEmpleado());
-        else
+        } else {
             return false;
+        }
     }
-    
-    
+
     /**
      * generar el reporte de liquidacion diaria de la fecha seleccioanda
+     *
      * @param fechaReporte fecha del reporte.
      * @throws Exception si se genera algun error generando el reporte
      */
-    public static void generarReporteLiquidacionDiaria(final String fechaReporte) throws Exception{
-        if(fechaReporte == null || fechaReporte.length() == 0)
+    public static void generarReporteLiquidacionDiaria(final String fechaReporte) throws Exception {
+        if (fechaReporte == null || fechaReporte.length() == 0) {
             throw new Exception("Ingrese la fecha para generar el reporte.");
+        }
         /*Iniciar la ejecucion del reporte*/
         Reports reports = new Reports();
         reports.liquidacionDiariaToPDF(fechaReporte);
     }
-    
-     /**
+
+    /**
      * generar el reporte de liquidacion diaria de la fecha seleccioanda
+     *
      * @param fechaReporte fecha del reporte.
      * @throws Exception si se genera algun error generando el reporte
      */
-    public static void generarReporteLiquidacionExtra(final String fechaReporte) throws Exception{
-        if(fechaReporte == null || fechaReporte.length() == 0)
+    public static void generarReporteLiquidacionExtra(final String fechaReporte) throws Exception {
+        if (fechaReporte == null || fechaReporte.length() == 0) {
             throw new Exception("Ingrese la fecha para generar el reporte.");
+        }
         /*Iniciar la ejecucion del reporte*/
         Reports reports = new Reports();
         reports.liquidacionExtraToPDF(fechaReporte);
     }
-    
-    
+
     /**
      * cargar la existencias de combustible que se han ingresado el dia actual
-     * @return lista con las existencias registradas el dia actual, o una lista vacia si no se 
-     * ha realizado registros de medida de regla mojada.
+     *
+     * @return lista con las existencias registradas el dia actual, o una lista
+     * vacia si no se ha realizado registros de medida de regla mojada.
      */
-    public static ArrayList<Existencias> cargarExistenciasDeCombustible(){
+    public static ArrayList<Existencias> cargarExistenciasDeCombustible() {
         return MODELO.cargarExistenciasDeCombustible();
     }
 
-    
     /**
-     * Metodo encargado de realizar el registro de los movimientos de combustibles del dia.
-     * @param listaExistencias 
+     * Metodo encargado de realizar el registro de los movimientos de
+     * combustibles del dia.
+     *
+     * @param listaExistencias
      */
     public static void registrarMovimientoDeCombustibles(final ArrayList<Existencias> listaExistencias) {
-        if(listaExistencias != null && !listaExistencias.isEmpty())
+        if (listaExistencias != null && !listaExistencias.isEmpty()) {
             MODELO.registrarMovimientoDeExistenciasDeCombustibles(listaExistencias);
+        }
     }
 
     /**
      * Metodo para actualizar el precio de planta de los combustibles
+     *
      * @param sPrecioCorriente
-     * @param sPrecioAcpm 
-     * @return  rowid del nuevo registro vigente de combustibles
-     * @throws java.lang.Exception 
+     * @param sPrecioAcpm
+     * @return rowid del nuevo registro vigente de combustibles
+     * @throws java.lang.Exception
      */
-    public static int actualizarPrecioCombustiblePlanta(String sPrecioCorriente, String sPrecioAcpm) throws Exception{
+    public static int actualizarPrecioCombustiblePlanta(String sPrecioCorriente, String sPrecioAcpm) throws Exception {
         /*validar que el precio de corriente sea valido*/
-        if(sPrecioCorriente == null || sPrecioCorriente.length() == 0 || !Util.isNumeric(sPrecioCorriente))
-            throw  new Exception("Ingrese un precio de corriente valido.");
-        
+        if (sPrecioCorriente == null || sPrecioCorriente.length() == 0 || !Util.isNumeric(sPrecioCorriente)) {
+            throw new Exception("Ingrese un precio de corriente valido.");
+        }
+
         /*validar que el precio de corriente sea valido*/
-        if(sPrecioAcpm == null || sPrecioAcpm.length() == 0 || !Util.isNumeric(sPrecioAcpm))
-            throw  new Exception("Ingrese un precio de ACPM valido.");
-        
+        if (sPrecioAcpm == null || sPrecioAcpm.length() == 0 || !Util.isNumeric(sPrecioAcpm)) {
+            throw new Exception("Ingrese un precio de ACPM valido.");
+        }
+
         /*Intentar actualizar el precio de los combustibles*/
         return MODELO.actualizarPrecioCombustiblesPlanta(Double.parseDouble(sPrecioCorriente), Double.parseDouble(sPrecioAcpm));
     }
 
-    
     /**
-     * cargar el resumen de liquidaciones realizados a la fecha actual
-     * en Corriente.
+     * cargar el resumen de liquidaciones realizados a la fecha actual en
+     * Corriente.
+     *
      * @return Lista que contiene los objectos que representaran la informacion
      * de cada fila de la tabla de resumen
      */
     public static ArrayList<Object[]> cargarResumenLiquidacionesCorriente() {
         return MODELO.cargarResumenLiquidacionesCorriente();
     }
-    
-    
+
     /**
-     * cargar el resumen de liquidaciones realizados a la fecha actual
-     * en ACPM
+     * cargar el resumen de liquidaciones realizados a la fecha actual en ACPM
+     *
      * @return Lista que contiene los objectos que representaran la informacion
      * de cada fila de la tabla de resumen
      */
@@ -452,21 +504,50 @@ public class ControllerBO {
     }
 
     /**
-     * Calcular los  valores para galones y ganacias generadas a la fecha actual.
+     * Calcular los valores para galones y ganacias generadas a la fecha actual.
      * CORRIENTE
-     * @return 
+     *
+     * @return
      */
     public static String[] calcularDatosGeneralesResumenLiquidacionCorriente() {
         return MODELO.calcularDatosGeneralesResumenLiquidacionCorriente();
     }
 
-    
     /**
-     * Calcular los  valores para galones y ganacias generadas a la fecha actual.
+     * Calcular los valores para galones y ganacias generadas a la fecha actual.
      * ACPM
-     * @return 
+     *
+     * @return
      */
     public static String[] calcularDatosGeneralesResumenLiquidacionAcpm() {
         return MODELO.calcularDatosGeneralesResumenLiquidacionAcpm();
     }
+
+    /**
+     * Cargar la lista de roles disponibles para asignar a un empleado.
+     *
+     * @return lista de roles disponibles, o una lista vacia si no hay rol para devolver.
+     */
+    public static ArrayList<Rol> cargarRoles() {
+        return MODELO.cargarRoles();
+    }
+    
+    
+    /**
+     * validar si ya se ha realizado un registro de liquidacion en la fecha actual
+     * @return true si ya tiene liquidacion, false en caso contrario.
+     */
+    public static boolean tieneRegistroLiquidacionActual(){
+        return MODELO.isLiquidacionHoy();
+    }
+
+    /**
+     * Guardar las formas de pago de la liquidacion extra
+     * @param liquidacionExtra
+     * @return 
+     */
+    public static double guardarLiquidacionExtra(double[] liquidacionExtra) {
+        return MODELO.insertarLiquidacionExtra(liquidacionExtra);
+    }
 }
+
