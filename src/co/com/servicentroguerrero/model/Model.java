@@ -1039,7 +1039,8 @@ public class Model {
                     + "CALL sp_insertar_liquidacion_extra('" + liquidacionExtra[0] +"',"
                     + " '" + liquidacionExtra[1] + "',"
                     + " '" + liquidacionExtra[2] + "',"
-                    + " '" + liquidacionExtra[3] + "');";
+                    + " '" + liquidacionExtra[3] + "',"
+                    + " '" + liquidacionExtra[4] + "');";
  
             /*Ejecutar la consulta para obtener el set de datos*/
             ResultSet resultSet = Instance.getInstance().executeQuery(insert);

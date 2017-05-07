@@ -2053,7 +2053,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
     }//GEN-LAST:event_formWindowOpened
 
     private void jMenuItemCalibracionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemCalibracionActionPerformed
-        if (jFrameCalibracion == null) {
+        if (jFrameCalibracion != null) {
             jFrameCalibracion.removeAll();
             jFrameCalibracion = null;
         }
