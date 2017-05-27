@@ -886,12 +886,12 @@ public class JFrameIngresoDinero extends javax.swing.JFrame implements IVale{
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         calcularTotalDinero();
-        this.interfaceDinero.dineroIngresado(this.totalDinero);
+        this.interfaceDinero.dineroIngresado(this.totalDinero, this.totalMonedas, this.totalBauches);
     }//GEN-LAST:event_formWindowClosed
 
     private void formComponentHidden(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentHidden
         calcularTotalDinero();
-        this.interfaceDinero.dineroIngresado(this.totalDinero);
+        this.interfaceDinero.dineroIngresado(this.totalDinero, this.totalMonedas, this.totalBauches);
     }//GEN-LAST:event_formComponentHidden
 
      

@@ -16,28 +16,60 @@ import javax.swing.JOptionPane;
  */
 public class DineroLiquidacionExtra extends javax.swing.JDialog {
 
+    /**
+     * Cantidad ingresada de dinero en moneda
+     */
+    private double moneda;
+
+    /**
+     * cantidad ingresada de dinero en bauches.
+     */
+    private double bauches;
+
+    /**
+     * Monto total de liquidacion extra
+     */
+    private double totalLiquidacionExtra;
+
+    /**
+     * Faltante para completar la liquidacion extra.
+     */
+    private double faltante;
 
     /**
      * Creates new form DineroLiquidacionExtra
      *
      * @param parent frame padre.
      * @param modal activar modo modal o no.
+     * @param moneda
+     * @param bauches
+     * @param totalLiquidacionExtra
      */
-    public DineroLiquidacionExtra(java.awt.Frame parent, boolean modal) {
+    public DineroLiquidacionExtra(java.awt.Frame parent, boolean modal, double moneda, double bauches, double totalLiquidacionExtra) {
         super(parent, modal);
         initComponents();
 
+        /*Cantidades precalculadas en el ingreso de dinero.*/
+        this.moneda = moneda;
+        this.bauches = bauches;
+        this.totalLiquidacionExtra = totalLiquidacionExtra;
+
         /*Asignar los formatos numerico decimal a cada caja de texto*/
         jFormattedTextFieldBauches.setFormatterFactory(Util.formatoNumericoDecimal());
-        jFormattedTextFieldBauches.setValue(new Double(0));
+        jFormattedTextFieldBauches.setValue(this.bauches);
         jFormattedTextFieldMoneda.setFormatterFactory(Util.formatoNumericoDecimal());
-        jFormattedTextFieldMoneda.setValue(new Double(0));
+        jFormattedTextFieldMoneda.setValue(this.moneda);
         jFormattedTextFieldVales.setFormatterFactory(Util.formatoNumericoDecimal());
         jFormattedTextFieldVales.setValue(new Double(0));
         jFormattedTextFieldEfectivo.setFormatterFactory(Util.formatoNumericoDecimal());
         jFormattedTextFieldEfectivo.setValue(new Double(0));
         jFormattedTextFieldCuentaP.setFormatterFactory(Util.formatoNumericoDecimal());
         jFormattedTextFieldCuentaP.setValue(new Double(0));
+
+        /*cargar informacion de totales*/
+        jLabelTotalLiquidacionExtra.setText("$" + Util.formatearMiles(this.totalLiquidacionExtra));
+        this.faltante = this.totalLiquidacionExtra - this.moneda - this.bauches;
+        jLabelFaltante.setText("$" + Util.formatearMiles(faltante));
     }
 
     /**
@@ -61,6 +93,10 @@ public class DineroLiquidacionExtra extends javax.swing.JDialog {
         jLabel5 = new javax.swing.JLabel();
         jFormattedTextFieldCuentaP = new javax.swing.JFormattedTextField();
         jButton2 = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        jLabelTotalLiquidacionExtra = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabelFaltante = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -71,26 +107,22 @@ public class DineroLiquidacionExtra extends javax.swing.JDialog {
         jLabel1.setText("  Bauches:");
         jPanel1.add(jLabel1);
 
+        jFormattedTextFieldBauches.setEditable(false);
         jFormattedTextFieldBauches.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jFormattedTextFieldBauches.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        jFormattedTextFieldBauches.setEnabled(false);
         jFormattedTextFieldBauches.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jFormattedTextFieldBauches.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jFormattedTextFieldBauchesActionPerformed(evt);
-            }
-        });
         jPanel1.add(jFormattedTextFieldBauches);
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel2.setText("  Moneda:");
         jPanel1.add(jLabel2);
 
+        jFormattedTextFieldMoneda.setEditable(false);
         jFormattedTextFieldMoneda.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jFormattedTextFieldMoneda.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        jFormattedTextFieldMoneda.setEnabled(false);
         jFormattedTextFieldMoneda.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-        jFormattedTextFieldMoneda.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jFormattedTextFieldMonedaActionPerformed(evt);
-            }
-        });
         jPanel1.add(jFormattedTextFieldMoneda);
 
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
@@ -99,6 +131,11 @@ public class DineroLiquidacionExtra extends javax.swing.JDialog {
 
         jFormattedTextFieldVales.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jFormattedTextFieldVales.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jFormattedTextFieldVales.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jFormattedTextFieldValesFocusLost(evt);
+            }
+        });
         jFormattedTextFieldVales.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFormattedTextFieldValesActionPerformed(evt);
@@ -112,6 +149,11 @@ public class DineroLiquidacionExtra extends javax.swing.JDialog {
 
         jFormattedTextFieldEfectivo.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         jFormattedTextFieldEfectivo.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jFormattedTextFieldEfectivo.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jFormattedTextFieldEfectivoFocusLost(evt);
+            }
+        });
         jFormattedTextFieldEfectivo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jFormattedTextFieldEfectivoActionPerformed(evt);
@@ -122,6 +164,14 @@ public class DineroLiquidacionExtra extends javax.swing.JDialog {
         jLabel5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         jLabel5.setText("  Cuenta Papa");
         jPanel1.add(jLabel5);
+
+        jFormattedTextFieldCuentaP.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        jFormattedTextFieldCuentaP.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jFormattedTextFieldCuentaP.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                jFormattedTextFieldCuentaPFocusLost(evt);
+            }
+        });
         jPanel1.add(jFormattedTextFieldCuentaP);
 
         jButton2.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
@@ -132,24 +182,57 @@ public class DineroLiquidacionExtra extends javax.swing.JDialog {
             }
         });
 
+        jLabel6.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel6.setText("Total: ");
+
+        jLabelTotalLiquidacionExtra.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelTotalLiquidacionExtra.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+
+        jLabel8.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel8.setText("Faltante");
+
+        jLabelFaltante.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabelFaltante.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 378, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 378, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel8)
+                            .addComponent(jLabel6))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabelTotalLiquidacionExtra, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabelFaltante, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE))
+                        .addGap(20, 20, 20))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 231, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 220, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabelTotalLiquidacionExtra)
+                    .addComponent(jLabel6))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel8)
+                    .addComponent(jLabelFaltante))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -157,23 +240,34 @@ public class DineroLiquidacionExtra extends javax.swing.JDialog {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         try {
-
-            double[] liquidacionExtra = new double[5];
-            /*cargar el objeto de liquidacion extra*/
-            String sBauches = jFormattedTextFieldBauches.getText().length() == 0? "0.0" : jFormattedTextFieldBauches.getText();
-            String sMoneda = jFormattedTextFieldMoneda.getText().length() == 0? "0.0" : jFormattedTextFieldMoneda.getText();
-            String sVales = (jFormattedTextFieldVales.getText().length() == 0)? "0.0" : jFormattedTextFieldVales.getText();
-            String sEfectivo = jFormattedTextFieldEfectivo.getText().length() == 0? "0.0" : jFormattedTextFieldEfectivo.getText();
-            String sCuentaP = jFormattedTextFieldCuentaP.getText().length() == 0? "0.0" : jFormattedTextFieldCuentaP.getText();
+            double totalFaltante = calcularFaltante();
+            jLabelFaltante.setText("$" + Util.formatearMiles(totalFaltante));
             
+            
+            double[] liquidacionExtra = new double[6];
+            /*cargar el objeto de liquidacion extra*/
+            String sBauches = jFormattedTextFieldBauches.getText().length() == 0 ? "0.0" : jFormattedTextFieldBauches.getText();
+            String sMoneda = jFormattedTextFieldMoneda.getText().length() == 0 ? "0.0" : jFormattedTextFieldMoneda.getText();
+            String sVales = (jFormattedTextFieldVales.getText().length() == 0) ? "0.0" : jFormattedTextFieldVales.getText();
+            String sEfectivo = jFormattedTextFieldEfectivo.getText().length() == 0 ? "0.0" : jFormattedTextFieldEfectivo.getText();
+            String sCuentaP = jFormattedTextFieldCuentaP.getText().length() == 0 ? "0.0" : jFormattedTextFieldCuentaP.getText();
+
             liquidacionExtra[0] = Double.parseDouble(sBauches);
             liquidacionExtra[1] = Double.parseDouble(sMoneda);
             liquidacionExtra[2] = Double.parseDouble(sVales);
             liquidacionExtra[3] = Double.parseDouble(sEfectivo);
             liquidacionExtra[4] = Double.parseDouble(sCuentaP);
+            
+            /*si el faltante es menor a cero, se convierte en saldo a favor*/
+            if(totalFaltante < 0)
+                liquidacionExtra[5] = totalFaltante * (-1);
+            else
+                liquidacionExtra[5] = 0;
 
             /*guardar la informacion*/
+            
             double ingresado = ControllerBO.guardarLiquidacionExtra(liquidacionExtra);
+            
             if (ingresado > 0) {
                 JOptionPane.showMessageDialog(this, "Liquidacion extra insertada de forma correcta.", "Liquidacion Extra", JOptionPane.INFORMATION_MESSAGE);
                 this.dispose();
@@ -185,16 +279,6 @@ public class DineroLiquidacionExtra extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void jFormattedTextFieldBauchesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextFieldBauchesActionPerformed
-        jFormattedTextFieldMoneda.setText("");
-        jFormattedTextFieldMoneda.requestFocusInWindow();
-    }//GEN-LAST:event_jFormattedTextFieldBauchesActionPerformed
-
-    private void jFormattedTextFieldMonedaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextFieldMonedaActionPerformed
-        jFormattedTextFieldVales.setText("");
-        jFormattedTextFieldVales.requestFocusInWindow();
-    }//GEN-LAST:event_jFormattedTextFieldMonedaActionPerformed
-
     private void jFormattedTextFieldValesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextFieldValesActionPerformed
         jFormattedTextFieldEfectivo.setText("");
         jFormattedTextFieldEfectivo.requestFocusInWindow();
@@ -204,6 +288,18 @@ public class DineroLiquidacionExtra extends javax.swing.JDialog {
         jFormattedTextFieldCuentaP.setText("");
         jFormattedTextFieldCuentaP.requestFocusInWindow();
     }//GEN-LAST:event_jFormattedTextFieldEfectivoActionPerformed
+
+    private void jFormattedTextFieldValesFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jFormattedTextFieldValesFocusLost
+        jLabelFaltante.setText("$" + Util.formatearMiles(calcularFaltante()));
+    }//GEN-LAST:event_jFormattedTextFieldValesFocusLost
+
+    private void jFormattedTextFieldEfectivoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jFormattedTextFieldEfectivoFocusLost
+        jLabelFaltante.setText("$" + Util.formatearMiles(calcularFaltante()));
+    }//GEN-LAST:event_jFormattedTextFieldEfectivoFocusLost
+
+    private void jFormattedTextFieldCuentaPFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jFormattedTextFieldCuentaPFocusLost
+        jLabelFaltante.setText("$" + Util.formatearMiles(calcularFaltante()));
+    }//GEN-LAST:event_jFormattedTextFieldCuentaPFocusLost
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -218,6 +314,25 @@ public class DineroLiquidacionExtra extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabelFaltante;
+    private javax.swing.JLabel jLabelTotalLiquidacionExtra;
     private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
+
+    /**
+     * metodo que permite calcular el faltante dependiendo los datos ingresados
+     * por el usuario.
+     *
+     * @return
+     */
+    private double calcularFaltante() {
+        String sVales = (jFormattedTextFieldVales.getText().length() == 0) ? "0.0" : jFormattedTextFieldVales.getText();
+        String sEfectivo = jFormattedTextFieldEfectivo.getText().length() == 0 ? "0.0" : jFormattedTextFieldEfectivo.getText();
+        String sCuentaP = jFormattedTextFieldCuentaP.getText().length() == 0 ? "0.0" : jFormattedTextFieldCuentaP.getText();
+        /*Calcular faltante temporal*/
+        return this.faltante - Double.parseDouble(sVales) - Double.parseDouble(sEfectivo) - Double.parseDouble(sCuentaP);
+    }
+
 }

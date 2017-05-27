@@ -6,6 +6,7 @@
 package co.com.servicentroguerrero.gui;
 
 import co.com.servicentro.util.DocumentTypeDouble;
+import co.com.servicentro.util.EncabezadoResumenExistencias;
 import co.com.servicentro.util.Util;
 import co.com.servicentroguerrero.backup.BackUp;
 import co.com.servicentroguerrero.controler.ControllerBO;
@@ -22,8 +23,6 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.control.ComboBox;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -51,6 +50,22 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
     private static final int DISPENSADOR4 = 0X04;
     private static final int DISPENSADOR5 = 0X05;
     private static final int DISPENSADOR6 = 0X06;
+    
+    
+    /**
+     * Monto total de la liquidacion extra.
+     */
+    private double totalLiquidacionExtra;
+    
+    /**
+     * Monto en moneda ingreado en dinero.
+     */
+    private double totalMoneda;
+    
+    /**
+     * monto en baauches ingresado en dinero.
+     */
+    private double totalBauche;
 
     /**
      * Precio actual de la gasolina corriente.
@@ -93,6 +108,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
      * Referencia al modelo que permite asignar datos a la tablade acpm.
      */
     private DefaultTableModel modelAcpm;
+    
 
     /**
      * Representa el total de dinero liquidado por surtidores y aceites
@@ -178,11 +194,13 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
         /*asignar el modelo a la tabla de resumen de liquidaciones*/
         setTableModelResumenCorriente();
         setTableModelResumenAcpm();
+        setTableModelResumenExistencias();
 
         /*cargar el resumen de liquidaciones en la tabla*/
         cargarResumenLiquidacionesCorriente();
         cargarResumenLiquidacionesAcpm();
-
+        cargarResumenExistenciasSurtidores();
+        cargarEncabezadosResumenExistencias();
     }
 
     /**
@@ -458,6 +476,47 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
         jPanelTableResumeAcpm = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTableResumenAcpm = new javax.swing.JTable();
+        jPanelResumenExistencias = new javax.swing.JPanel();
+        jPanel14 = new javax.swing.JPanel();
+        jPanel12 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel16 = new javax.swing.JLabel();
+        jLabel17 = new javax.swing.JLabel();
+        jTextFieldSurtidor1ResumenVendido = new javax.swing.JTextField();
+        jTextFieldSurtidor1ResumenComprado = new javax.swing.JTextField();
+        jLabel18 = new javax.swing.JLabel();
+        jLabel19 = new javax.swing.JLabel();
+        jTextFieldSurtidor1ResumenExistencia = new javax.swing.JTextField();
+        jLabel20 = new javax.swing.JLabel();
+        jLabelSurtidor1UltimaCalibracion = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTableSurtidor1ResumenExistencia = new javax.swing.JTable();
+        jPanel11 = new javax.swing.JPanel();
+        jPanel15 = new javax.swing.JPanel();
+        jLabel22 = new javax.swing.JLabel();
+        jLabel23 = new javax.swing.JLabel();
+        jTextFieldSurtidor2ResumenVendido = new javax.swing.JTextField();
+        jTextFieldSurtidor2ResumenComprado = new javax.swing.JTextField();
+        jLabel24 = new javax.swing.JLabel();
+        jLabel25 = new javax.swing.JLabel();
+        jTextFieldSurtidor2ResumenExistencia = new javax.swing.JTextField();
+        jLabel26 = new javax.swing.JLabel();
+        jLabelSurtidor2UltimaCalibracion = new javax.swing.JLabel();
+        jScrollPane7 = new javax.swing.JScrollPane();
+        jTableSurtidor2ResumenExistencia = new javax.swing.JTable();
+        jPanel13 = new javax.swing.JPanel();
+        jPanel16 = new javax.swing.JPanel();
+        jLabel28 = new javax.swing.JLabel();
+        jLabel29 = new javax.swing.JLabel();
+        jTextFieldSurtidor3ResumenVendido = new javax.swing.JTextField();
+        jTextFieldSurtidor3ResumenComprado = new javax.swing.JTextField();
+        jLabel30 = new javax.swing.JLabel();
+        jLabel31 = new javax.swing.JLabel();
+        jTextFieldSurtidor3ResumenExistencia = new javax.swing.JTextField();
+        jLabel32 = new javax.swing.JLabel();
+        jLabelSurtidor3UltimaCalibracion = new javax.swing.JLabel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        jTableSurtidor3ResumenExistencia = new javax.swing.JTable();
         jMenuBar = new javax.swing.JMenuBar();
         jMenuArchivo = new javax.swing.JMenu();
         jMenuItemSalir = new javax.swing.JMenuItem();
@@ -1660,7 +1719,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
                 .addComponent(jPanelIngresoDinero, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanelContenedorSurtidores, javax.swing.GroupLayout.PREFERRED_SIZE, 470, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(237, Short.MAX_VALUE))
+                .addContainerGap(440, Short.MAX_VALUE))
         );
 
         jTabbedPane.addTab("Liquidacion", jPanelLiquidacion);
@@ -1733,7 +1792,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
             jPanelTableLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelTableLayout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 533, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 246, Short.MAX_VALUE))
+                .addGap(0, 449, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanelResumenCorrienteLayout = new javax.swing.GroupLayout(jPanelResumenCorriente);
@@ -1835,7 +1894,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
             jPanelTableResumeAcpmLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelTableResumeAcpmLayout.createSequentialGroup()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 533, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 246, Short.MAX_VALUE))
+                .addGap(0, 449, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanelResumenAcpmLayout = new javax.swing.GroupLayout(jPanelResumenAcpm);
@@ -1860,6 +1919,385 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
         );
 
         jTabbedPane.addTab("Resumen ACPM", jPanelResumenAcpm);
+
+        jPanel14.setLayout(new java.awt.GridLayout(3, 1, 3, 3));
+
+        jPanel12.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Surtidor 1", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 12))); // NOI18N
+
+        jLabel16.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel16.setText("Gasolina Corriente");
+
+        jLabel17.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel17.setText("Total Vendido:");
+
+        jTextFieldSurtidor1ResumenVendido.setEditable(false);
+        jTextFieldSurtidor1ResumenVendido.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTextFieldSurtidor1ResumenVendido.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        jTextFieldSurtidor1ResumenVendido.setEnabled(false);
+
+        jTextFieldSurtidor1ResumenComprado.setEditable(false);
+        jTextFieldSurtidor1ResumenComprado.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTextFieldSurtidor1ResumenComprado.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        jTextFieldSurtidor1ResumenComprado.setEnabled(false);
+
+        jLabel18.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel18.setText("Total Comprado:");
+
+        jLabel19.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel19.setText("Existencia actual:");
+
+        jTextFieldSurtidor1ResumenExistencia.setEditable(false);
+        jTextFieldSurtidor1ResumenExistencia.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTextFieldSurtidor1ResumenExistencia.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        jTextFieldSurtidor1ResumenExistencia.setEnabled(false);
+
+        jLabel20.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel20.setText("Ultima Calibracion:");
+
+        jLabelSurtidor1UltimaCalibracion.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextFieldSurtidor1ResumenComprado)
+                            .addComponent(jTextFieldSurtidor1ResumenVendido)
+                            .addComponent(jTextFieldSurtidor1ResumenExistencia)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabelSurtidor1UltimaCalibracion, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addComponent(jLabel16)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel17)
+                    .addComponent(jTextFieldSurtidor1ResumenVendido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextFieldSurtidor1ResumenComprado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel18))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel19)
+                    .addComponent(jTextFieldSurtidor1ResumenExistencia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabelSurtidor1UltimaCalibracion)
+                    .addComponent(jLabel20))
+                .addGap(0, 27, Short.MAX_VALUE))
+        );
+
+        jTableSurtidor1ResumenExistencia.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane3.setViewportView(jTableSurtidor1ResumenExistencia);
+
+        javax.swing.GroupLayout jPanel12Layout = new javax.swing.GroupLayout(jPanel12);
+        jPanel12.setLayout(jPanel12Layout);
+        jPanel12Layout.setHorizontalGroup(
+            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel12Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 947, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel12Layout.setVerticalGroup(
+            jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel12Layout.createSequentialGroup()
+                .addGroup(jPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel12Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        jPanel14.add(jPanel12);
+
+        jPanel11.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Surtidor 2", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 12))); // NOI18N
+
+        jLabel22.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel22.setText("Gasolina Corriente");
+
+        jLabel23.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel23.setText("Total Vendido:");
+
+        jTextFieldSurtidor2ResumenVendido.setEditable(false);
+        jTextFieldSurtidor2ResumenVendido.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTextFieldSurtidor2ResumenVendido.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        jTextFieldSurtidor2ResumenVendido.setEnabled(false);
+        jTextFieldSurtidor2ResumenVendido.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextFieldSurtidor2ResumenVendidoActionPerformed(evt);
+            }
+        });
+
+        jTextFieldSurtidor2ResumenComprado.setEditable(false);
+        jTextFieldSurtidor2ResumenComprado.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTextFieldSurtidor2ResumenComprado.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        jTextFieldSurtidor2ResumenComprado.setEnabled(false);
+
+        jLabel24.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel24.setText("Total Comprado:");
+
+        jLabel25.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel25.setText("Existencia actual:");
+
+        jTextFieldSurtidor2ResumenExistencia.setEditable(false);
+        jTextFieldSurtidor2ResumenExistencia.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTextFieldSurtidor2ResumenExistencia.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        jTextFieldSurtidor2ResumenExistencia.setEnabled(false);
+
+        jLabel26.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel26.setText("Ultima Calibracion:");
+
+        jLabelSurtidor2UltimaCalibracion.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+
+        javax.swing.GroupLayout jPanel15Layout = new javax.swing.GroupLayout(jPanel15);
+        jPanel15.setLayout(jPanel15Layout);
+        jPanel15Layout.setHorizontalGroup(
+            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel15Layout.createSequentialGroup()
+                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel22, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel15Layout.createSequentialGroup()
+                        .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextFieldSurtidor2ResumenComprado)
+                            .addComponent(jTextFieldSurtidor2ResumenVendido)
+                            .addComponent(jTextFieldSurtidor2ResumenExistencia)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel15Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jLabel26, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabelSurtidor2UltimaCalibracion, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        jPanel15Layout.setVerticalGroup(
+            jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel15Layout.createSequentialGroup()
+                .addComponent(jLabel22)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel23)
+                    .addComponent(jTextFieldSurtidor2ResumenVendido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextFieldSurtidor2ResumenComprado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel24))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel25)
+                    .addComponent(jTextFieldSurtidor2ResumenExistencia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel26, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabelSurtidor2UltimaCalibracion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(0, 24, Short.MAX_VALUE))
+        );
+
+        jTableSurtidor2ResumenExistencia.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane7.setViewportView(jTableSurtidor2ResumenExistencia);
+
+        javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
+        jPanel11.setLayout(jPanel11Layout);
+        jPanel11Layout.setHorizontalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel11Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 947, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel11Layout.setVerticalGroup(
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel11Layout.createSequentialGroup()
+                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel11Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        jPanel14.add(jPanel11);
+
+        jPanel13.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Surtidor 3", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 12))); // NOI18N
+
+        jLabel28.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel28.setText("ACPM");
+
+        jLabel29.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel29.setText("Total Vendido:");
+
+        jTextFieldSurtidor3ResumenVendido.setEditable(false);
+        jTextFieldSurtidor3ResumenVendido.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTextFieldSurtidor3ResumenVendido.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        jTextFieldSurtidor3ResumenVendido.setEnabled(false);
+
+        jTextFieldSurtidor3ResumenComprado.setEditable(false);
+        jTextFieldSurtidor3ResumenComprado.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTextFieldSurtidor3ResumenComprado.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        jTextFieldSurtidor3ResumenComprado.setEnabled(false);
+
+        jLabel30.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel30.setText("Total Comprado:");
+
+        jLabel31.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel31.setText("Existencia actual:");
+
+        jTextFieldSurtidor3ResumenExistencia.setEditable(false);
+        jTextFieldSurtidor3ResumenExistencia.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jTextFieldSurtidor3ResumenExistencia.setDisabledTextColor(new java.awt.Color(0, 0, 0));
+        jTextFieldSurtidor3ResumenExistencia.setEnabled(false);
+
+        jLabel32.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel32.setText("Ultima Calibracion:");
+
+        jLabelSurtidor3UltimaCalibracion.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+
+        javax.swing.GroupLayout jPanel16Layout = new javax.swing.GroupLayout(jPanel16);
+        jPanel16.setLayout(jPanel16Layout);
+        jPanel16Layout.setHorizontalGroup(
+            jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel16Layout.createSequentialGroup()
+                .addGroup(jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel28, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel16Layout.createSequentialGroup()
+                        .addGroup(jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel29, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel30, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel31, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextFieldSurtidor3ResumenComprado)
+                            .addComponent(jTextFieldSurtidor3ResumenVendido)
+                            .addComponent(jTextFieldSurtidor3ResumenExistencia)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel16Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jLabel32, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabelSurtidor3UltimaCalibracion, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        jPanel16Layout.setVerticalGroup(
+            jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel16Layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(jLabel28)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel29)
+                    .addComponent(jTextFieldSurtidor3ResumenVendido, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jTextFieldSurtidor3ResumenComprado, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel30))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel31)
+                    .addComponent(jTextFieldSurtidor3ResumenExistencia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9)
+                .addGroup(jPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel32)
+                    .addComponent(jLabelSurtidor3UltimaCalibracion))
+                .addGap(0, 39, Short.MAX_VALUE))
+        );
+
+        jTableSurtidor3ResumenExistencia.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane8.setViewportView(jTableSurtidor3ResumenExistencia);
+
+        javax.swing.GroupLayout jPanel13Layout = new javax.swing.GroupLayout(jPanel13);
+        jPanel13.setLayout(jPanel13Layout);
+        jPanel13Layout.setHorizontalGroup(
+            jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel13Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel16, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 947, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        jPanel13Layout.setVerticalGroup(
+            jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel13Layout.createSequentialGroup()
+                .addGroup(jPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+
+        jPanel14.add(jPanel13);
+
+        javax.swing.GroupLayout jPanelResumenExistenciasLayout = new javax.swing.GroupLayout(jPanelResumenExistencias);
+        jPanelResumenExistencias.setLayout(jPanelResumenExistenciasLayout);
+        jPanelResumenExistenciasLayout.setHorizontalGroup(
+            jPanelResumenExistenciasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelResumenExistenciasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanelResumenExistenciasLayout.setVerticalGroup(
+            jPanelResumenExistenciasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelResumenExistenciasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel14, javax.swing.GroupLayout.PREFERRED_SIZE, 625, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(449, Short.MAX_VALUE))
+        );
+
+        jTabbedPane.addTab("Resumen Existencias", jPanelResumenExistencias);
 
         jMenuArchivo.setText("Archivo");
 
@@ -2730,6 +3168,10 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
         jFrameGenerarReporteExtra.setVisible(true);
     }//GEN-LAST:event_jMenuItemExtraLiquidacionActionPerformed
 
+    private void jTextFieldSurtidor2ResumenVendidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextFieldSurtidor2ResumenVendidoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextFieldSurtidor2ResumenVendidoActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonGuardarLiquidacion;
@@ -2742,8 +3184,23 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
+    private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
+    private javax.swing.JLabel jLabel22;
+    private javax.swing.JLabel jLabel23;
+    private javax.swing.JLabel jLabel24;
+    private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel26;
+    private javax.swing.JLabel jLabel28;
+    private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel30;
+    private javax.swing.JLabel jLabel31;
+    private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -2795,6 +3252,9 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
     private javax.swing.JLabel jLabelS3D2Recibido;
     private javax.swing.JLabel jLabelS3D2TotalDinero;
     private javax.swing.JLabel jLabelS3D2TotalDineroCalculado;
+    private javax.swing.JLabel jLabelSurtidor1UltimaCalibracion;
+    private javax.swing.JLabel jLabelSurtidor2UltimaCalibracion;
+    private javax.swing.JLabel jLabelSurtidor3UltimaCalibracion;
     private javax.swing.JLabel jLabelTotalAceites;
     private javax.swing.JLabel jLabelTotalAcpm;
     private javax.swing.JLabel jLabelTotalGalonesCorriente;
@@ -2819,8 +3279,15 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
     private javax.swing.JMenuItem jMenuItemSalir;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
@@ -2840,6 +3307,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
     private javax.swing.JPanel jPanelResumenAcpm;
     private javax.swing.JPanel jPanelResumenAcpmGeneral;
     private javax.swing.JPanel jPanelResumenCorriente;
+    private javax.swing.JPanel jPanelResumenExistencias;
     private javax.swing.JPanel jPanelResumenLiquidacion;
     private javax.swing.JPanel jPanelS1D1DiferenciaDinero;
     private javax.swing.JPanel jPanelS1D1Entregado;
@@ -2896,10 +3364,16 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
     private javax.swing.JPanel jPanelTableResumeAcpm;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTabbedPane jTabbedPane;
     private javax.swing.JTable jTableResumenAcpm;
     private javax.swing.JTable jTableResumenLiquidacion;
+    private javax.swing.JTable jTableSurtidor1ResumenExistencia;
+    private javax.swing.JTable jTableSurtidor2ResumenExistencia;
+    private javax.swing.JTable jTableSurtidor3ResumenExistencia;
     private javax.swing.JTextField jTextFieldCompraCombustibleSurtidor1;
     private javax.swing.JTextField jTextFieldCompraCombustibleSurtidor2;
     private javax.swing.JTextField jTextFieldCompraCombustibleSurtidor3;
@@ -2947,6 +3421,15 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
     private javax.swing.JTextField jTextFieldS3D2Recibido;
     private javax.swing.JTextField jTextFieldS3D2TotalDinero;
     private javax.swing.JTextField jTextFieldS3D2TotalDineroCalculado;
+    private javax.swing.JTextField jTextFieldSurtidor1ResumenComprado;
+    private javax.swing.JTextField jTextFieldSurtidor1ResumenExistencia;
+    private javax.swing.JTextField jTextFieldSurtidor1ResumenVendido;
+    private javax.swing.JTextField jTextFieldSurtidor2ResumenComprado;
+    private javax.swing.JTextField jTextFieldSurtidor2ResumenExistencia;
+    private javax.swing.JTextField jTextFieldSurtidor2ResumenVendido;
+    private javax.swing.JTextField jTextFieldSurtidor3ResumenComprado;
+    private javax.swing.JTextField jTextFieldSurtidor3ResumenExistencia;
+    private javax.swing.JTextField jTextFieldSurtidor3ResumenVendido;
     private javax.swing.JTextField jTextFieldTotalCombustibles;
     private javax.swing.JTextField jTextFieldTotalLiquidado;
     private javax.swing.JTextField jTextFieldVentasAceites;
@@ -2993,8 +3476,10 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
     }
 
     @Override
-    public void dineroIngresado(double totalDineroIngresado) {
+    public void dineroIngresado(double totalDineroIngresado, double moneda, double bauches) {
         this.totalDineroIngresado = totalDineroIngresado;
+        this.totalMoneda = moneda;
+        this.totalBauche = bauches;
         mostrarDineroIngresado();
     }
 
@@ -3210,10 +3695,10 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
             if (liquidacionDispensador.getNumeroEntregado() == 0) {
                 throw new Exception("Hay liquidaciones con numero entregado no validos!.\nVerifique los datos de liquidacion.");
             }
-            if (liquidacionDispensador.getGalones() == 0) {
+            if (liquidacionDispensador.getGalones() < 0) {
                 throw new Exception("Hay liquidaciones con galones no validos!.\nVerifique los datos de liquidacion.");
             }
-            if (liquidacionDispensador.getDineroEntregado() == 0) {
+            if (liquidacionDispensador.getDineroEntregado() < 0) {
                 throw new Exception("Hay liquidaciones con dinero entregado no validos!.\nVerifique los datos de liquidacion.");
             }
         }
@@ -3316,6 +3801,9 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
 
         /*Total de dinero entregado por liquidacion de combustibles*/
         double totalCombustibles = 0;
+        
+        /*Total de dinero entregado por concepto de combustible ACPM*/
+        double totalAcpm = 0;
 
         /*Conservar el movimiento de salida de combustibles de cada surtidor*/
         double galonesVendidosSurtidor1 = 0;
@@ -3351,9 +3839,10 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
 
             if (liquidacionDispensador.getIdSurtidor() == SURTIDOR3) {
                 galonesVendidosSurtidor3 += liquidacionDispensador.getGalones();
+                totalAcpm += liquidacionDispensador.getDineroEntregado();
             }
         }
-
+        
         /*calcular movimiento de existencias de combustibles*/
         ArrayList<Existencias> listaExistencias = ControllerBO.cargarExistenciasDeCombustible();
         {
@@ -3361,29 +3850,37 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
             double comprasSurtidor1 = Double.parseDouble(jTextFieldCompraCombustibleSurtidor1.getText().trim());
             double comprasSurtidor2 = Double.parseDouble(jTextFieldCompraCombustibleSurtidor2.getText().trim());
             double comprasSurtidor3 = Double.parseDouble(jTextFieldCompraCombustibleSurtidor3.getText().trim());
-
+            double calibracionSurtidor1 = ControllerBO.cargarGalonesUsadosCalibracion(SURTIDOR1);
+            double calibracionSurtidor2 = ControllerBO.cargarGalonesUsadosCalibracion(SURTIDOR2);
+            double calibracionSurtidor3 = ControllerBO.cargarGalonesUsadosCalibracion(SURTIDOR3);
+            
             /*realizar movimientos de entrada y salida de galones de combustibles*/
             for (Existencias existencia : listaExistencias) {
                 if (existencia.getIdSurtidor() == SURTIDOR1) {
                     existencia.setGalonesComprados(comprasSurtidor1);
                     existencia.setGalonesVendidos(galonesVendidosSurtidor1);
-                    existencia.setGalonesExistentes(existencia.getMedidaGalonesInicial() + comprasSurtidor1 - galonesVendidosSurtidor1);
+                    existencia.setGalonesExistentes(existencia.getMedidaGalonesInicial() + comprasSurtidor1 - galonesVendidosSurtidor1 + calibracionSurtidor1);
                 }
 
                 if (existencia.getIdSurtidor() == SURTIDOR2) {
                     existencia.setGalonesComprados(comprasSurtidor2);
                     existencia.setGalonesVendidos(galonesVendidosSurtidor2);
-                    existencia.setGalonesExistentes(existencia.getMedidaGalonesInicial() + comprasSurtidor2 - galonesVendidosSurtidor2);
+                    existencia.setGalonesExistentes(existencia.getMedidaGalonesInicial() + comprasSurtidor2 - galonesVendidosSurtidor2 + calibracionSurtidor2);
                 }
 
                 if (existencia.getIdSurtidor() == SURTIDOR3) {
                     existencia.setGalonesComprados(comprasSurtidor3);
                     existencia.setGalonesVendidos(galonesVendidosSurtidor3);
-                    existencia.setGalonesExistentes(existencia.getMedidaGalonesInicial() + comprasSurtidor3 - galonesVendidosSurtidor3);
+                    existencia.setGalonesExistentes(existencia.getMedidaGalonesInicial() + comprasSurtidor3 - galonesVendidosSurtidor3 + calibracionSurtidor3);
                 }
             }
         }
 
+        /*Calcular el total de liquidacion extra*/
+        {
+            this.totalLiquidacionExtra = totalAceites + totalAcpm;
+        }
+        
         /*crear el worker encargado de crear los hilos para insercion*/
         WorkerBO worked = new WorkerBO(empleadoLiquidador.getIdEmpleado(),
                 totalCombustibles,
@@ -3399,6 +3896,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
         cargarResumenLiquidacionesCorriente();
         cargarResumenLiquidacionesAcpm();
         mostrarDialogLiquidacionExtra();
+        
     }
 
     /**
@@ -3523,6 +4021,8 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
         /*cargar el resumen de liquidaciones en la tabla*/
         cargarResumenLiquidacionesCorriente();
         cargarResumenLiquidacionesAcpm();
+        cargarResumenExistenciasSurtidores();
+        cargarEncabezadosResumenExistencias();
 
     }
 
@@ -3530,7 +4030,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
      * Mostrar el dialog para registrar la informacion de la liquidacion extra.
      */
     private void mostrarDialogLiquidacionExtra() {
-        DineroLiquidacionExtra dialog = new DineroLiquidacionExtra(new javax.swing.JFrame(), true);
+        DineroLiquidacionExtra dialog = new DineroLiquidacionExtra(new javax.swing.JFrame(), true, this.totalMoneda, this.totalBauche, this.totalLiquidacionExtra);
         dialog.setLocationRelativeTo(this);
         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -3539,5 +4039,113 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
             }
         });
         dialog.setVisible(true);
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+     /**
+     * Definir el modelo de la tabla de resumen de liquidaciones en corriente
+     */
+    private void setTableModelResumenExistencias() {
+        
+         ControllerBO.cargarListaSurtidores().forEach(surtidor -> {
+            
+             /*Crear el modelo solo si no se ha asignado uno antes.*/             
+            DefaultTableModel modelResumenExistencias = new DefaultTableModel(
+                    new Object[][]{},
+                    new String[]{"Comprado (gls)", "Vendido (gls)", "Existencia (gls)", "Medida Regla (gls)", "Diferencia (gls)", "Fecha"}
+            ) {
+                /*Inpedir que se puedan editar los valores ingresados, false por cada columna*/
+                boolean[] canEdit = new boolean[]{
+                    false, false, false, false, false, false
+                };
+
+                @Override
+                public boolean isCellEditable(int rowIndex, int columnIndex) {
+                    return canEdit[columnIndex];
+                }
+            };
+            switch (surtidor.getIdSurtidor()) {
+                case SURTIDOR1:
+                    jTableSurtidor1ResumenExistencia.setModel(modelResumenExistencias);
+                    break;
+                case SURTIDOR2:
+                    jTableSurtidor2ResumenExistencia.setModel(modelResumenExistencias);
+                    break;
+                case SURTIDOR3:
+                    jTableSurtidor3ResumenExistencia.setModel(modelResumenExistencias);
+                    break;
+            }
+        });
+    }
+    
+    
+    /**
+     * Cargar el resumen de liquidaciones ejecutadas a la fecha actual
+     * para el resumen de existencias del surtidor 1
+     */
+    private void cargarResumenExistenciasSurtidores() {
+        /*cargar tablas para cada surtidor*/
+        ControllerBO.cargarListaSurtidores().forEach(surtidor -> {
+
+            DefaultTableModel modelResumenExistencias;
+            /*Crear el modelo solo si no se ha asignado uno antes.*/
+            switch (surtidor.getIdSurtidor()) {
+                case SURTIDOR1:
+                    modelResumenExistencias = (DefaultTableModel) jTableSurtidor1ResumenExistencia.getModel();
+                    for (Iterator<Object[]> it = ControllerBO.cargarResumenExistencias(surtidor.getIdSurtidor()).iterator(); it.hasNext();) {
+                        modelResumenExistencias.addRow(it.next());
+                    }
+                    break;
+                case SURTIDOR2:
+                    modelResumenExistencias = (DefaultTableModel) jTableSurtidor2ResumenExistencia.getModel();
+                    for (Iterator<Object[]> it = ControllerBO.cargarResumenExistencias(surtidor.getIdSurtidor()).iterator(); it.hasNext();) {
+                        modelResumenExistencias.addRow(it.next());
+                    }
+                    break;
+                case SURTIDOR3:
+                    modelResumenExistencias = (DefaultTableModel) jTableSurtidor3ResumenExistencia.getModel();
+                    for (Iterator<Object[]> it = ControllerBO.cargarResumenExistencias(surtidor.getIdSurtidor()).iterator(); it.hasNext();) {
+                        modelResumenExistencias.addRow(it.next());
+                    }
+                    break;
+            }
+        });
+    }
+    
+    
+    /**
+     * Mostrar encabzados de resumen de existencias por surtidor
+     */
+    private void cargarEncabezadosResumenExistencias(){
+        for (EncabezadoResumenExistencias encabezadoResumen : ControllerBO.cargarEncabezadoResumenExistencias()) {
+             switch (encabezadoResumen.getIdSurtidor()) {
+                case SURTIDOR1:
+                    jTextFieldSurtidor1ResumenVendido.setText(Util.formatearMiles(encabezadoResumen.getVendido()) + " gls");
+                    jTextFieldSurtidor1ResumenComprado.setText(Util.formatearMiles(encabezadoResumen.getComprado()) + " gls");
+                    jTextFieldSurtidor1ResumenExistencia.setText(Util.formatearMiles(encabezadoResumen.getEnExistencias()) + " gls");
+                    jLabelSurtidor1UltimaCalibracion.setText(Util.formatoTextoFecha(encabezadoResumen.getCalibracion().getFecha()));
+                    break;
+                case SURTIDOR2:
+                    jTextFieldSurtidor2ResumenVendido.setText(Util.formatearMiles(encabezadoResumen.getVendido()) + " gls");
+                    jTextFieldSurtidor2ResumenComprado.setText(Util.formatearMiles(encabezadoResumen.getComprado()) + " gls");
+                    jTextFieldSurtidor2ResumenExistencia.setText(Util.formatearMiles(encabezadoResumen.getEnExistencias()) + " gls");
+                    jLabelSurtidor2UltimaCalibracion.setText(Util.formatoTextoFecha(encabezadoResumen.getCalibracion().getFecha()));
+                    
+                    break;
+                case SURTIDOR3:
+                    jTextFieldSurtidor3ResumenVendido.setText(Util.formatearMiles(encabezadoResumen.getVendido()) + " gls");
+                    jTextFieldSurtidor3ResumenComprado.setText(Util.formatearMiles(encabezadoResumen.getComprado()) + " gls");
+                    jTextFieldSurtidor3ResumenExistencia.setText(Util.formatearMiles(encabezadoResumen.getEnExistencias()) + " gls");
+                    jLabelSurtidor3UltimaCalibracion.setText(Util.formatoTextoFecha(encabezadoResumen.getCalibracion().getFecha()));
+                    break;
+            }
+        }
     }
 }

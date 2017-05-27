@@ -7,6 +7,8 @@ package co.com.servicentroguerrero.controler;
 
 import co.com.formulavolumen.VolumenCombustible;
 import co.com.reports.Reports;
+import co.com.servicentro.util.EncabezadoResumenExistencias;
+import co.com.servicentro.util.ResumenExistencia;
 import co.com.servicentro.util.Util;
 import co.com.servicentroguerrero.backup.BackUp;
 import co.com.servicentroguerrero.model.Model;
@@ -548,6 +550,35 @@ public class ControllerBO {
      */
     public static double guardarLiquidacionExtra(double[] liquidacionExtra) {
         return MODELO.insertarLiquidacionExtra(liquidacionExtra);
+    }
+
+    
+    /**
+     * metodo que permite cargar la informacion de la tabla de resumen de existencias
+     * de combustible de un surtidor
+     * @param idSurtidor
+     * @return 
+     */
+    public static ArrayList<Object[]> cargarResumenExistencias(final int idSurtidor) {
+        return MODELO.generarResumenExistenciasCombustible(idSurtidor);
+    }
+    
+    /**
+     * Cargar los encabzados con los resumenes de existencias de cada surtidor
+     * @return 
+     */
+    public static ArrayList<EncabezadoResumenExistencias> cargarEncabezadoResumenExistencias(){
+        return ResumenExistencia.cargarEncabezadosResumen();
+    }
+
+    
+    /**
+     * Cargar los galones de combustibles usados para la calibracion de un surtidor el dia actual
+     * @param idSurtidor
+     * @return 
+     */
+    public static double cargarGalonesUsadosCalibracion(int idSurtidor) {
+        return MODELO.cargarGalonesUsadosCalibracion(idSurtidor);
     }
 }
 

@@ -16,6 +16,10 @@ public interface IDinero {
      * Metodo para calcular el cambio de dinero ingresado en las ventanas de ingreso de dinero
      * y transferido a la pantalla de liquidacion principal. 
      * @param totalDineroIngresado 
+     * @param moneda monto en monedas para liquidacion extra
+     * @param bauches monto en bauches para liquidacion extra.
      */
-    public void dineroIngresado(double totalDineroIngresado);
+    public void dineroIngresado(double totalDineroIngresado, double moneda, double bauches);
+    
+    
 }

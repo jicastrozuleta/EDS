@@ -39,7 +39,8 @@ public class LiquidacionExtraReport {
                     + "		COALESCE(le.vales, 0), "
                     + "		COALESCE(le.efectivo, 0),"
                     + "         SUM(l.galones),"
-                    + "		COALESCE(le.cuentap, 0) "
+                    + "		COALESCE(le.cuentap, 0), "
+                    + "		COALESCE(le.aFavor, 0) afavor "
                     + "FROM liquidaciondispensador l "
                     + "INNER JOIN liquidaciones lq ON lq.numeroLiquidacion = l.numeroLiquidacion "
                     + "LEFT JOIN liquidacionextra le ON le.numeroLiquidacion = l.numeroLiquidacion "
@@ -64,6 +65,7 @@ public class LiquidacionExtraReport {
                 hashMap.put("efectivo", "$" + Util.formatearMiles(resultSet.getDouble(8)));
                 hashMap.put("glAcpm", Util.formatearMiles(resultSet.getDouble(9)));
                 hashMap.put("cuentap", "$" + Util.formatearMiles(resultSet.getDouble(10)));
+                hashMap.put("afavor", "$" + Util.formatearMiles(resultSet.getDouble(11)));
             }
             
             /*cerrar el resultset */

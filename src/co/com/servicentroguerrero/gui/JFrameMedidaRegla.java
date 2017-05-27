@@ -137,7 +137,7 @@ public class JFrameMedidaRegla extends javax.swing.JFrame {
                 
                 /*Iniciar el calculo del volumen*/
                 double galonesInsertado = ControllerBO.insertarVolumenes(String.valueOf(idSurtidor), medidaRegla);
-                if(galonesInsertado > 0){
+                if(galonesInsertado >= 0){
                     String mensaje = "El volumen registrado para este surtidor es de: " + galonesInsertado + " gls.";
                     JOptionPane.showMessageDialog(this, mensaje, "VOLUMEN CALCULADO", JOptionPane.INFORMATION_MESSAGE);
                     cargarSurtidores();

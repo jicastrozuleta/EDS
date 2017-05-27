@@ -5,6 +5,7 @@
  */
 package co.com.servicentroguerrero.model;
 
+import co.com.servicentro.util.EncabezadoResumenExistencias;
 import co.com.servicentro.util.Util;
 import co.com.servicentroguerrero.conexion.Instance;
 import co.com.servicentroguerrero.modelos.Calibraciones;
@@ -702,17 +703,21 @@ public class Model {
         ArrayList<Existencias> listaExistencias = new ArrayList<>();
         
         /*Query para cargar la lista de existencias del dia.*/
+        
         String query = ""
-                + "SELECT   ROUND((v.volumen * c.volumenFijo),2), "
-                + "         s.idSurtidor,"
-                + "         c.idCilindro "
-                + "FROM volumenes v "
-                + "INNER JOIN cilindros c ON c.idCilindro = v.idCilindro "
+                + "SELECT ROUND(g.existentes,2),"
+                + "	  d.idSurtidor,"
+                + "	  c.idCilindro "
+                + "FROM galones g "
+                + "INNER JOIN cilindros c ON c.idCilindro = g.idCilindro "
                 + "INNER JOIN dispensadores d ON d.idCilindro = c.idCilindro "
-                + "INNER JOIN surtidores s ON s.idSurtidor = d.idSurtidor "
-                + "WHERE DATE(v.fecha) = CURRENT_DATE() "
-                + "GROUP BY s.idSurtidor "
-                + "ORDER BY v.idCilindro;";
+                + "WHERE g.idGalon IN ( "
+                + "	SELECT MAX(idGalon) "
+                + "	FROM GALONES "
+                + "	GROUP BY idCilindro "
+                + ") "
+                + "GROUP BY d.idCilindro "
+                + "ORDER BY d.idCilindro;";
 
         try {
             /*Ejecutar la consulta para obtener el set de datos*/
@@ -1040,7 +1045,9 @@ public class Model {
                     + " '" + liquidacionExtra[1] + "',"
                     + " '" + liquidacionExtra[2] + "',"
                     + " '" + liquidacionExtra[3] + "',"
-                    + " '" + liquidacionExtra[4] + "');";
+                    + " '" + liquidacionExtra[4] + "',"
+                    + " '" + liquidacionExtra[5] + "'"
+                    + ");";
  
             /*Ejecutar la consulta para obtener el set de datos*/
             ResultSet resultSet = Instance.getInstance().executeQuery(insert);
@@ -1054,4 +1061,187 @@ public class Model {
         }
         return validate;
     }
+    
+    
+    /**
+     * cargar la lista de calibraciones mas actualizadas de cada surtidor
+     * @return lista de calibraciones
+     */
+    public ArrayList<Calibraciones> obtenerUltimaCalibracionSurtidor(){
+
+        ArrayList<Calibraciones> listaCalibraciones = new ArrayList<>();
+        try {
+            /*Query para capturar registros*/
+            String insert = ""
+                    + "SELECT 	c.idCalibracion, "
+                    + "		c.idSurtidor, "
+                    + "		c.galonesUsados,  "
+                    + "		MAX(c.fecha), "
+                    + "		c.descripcion "
+                    + "FROM calibraciones c "
+                    + "GROUP BY c.idSurtidor "
+                    + "ORDER BY c.idSurtidor;";
+
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(insert);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                do {                    
+                    listaCalibraciones.add(new Calibraciones(
+                            resultSet.getLong(1),
+                            resultSet.getInt(2),
+                            resultSet.getDouble(3),
+                            resultSet.getString(4),
+                            resultSet.getString(5)
+                    ));
+                } while (resultSet.next());
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        }
+        return listaCalibraciones;
+    }
+
+    
+    /**
+     * Genrar un resumen del movimiento de combustibles que se tienen 
+     * hasta la fecha actual.
+     * @param idSurtidor
+     * @return 
+     */
+    public ArrayList<Object[]> generarResumenExistenciasCombustible(int idSurtidor) {
+         /*lista inicial vacia para conservar los objetos cargados de BD*/
+        ArrayList<Object[]> lista = new ArrayList<>();
+        try {
+            /*Query para cargar la informacion necesaria*/
+            String query = ""
+                    + "SELECT  	comprados,"
+                    + "		vendidos,"
+                    + "		existenciaGalones AS CombustibleAcumulado,"
+                    + "		existenciaRegla AS medidaRegla,"
+                    + "		diferencia,"
+                    + "		fecha "
+                    + "from view_control_existencias "
+                    + "where surtidor = " + idSurtidor + " "
+                    + "ORDER BY fecha;";
+ 
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(query);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                do {
+                    /*llenar la lista con los datos obtenidos*/
+                    lista.add(new Object[]{
+                        Util.formatearMiles(resultSet.getDouble(1)),
+                        Util.formatearMiles(resultSet.getDouble(2)),
+                        Util.formatearMiles(resultSet.getDouble(3)),
+                        Util.formatearMiles(resultSet.getDouble(4)),
+                        Util.formatearMiles(resultSet.getDouble(5)),
+                        resultSet.getString(6).trim()                       
+                    });
+                } while (resultSet.next());
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        }
+        return lista;
+    }
+    
+    
+    /**
+     * metodo para cargar la informacion de vendido y comrpado de un surtidor
+     * @param idSurtidor
+     * @param encabezadoResumenExistencias 
+     */
+    public void generarResumenEncabezadoExistencias(int idSurtidor, EncabezadoResumenExistencias encabezadoResumenExistencias) {
+         
+        try {
+            /*Query para cargar la informacion necesaria*/
+            String query = ""
+                    + "SELECT SUM(v.vendidos),"
+                    + "		 SUM(v.comprados) "
+                    + "FROM view_control_existencias v "
+                    + "WHERE v.surtidor = " + idSurtidor + " "
+                    + "GROUP BY v.surtidor;";
+ 
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(query);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                do {
+                    encabezadoResumenExistencias.setVendido(resultSet.getDouble(1));
+                    encabezadoResumenExistencias.setComprado(resultSet.getDouble(2));                    
+                } while (resultSet.next());
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        }
+    }
+
+    /**
+     * metodo que permite calcular la cantidad de combustible en existencia actualmente.
+     * @param idSurtidor
+     * @return 
+     */
+    public double calcularExistenciaActualSurtidor(int idSurtidor) {
+        double existencia = 0;
+        try {
+            /*Query para actualizar el registro*/
+            String insert = ""
+                    + "SELECT g.existentes "
+                    + "FROM galones g "
+                    + "INNER JOIN ( "
+                    + "	SELECT MAX(idGalon) id "
+                    + "	FROM galones "
+                    + "	GROUP BY idCilindro "
+                    + ") b ON b.id = g.idGalon "
+                    + "WHERE g.idCilindro = " + idSurtidor + ";";
+ 
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(insert);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                existencia = resultSet.getDouble(1);
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        }
+        return existencia;
+    }
+
+    
+    /**
+     * consultar los galones usados en la calibracion de un surtidor.
+     * @param idSurtidor
+     * @return 
+     */
+    public double cargarGalonesUsadosCalibracion(int idSurtidor) {
+        
+        double existencia = 0;
+        try {
+            /*Query para actualizar el registro*/
+            String insert = ""
+                    + "SELECT galonesUsados "
+                    + "FROM calibraciones "
+                    + "WHERE DATE_FORMAT(fecha,'%Y-%m-%d') = DATE_FORMAT(CURRENT_DATE(),'%Y-%m-%d') "
+                    + "AND idSurtidor = " + idSurtidor + " LIMIT 1;";
+ 
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(insert);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                existencia = resultSet.getDouble(1);
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        }
+        return existencia;
+    }
+
+   
 }
