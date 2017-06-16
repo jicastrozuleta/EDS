@@ -7,7 +7,6 @@ package co.com.servicentroguerrero.controler;
 
 import co.com.servicentroguerrero.modelos.Existencias;
 import co.com.servicentroguerrero.modelos.Liquidacion;
-import co.com.servicentroguerrero.modelos.LiquidacionDispensador;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JProgressBar;
@@ -147,5 +146,4 @@ public class WorkerBO extends SwingWorker<Boolean, String> {
     public void setProgressBar(JProgressBar progressBar) {
         this.progressBar = progressBar;
     }
-
 }

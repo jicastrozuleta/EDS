@@ -11,4 +11,5 @@ package co.com.servicentroguerrero.gui;
  */
 public interface IRefresh {
     public void refrescarVentanaLiquidacion();
+    public void finalizarLiquidacion();
 }

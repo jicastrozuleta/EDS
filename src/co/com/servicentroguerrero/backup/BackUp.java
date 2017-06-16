@@ -49,8 +49,8 @@ public class BackUp {
      * MYSQL_32 = "C:\\mysql\\bin\\"
      * 
      */
-     private static final String MYSQLDUMP_PATH = "C:\\Program Files (x86)\\MariaDB 10.1\\bin";
-    //private static final String MYSQLDUMP_PATH = "C:\\Program Files\\MariaDB 10.1\\bin\\";
+//     private static final String MYSQLDUMP_PATH = "C:\\Program Files (x86)\\MariaDB 10.1\\bin";
+    private static final String MYSQLDUMP_PATH = "C:\\Program Files\\MariaDB 10.1\\bin\\";
     
    
     

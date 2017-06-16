@@ -34,7 +34,9 @@ public class DineroLiquidacionExtra extends javax.swing.JDialog {
     /**
      * Faltante para completar la liquidacion extra.
      */
-    private double faltante;
+    private final double faltante;
+    
+    private IRefresh iRefresh;
 
     /**
      * Creates new form DineroLiquidacionExtra
@@ -44,10 +46,13 @@ public class DineroLiquidacionExtra extends javax.swing.JDialog {
      * @param moneda
      * @param bauches
      * @param totalLiquidacionExtra
+     * @param refresh
      */
-    public DineroLiquidacionExtra(java.awt.Frame parent, boolean modal, double moneda, double bauches, double totalLiquidacionExtra) {
+    public DineroLiquidacionExtra(java.awt.Frame parent, boolean modal, double moneda, double bauches, double totalLiquidacionExtra, IRefresh refresh) {
         super(parent, modal);
         initComponents();
+        
+        this.iRefresh = refresh;
 
         /*Cantidades precalculadas en el ingreso de dinero.*/
         this.moneda = moneda;
@@ -271,6 +276,7 @@ public class DineroLiquidacionExtra extends javax.swing.JDialog {
             if (ingresado > 0) {
                 JOptionPane.showMessageDialog(this, "Liquidacion extra insertada de forma correcta.", "Liquidacion Extra", JOptionPane.INFORMATION_MESSAGE);
                 this.dispose();
+                this.iRefresh.finalizarLiquidacion();
             } else {
                 throw new HeadlessException("No se registro la liquidacion extra. Intente nuevamente.");
             }

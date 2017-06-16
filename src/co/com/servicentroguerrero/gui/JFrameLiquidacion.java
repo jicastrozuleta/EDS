@@ -159,6 +159,14 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
      */
     private JFrameGenerarReporteExtra jFrameGenerarReporteExtra;
 
+    
+    /**
+     * Objeto que representa la ventana para generar el reporte mensual
+     * ACPM.
+     */
+    private JFrameGenerarReporteResumenMensualAcpm jFrameGenerarReporteResumenMensualAcpm;
+    
+    
     /**
      * Creates new form JFrameLiquidacion
      *
@@ -531,6 +539,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
         jMenuItemMedicionRegla = new javax.swing.JMenuItem();
         jMenuItemExtraLiquidacion = new javax.swing.JMenuItem();
         jMenuItemGenerarReporteDiario = new javax.swing.JMenuItem();
+        jMenuItemReporteMensualAcpm = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
         jMenuItemActualizarPreciosVenta = new javax.swing.JMenuItem();
         jMenuItemActualizarPrecioPlanta = new javax.swing.JMenuItem();
@@ -2385,6 +2394,14 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
         });
         jMenuHerramientas.add(jMenuItemGenerarReporteDiario);
 
+        jMenuItemReporteMensualAcpm.setText("Reporte Mensual ACPM");
+        jMenuItemReporteMensualAcpm.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemReporteMensualAcpmActionPerformed(evt);
+            }
+        });
+        jMenuHerramientas.add(jMenuItemReporteMensualAcpm);
+
         jMenuBar.add(jMenuHerramientas);
 
         jMenu1.setText("Precios");
@@ -2430,7 +2447,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItemSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemSalirActionPerformed
-        System.exit(0);
+        mostrarDialogResumenExistencias();
     }//GEN-LAST:event_jMenuItemSalirActionPerformed
 
     private void jMenuItemRestaurarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemRestaurarActionPerformed
@@ -3172,6 +3189,14 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextFieldSurtidor2ResumenVendidoActionPerformed
 
+    private void jMenuItemReporteMensualAcpmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemReporteMensualAcpmActionPerformed
+        if (jFrameGenerarReporteResumenMensualAcpm == null) {
+            jFrameGenerarReporteResumenMensualAcpm = new JFrameGenerarReporteResumenMensualAcpm();
+        }
+        jFrameGenerarReporteResumenMensualAcpm.setLocationRelativeTo(this);
+        jFrameGenerarReporteResumenMensualAcpm.setVisible(true);
+    }//GEN-LAST:event_jMenuItemReporteMensualAcpmActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonGuardarLiquidacion;
@@ -3275,6 +3300,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
     private javax.swing.JMenuItem jMenuItemExtraLiquidacion;
     private javax.swing.JMenuItem jMenuItemGenerarReporteDiario;
     private javax.swing.JMenuItem jMenuItemMedicionRegla;
+    private javax.swing.JMenuItem jMenuItemReporteMensualAcpm;
     private javax.swing.JMenuItem jMenuItemRestaurar;
     private javax.swing.JMenuItem jMenuItemSalir;
     private javax.swing.JPanel jPanel1;
@@ -4030,7 +4056,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
      * Mostrar el dialog para registrar la informacion de la liquidacion extra.
      */
     private void mostrarDialogLiquidacionExtra() {
-        DineroLiquidacionExtra dialog = new DineroLiquidacionExtra(new javax.swing.JFrame(), true, this.totalMoneda, this.totalBauche, this.totalLiquidacionExtra);
+        DineroLiquidacionExtra dialog = new DineroLiquidacionExtra(new javax.swing.JFrame(), true, this.totalMoneda, this.totalBauche, this.totalLiquidacionExtra, this);
         dialog.setLocationRelativeTo(this);
         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -4147,5 +4173,56 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
                     break;
             }
         }
+    }
+    
+    
+    /**
+     * Metodo para mostrar el resumen de existencias, antes de terminar el servicio de liquidacion
+     */
+    private void mostrarDialogResumenExistencias() {
+
+        double existenciaCorriente = 0;
+        double existenciaSurtidor1 = 0;
+        double existenciaSurtidor2 = 0;
+        double existenciaAcpm = 0;
+
+        for (EncabezadoResumenExistencias encabezadoResumen : ControllerBO.cargarEncabezadoResumenExistencias()) {
+            switch (encabezadoResumen.getIdSurtidor()) {
+                case SURTIDOR1:
+                    existenciaSurtidor1 = encabezadoResumen.getEnExistencias();
+                    existenciaCorriente += existenciaSurtidor1;
+                    break;
+
+                case SURTIDOR2:
+                    existenciaSurtidor2 = encabezadoResumen.getEnExistencias();
+                    existenciaCorriente += existenciaSurtidor2;
+                    break;
+
+                case SURTIDOR3:
+                    existenciaAcpm = encabezadoResumen.getEnExistencias();
+                    break;
+            }
+        }
+        String mensaje = 
+                "<html>"
+                + "<h3>"
+                + "<b>  RESUMEN EXISTENCIAS   </b>"
+                + "</h3>"
+                + "<p>"
+                + "<br><b>Gasolina Corriente: " + Util.formatearMiles(existenciaCorriente) + " Gls.</b>"
+                + "<br>  Surtidor 1 corriente: " + Util.formatearMiles(existenciaSurtidor1) + " Gls."
+                + "<br>  Surtidor 2 corriente: " + Util.formatearMiles(existenciaSurtidor2) + " Gls."
+                + "<br><b>ACPM: " + Util.formatearMiles(existenciaAcpm) + " Gls.</b> "
+                + "</p>"
+                + "</html>";
+        int input = JOptionPane.showOptionDialog(this, mensaje, "Liquidacion Terminada", JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE, null, new Object[] { "Aceptar"}, "Aceptar");
+        if (input == JOptionPane.OK_OPTION || input == JOptionPane.DEFAULT_OPTION) {
+            System.exit(0);
+        }
+    }
+
+    @Override
+    public void finalizarLiquidacion() {
+        mostrarDialogResumenExistencias();
     }
 }

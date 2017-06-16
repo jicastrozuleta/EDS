@@ -22,7 +22,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -1011,7 +1010,7 @@ public class Model {
             String query = ""
                     + "SELECT COUNT(1) "
                     + "FROM liquidaciones l "
-                    + "WHERE DATEDIFF(DATE_FORMAT(CURRENT_DATE(),'%Y%m%d'), DATE_FORMAT(l.fechaLiquidacion,'%Y%m%d')) = 0;";
+                    + "WHERE DATEDIFF(DATE_FORMAT(DATE_ADD(CURRENT_DATE(),INTERVAL -1 DAY),'%Y%m%d'), DATE_FORMAT(l.fechaLiquidacion,'%Y%m%d')) = 0;";
  
             /*Ejecutar la consulta para obtener el set de datos*/
             ResultSet resultSet = Instance.getInstance().executeQuery(query);

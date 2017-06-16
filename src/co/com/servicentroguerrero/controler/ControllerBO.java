@@ -23,7 +23,10 @@ import co.com.servicentroguerrero.modelos.Rol;
 import co.com.servicentroguerrero.modelos.Surtidores;
 import co.com.servicentroguerrero.modelos.Volumenes;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Controlador donde se valida la logica de negocio para comunicacion entre BD y
@@ -438,6 +441,27 @@ public class ControllerBO {
         Reports reports = new Reports();
         reports.liquidacionExtraToPDF(fechaReporte);
     }
+    
+    
+    /**
+     * generar el reporte de liquidacion diaria de la fecha seleccioanda
+     *
+     * @param fechaReporte fecha del reporte.
+     * @throws Exception si se genera algun error generando el reporte
+     */
+    public static void generarReporteMensualAcpm(final String fechaReporte) throws Exception {
+        if (fechaReporte == null || fechaReporte.length() == 0) {
+            throw new Exception("Ingrese la fecha para generar el reporte.");
+        }
+        
+        /*Formatear fecha a año y mes*/
+        SimpleDateFormat formateador = new SimpleDateFormat("yyyy-MM", new Locale("es", "CO"));
+        Date date =  formateador.parse(fechaReporte);
+        String fechaFormato = formateador.format(date);
+        /*Iniciar la ejecucion del reporte*/
+        Reports reports = new Reports();
+        reports.reporteMensualAcpmToPDF(fechaFormato);
+    }
 
     /**
      * cargar la existencias de combustible que se han ingresado el dia actual
@@ -581,4 +605,3 @@ public class ControllerBO {
         return MODELO.cargarGalonesUsadosCalibracion(idSurtidor);
     }
 }
-
