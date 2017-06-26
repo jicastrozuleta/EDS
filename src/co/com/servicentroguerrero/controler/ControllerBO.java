@@ -472,6 +472,15 @@ public class ControllerBO {
     public static ArrayList<Existencias> cargarExistenciasDeCombustible() {
         return MODELO.cargarExistenciasDeCombustible();
     }
+    
+    
+    /**
+     * Calcular las mediciones de regla que se han realizado actualemte.
+     * @return las mediciones realizadas al dia actual
+     */
+    public static int medicionesDeReglaRealizadosActualmente(){
+        return MODELO.medicionesDeReglaRealizadosActualmente();
+    }
 
     /**
      * Metodo encargado de realizar el registro de los movimientos de

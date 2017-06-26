@@ -3932,7 +3932,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
      * @return true si ya estan los registros, false en caso contrario.
      */
     private boolean verficarMedidasDeExistenciasActuales() {
-        return (ControllerBO.cargarExistenciasDeCombustible().size() < TOTAL_CILINDROS);
+        return (ControllerBO.medicionesDeReglaRealizadosActualmente() < TOTAL_CILINDROS);
     }
 
     /**
@@ -4212,7 +4212,7 @@ public class JFrameLiquidacion extends javax.swing.JFrame implements IDinero, IR
                 + "<br><b>Gasolina Corriente: " + Util.formatearMiles(existenciaCorriente) + " Gls.</b>"
                 + "<br>  Surtidor 1 corriente: " + Util.formatearMiles(existenciaSurtidor1) + " Gls."
                 + "<br>  Surtidor 2 corriente: " + Util.formatearMiles(existenciaSurtidor2) + " Gls."
-                + "<br><b>ACPM: " + Util.formatearMiles(existenciaAcpm) + " Gls.</b> "
+                + "<br><br><br><b>ACPM: " + Util.formatearMiles(existenciaAcpm) + " Gls.</b> "
                 + "</p>"
                 + "</html>";
         int input = JOptionPane.showOptionDialog(this, mensaje, "Liquidacion Terminada", JOptionPane.OK_OPTION, JOptionPane.INFORMATION_MESSAGE, null, new Object[] { "Aceptar"}, "Aceptar");

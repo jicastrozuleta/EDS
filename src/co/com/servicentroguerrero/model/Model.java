@@ -1242,5 +1242,32 @@ public class Model {
         return existencia;
     }
 
+    /**
+     * 
+     * @return 
+     */
+    public int medicionesDeReglaRealizadosActualmente() {
+
+        int existencia = 0;
+        try {
+            /*Query para actualizar el registro*/
+            String insert = ""
+                    + "SELECT COUNT(idVolumen) "
+                    + "FROM volumenes v "
+                    + "WHERE  DATE_FORMAT(v.fecha,'%Y-%M-%d') = DATE_FORMAT(CURRENT_DATE(),'%Y-%M-%d');";
+
+            /*Ejecutar la consulta para obtener el set de datos*/
+            ResultSet resultSet = Instance.getInstance().executeQuery(insert);
+
+            /*Capturar el resultado de la consulta*/
+            if (resultSet != null && resultSet.first()) {
+                existencia = resultSet.getInt(1);
+            }
+        } catch (SQLException e) {
+            Logger.getLogger(Model.class.getName()).log(Level.SEVERE, e.getMessage(), e);
+        }
+        return existencia;
+    }
+
    
 }
